@@ -39,3 +39,6 @@
 - [ ] Add custom prefix/credential lists editor
 - [ ] Add keyboard shortcuts (Ctrl+Enter to parse)
 - [ ] Add internationalization support
+
+## Bug Fixes
+- [x] Fix React ref warning with Tooltip wrapping Button components

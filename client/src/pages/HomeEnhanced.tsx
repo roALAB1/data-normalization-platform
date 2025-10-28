@@ -201,14 +201,16 @@ export default function HomeEnhanced() {
             <div className="flex items-center gap-4">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleTheme}
-                    className="transition-transform hover:scale-110"
-                  >
-                    {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                  </Button>
+                  <div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleTheme}
+                      className="transition-transform hover:scale-110"
+                    >
+                      {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </Button>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>Toggle dark mode</TooltipContent>
               </Tooltip>
@@ -390,9 +392,9 @@ export default function HomeEnhanced() {
                         <div className="flex flex-wrap gap-2 p-4 bg-muted rounded-lg">
                           {highlightedParts.map((part, idx) => (
                             <Tooltip key={idx}>
-                              <TooltipTrigger>
+                              <TooltipTrigger asChild>
                                 <span
-                                  className={`px-2 py-1 rounded transition-all duration-200 ${
+                                  className={`px-2 py-1 rounded transition-all duration-200 cursor-help ${
                                     part.type === 'first' ? 'bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100' :
                                     part.type === 'middle' ? 'bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-100' :
                                     part.type === 'last' ? 'bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-100' :
