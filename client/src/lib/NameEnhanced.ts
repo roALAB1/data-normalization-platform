@@ -147,7 +147,17 @@ export class NameEnhanced {
       }
     }
 
-    // 2. Multi-person detection
+    // 2. Remove pronouns in parentheses (she/her, he/him, they/them, etc.)
+    // Do this BEFORE multi-person detection to avoid false positives from pronoun slashes
+    const pronounPattern = /\(\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*\)/gi;
+    const pronounMatch = text.match(pronounPattern);
+    if (pronounMatch) {
+      const before = text;
+      text = text.replace(pronounPattern, '').trim();
+      this.recordRepair(before, text, 'pronouns_removed');
+    }
+
+    // 3. Multi-person detection (after pronoun removal)
     if (/\b(&|and)\b|\//i.test(text)) {
       this.recordRepair(originalText, text, 'multi_person_detected');
       this.isValid = false;
@@ -155,15 +165,28 @@ export class NameEnhanced {
       return;
     }
 
-    // 3. Remove pronouns in parentheses (she/her, he/him, they/them, etc.)
-    const pronounPattern = /\(\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*\)/gi;
-    const pronounMatch = text.match(pronounPattern);
-    if (pronounMatch) {
-      text = text.replace(pronounPattern, '').trim();
-      this.recordRepair(originalText, text, 'pronouns_removed');
+    // 4. Remove credential modifiers in parentheses like (ABD), (c), (ret.)
+    const modifierPattern = /\(\s*(ABD|c|ret\.?|retired|candidate|cand\.)\s*\)/gi;
+    const modifierMatches = text.match(modifierPattern);
+    if (modifierMatches) {
+      const before = text;
+      text = text.replace(modifierPattern, '').trim();
+      this.recordRepair(before, text, 'credential_modifiers_removed');
     }
 
-    // 4. Extract nicknames
+    // 5. Remove credentials in parentheses (Ph.D.), (MD), etc.
+    const credInParensPattern = new RegExp(
+      `\\(\\s*(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\s*\\)`,
+      'gi'
+    );
+    const credInParensMatches = text.match(credInParensPattern);
+    if (credInParensMatches) {
+      const before = text;
+      text = text.replace(credInParensPattern, '').trim();
+      this.recordRepair(before, text, 'credentials_in_parens_removed');
+    }
+
+    // 6. Extract nicknames from remaining parentheses/quotes
     const nicknames: string[] = [];
     let textNoNicknames = text;
     const nicknameRegex = /"([^"]+)"|'([^']+)'|\(([^)]+)\)/g;
@@ -178,7 +201,7 @@ export class NameEnhanced {
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
     textNoNicknames = text.replace(/['"(),]/g, ' ');
 
-    // 5. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
+    // 7. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
       `^(${nameConfig.TITLES.map(t => this.escapeRegex(t)).join('|')})\\s+`,
       'i'
@@ -191,17 +214,9 @@ export class NameEnhanced {
       text = textNoNicknames;
     }
 
-    // 6. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
+    // 8. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
-    
-    // First, remove credential modifiers in parentheses like (ABD), (c), (ret.)
-    const modifierPattern = /\(\s*(ABD|c|ret\.?|retired|candidate|cand\.)\s*\)/gi;
-    const modifierMatches = textNoNicknames.match(modifierPattern);
-    if (modifierMatches) {
-      credentialsRemoved.push(...modifierMatches.map(m => m.replace(/[()]/g, '')));
-      textNoNicknames = textNoNicknames.replace(modifierPattern, '').trim();
-    }
     
     // Build pattern for credentials as standalone words
     const credentialPattern = new RegExp(
@@ -229,7 +244,7 @@ export class NameEnhanced {
       text = textNoNicknames;
     }
 
-    // 7. Filter out job titles
+    // 9. Filter out job titles
     const hasJobWord = nameConfig.JOB_WORDS.some(word => 
       new RegExp(`\\b${word}\\b`, 'i').test(textNoNicknames)
     );
@@ -240,21 +255,15 @@ export class NameEnhanced {
       return;
     }
 
-    // 5. Remove credentials
-    const credPattern = new RegExp(
-      `\\b(${nameConfig.CREDENTIALS.map(c => c.replace(/\./g, '\\.?')).join('|')})\\b\\.?`,
-      'gi'
-    );
-    let cleanedName = textNoNicknames.replace(credPattern, ' ');
-
-    // 6. Normalize punctuation and spaces
+    // 10. Normalize punctuation and spaces
+    let cleanedName = textNoNicknames;
     cleanedName = cleanedName
       .split('')
       .map(ch => this.keepLettersAndAllowed(ch) ? ch : ' ')
       .join('');
     cleanedName = cleanedName.replace(/\s+/g, ' ').trim();
 
-    // 7. Strip accents (if option is enabled)
+    // 11. Strip accents (if option is enabled)
     const beforeAccents = cleanedName;
     cleanedName = this.stripAccents(cleanedName);
     if (cleanedName !== beforeAccents && !this.options.preserveAccents) {

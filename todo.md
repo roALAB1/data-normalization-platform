@@ -143,3 +143,6 @@
 ## Active Bugs
 - [x] Credentials with modifiers like "DBA (ABD)" - now fully removed
 - [x] Hyphens before credentials - now properly cleaned (e.g., "Nancy Kurts - DBA (ABD)")
+
+## Enhancements (Completed)
+- [x] Handle multiple sets of parentheses like "John Doe (he/him) (Ph.D.)" - now properly removes pronouns and credentials in correct order

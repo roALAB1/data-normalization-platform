@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Name } from '@/lib/Name';
+import { NameEnhanced as Name, NameEnhanced } from '@/lib/NameEnhanced';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +22,7 @@ const exampleNames = [
 
 export default function Home() {
   const [inputName, setInputName] = useState('');
-  const [parsedName, setParsedName] = useState<Name | null>(null);
+  const [parsedName, setParsedName] = useState<NameEnhanced | null>(null);
 
   const handleParse = () => {
     if (inputName.trim()) {
@@ -256,7 +256,7 @@ export default function Home() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {parsedName.parseLog.map((log, idx) => (
+                        {parsedName.parseLog.map((log: any, idx: number) => (
                           <div key={idx} className="p-3 bg-muted rounded-lg text-sm">
                             <div className="flex items-center gap-2 mb-1">
                               <Badge variant="outline" className="text-xs">
