@@ -175,3 +175,7 @@
 - [x] Update all normalizers to import from shared location
 - [x] Add common utilities for validation and formatting
 - [x] Document shared library API for future normalizer development with comprehensive README
+
+## Critical Bugs (Fixed)
+- [x] Missing navigation - no way to return to homepage from Phone Demo or Batch Jobs pages - added Home button to Batch Jobs page header
+- [x] Add consistent navigation header across all pages - Phone Demo already had back button, Batch Jobs now has Home button

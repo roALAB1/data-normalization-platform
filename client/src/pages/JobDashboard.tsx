@@ -17,6 +17,7 @@ import {
   FileText,
   BarChart3,
   RefreshCw,
+  Home,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLoginUrl } from '@/const';
@@ -162,6 +163,10 @@ export default function JobDashboard() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/'}>
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
