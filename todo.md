@@ -120,3 +120,22 @@
 - [x] Credentials appearing in middle/last name positions - now stripped from all positions
 - [x] Credential removal now works anywhere in the name, not just the end
 - [x] Added missing credentials (DACM, BCTMB, FAIHM, CFP®, LAc, LMHC, LCSW, etc.)
+
+## Critical Bugs (Active)
+- [ ] Credential removal still not working - credentials appearing in middle/last names
+- [x] Pronouns in parentheses (she/her, he/him, they/them) - now properly removed
+
+## New Features to Implement
+- [ ] Enhanced validation with confidence scoring
+- [ ] Name length validation
+- [ ] Better handling of initials (J., R.J., etc.)
+- [ ] Generational suffix detection (Jr., Sr., II, III, IV)
+- [ ] Asian name order detection (family-name-first)
+- [ ] Mononym support (single names)
+- [ ] Patronymic/matronymic pattern recognition
+- [ ] Hyphenated name handling
+- [ ] Name particle position detection
+- [ ] Phonetic matching for duplicates (Soundex/Metaphone)
+- [ ] Fuzzy matching against known name databases
+- [ ] Context-aware parsing using other CSV columns
+- [ ] Character set validation (mixed scripts detection)

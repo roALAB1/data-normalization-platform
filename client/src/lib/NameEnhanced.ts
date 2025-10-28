@@ -155,7 +155,15 @@ export class NameEnhanced {
       return;
     }
 
-    // 3. Extract nicknames
+    // 3. Remove pronouns in parentheses (she/her, he/him, they/them, etc.)
+    const pronounPattern = /\(\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*\)/gi;
+    const pronounMatch = text.match(pronounPattern);
+    if (pronounMatch) {
+      text = text.replace(pronounPattern, '').trim();
+      this.recordRepair(originalText, text, 'pronouns_removed');
+    }
+
+    // 4. Extract nicknames
     const nicknames: string[] = [];
     let textNoNicknames = text;
     const nicknameRegex = /"([^"]+)"|'([^']+)'|\(([^)]+)\)/g;
@@ -170,7 +178,7 @@ export class NameEnhanced {
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
     textNoNicknames = text.replace(/['"(),]/g, ' ');
 
-    // 4. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
+    // 5. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
       `^(${nameConfig.TITLES.map(t => this.escapeRegex(t)).join('|')})\\s+`,
       'i'
@@ -183,7 +191,7 @@ export class NameEnhanced {
       text = textNoNicknames;
     }
 
-    // 5. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
+    // 6. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
     // Build pattern for credentials as standalone words
     const credentialPattern = new RegExp(
       `\\b(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b`,
@@ -206,7 +214,7 @@ export class NameEnhanced {
       text = textNoNicknames;
     }
 
-    // 6. Filter out job titles
+    // 7. Filter out job titles
     const hasJobWord = nameConfig.JOB_WORDS.some(word => 
       new RegExp(`\\b${word}\\b`, 'i').test(textNoNicknames)
     );
