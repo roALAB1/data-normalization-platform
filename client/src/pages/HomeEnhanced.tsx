@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { NameEnhanced, parseBatch, ParseResult } from '@/lib/NameEnhanced';
+import { parseCSVForNames, getFormatDescription } from '@/lib/csvParser';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -183,14 +184,21 @@ export default function HomeEnhanced() {
           return;
         }
         
-        // If it's a CSV, try to extract names from first column
+        // Use intelligent CSV parser
         if (file.name.endsWith('.csv')) {
-          const names = lines.slice(1).map(line => {
-            const match = line.match(/^"?([^",]+)"?/);
-            return match ? match[1] : line.split(',')[0];
-          });
-          setBatchInput(names.join('\n'));
-          toast.success(`Loaded ${names.length} names from CSV`);
+          const parseResult = parseCSVForNames(text);
+          
+          if (parseResult.names.length === 0) {
+            toast.error('No valid names found in CSV');
+            return;
+          }
+          
+          setBatchInput(parseResult.names.join('\n'));
+          toast.success(
+            `Loaded ${parseResult.names.length} names from CSV\n` +
+            `Format: ${getFormatDescription(parseResult.detectedFormat)}\n` +
+            `${parseResult.hasHeader ? 'Header row detected and skipped' : 'No header row detected'}`
+          );
         } else {
           setBatchInput(lines.join('\n'));
           toast.success(`Loaded ${lines.length} names from file`);

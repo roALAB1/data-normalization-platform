@@ -76,3 +76,12 @@
 
 ## Bug Fixes (In Progress)
 - [x] Add better error logging for batch upload errors (now shows specific error message)
+
+## Critical Bugs
+- [x] Fix NameEnhanced parser marking 99% of names as invalid (was using wrong CSV column with credentials)
+
+## New Features (Completed)
+- [x] Implement intelligent CSV column detection (single full name, first/last split, or multi-column)
+- [x] Auto-detect header row vs data row
+- [x] Support multiple name column formats
+- [x] Clean credentials from combined first/last names
