@@ -109,3 +109,6 @@
 
 ## Critical Bugs (Fixed)
 - [x] Batch jobs not using intelligent CSV parser - now correctly parses CSV columns
+
+## Bugs Fixed
+- [x] Titles like "Dr" being treated as first names - now properly removed

@@ -7,6 +7,11 @@ export const nameConfig = {
     "CHIA", "CSP", "CSM", "FCCA", "CMgr", "MCMI", "GAICD", "MIRHR", "CHRL", "APMA", "C.M.C.", "PPM", "CSPO", "ICD.D", "CFRE", "CPFA", "CCEP", "DBA", "SMIEEE", "ACA", "SPHR", "FCIM", "M.IDST", "MAHRI", "FACHE", "MBACP", "CPTD", "LCPC", "LPHA", "CADC", "CODP", "P.E", "CPT", "FRSA", "FCA", "ANIPR", "PME", "ASEAN", "CISA", "CISM", "FRM", "ACII"
   ],
   
+  TITLES: [
+    "Dr", "Dr.", "Mr", "Mr.", "Mrs", "Mrs.", "Miss", "Ms", "Ms.", 
+    "Prof", "Prof.", "Mx", "Mx.", "Revd", "Rev", "Rev.", "Sir", "Lady"
+  ],
+  
   JOB_WORDS: [
     "Chief", "Officer", "Director", "Manager", "President", "Chair", "Board",
     "Founder", "CEO", "CFO", "COO", "CTO", "VP", "Specialist", "Consultant",

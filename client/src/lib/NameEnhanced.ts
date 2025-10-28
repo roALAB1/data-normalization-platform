@@ -170,7 +170,20 @@ export class NameEnhanced {
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
     textNoNicknames = text.replace(/['"(),]/g, ' ');
 
-    // 4. Filter out job titles
+    // 4. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
+    const titlePattern = new RegExp(
+      `^(${nameConfig.TITLES.map(t => this.escapeRegex(t)).join('|')})\\s+`,
+      'i'
+    );
+    const titleMatch = textNoNicknames.match(titlePattern);
+    if (titleMatch) {
+      this.prefix = titleMatch[1];
+      textNoNicknames = textNoNicknames.replace(titlePattern, '').trim();
+      this.recordRepair(text, textNoNicknames, 'title_removed');
+      text = textNoNicknames;
+    }
+
+    // 5. Filter out job titles
     const hasJobWord = nameConfig.JOB_WORDS.some(word => 
       new RegExp(`\\b${word}\\b`, 'i').test(textNoNicknames)
     );
