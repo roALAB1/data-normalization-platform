@@ -56,3 +56,20 @@
 
 ## Bug Fixes (Completed)
 - [x] Fix CSV upload stuck on processing in name demo
+
+## Server-Side Processing Upgrade (Completed)
+- [x] Upgrade project to web-db-user (adds backend, database, auth)
+- [x] Design database schema for jobs and results
+- [x] Implement job queue system
+- [x] Create API endpoints for file upload
+- [x] Build background worker for batch processing
+- [x] Add chunked processing (1000 rows per chunk)
+- [ ] Implement real-time progress tracking via WebSocket
+- [x] Create job status dashboard UI
+- [x] Add result download endpoints (CSV, JSON)
+- [x] Implement error handling and retry logic
+- [x] Add job cancellation support
+- [x] Migrate existing normalizers to server-side
+- [x] Add S3 file storage for uploads and results
+- [x] Create user job history page UI
+- [x] Add data quality scoring and statistics

@@ -238,6 +238,9 @@ export default function HomeEnhanced() {
               <Link href="/phone">
                 <Button variant="outline" size="sm">Phone Demo →</Button>
               </Link>
+              <Link href="/jobs">
+                <Button variant="outline" size="sm">Batch Jobs →</Button>
+              </Link>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
