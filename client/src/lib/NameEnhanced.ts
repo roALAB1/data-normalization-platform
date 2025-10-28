@@ -1,4 +1,15 @@
 import { nameConfig } from './nameConfig';
+import {
+  CREDENTIALS_SET,
+  ALL_CREDENTIALS,
+  isCredential,
+  GENERATIONAL_SUFFIXES,
+  isGenerationalSuffix,
+  TITLES,
+  isTitle,
+  LAST_NAME_PREFIXES,
+  isLastNamePrefix
+} from './normalization';
 
 export interface RepairLog {
   original: string;
@@ -176,7 +187,7 @@ export class NameEnhanced {
 
     // 5. Remove credentials in parentheses (Ph.D.), (MD), etc.
     const credInParensPattern = new RegExp(
-      `\\(\\s*(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\s*\\)`,
+      `\\(\\s*(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\s*\\)`,
       'gi'
     );
     const credInParensMatches = text.match(credInParensPattern);
@@ -203,7 +214,7 @@ export class NameEnhanced {
 
     // 7. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
-      `^(${nameConfig.TITLES.map(t => this.escapeRegex(t)).join('|')})\\s+`,
+      `^(${TITLES.map(t => this.escapeRegex(t)).join('|')})\\s+`,
       'i'
     );
     const titleMatch = textNoNicknames.match(titlePattern);
@@ -220,7 +231,7 @@ export class NameEnhanced {
     
     // Build pattern for credentials as standalone words
     const credentialPattern = new RegExp(
-      `\\b(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b`,
+      `\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b`,
       'gi'
     );
     
@@ -300,17 +311,9 @@ export class NameEnhanced {
     const lastPartNormalized = lastPart.replace(/\./g, '');
     
     // Check if it matches a generational suffix (case-insensitive for Jr/Sr, case-sensitive for Roman numerals)
-    const isGenerationalSuffix = nameConfig.GENERATIONAL_SUFFIXES.some(suffix => {
-      const suffixNormalized = suffix.replace(/\./g, '');
-      // For Roman numerals (I, II, III, etc.), match exactly
-      if (/^[IVX]+$/.test(suffix)) {
-        return lastPart === suffix;
-      }
-      // For Jr/Sr/Junior/Senior, case-insensitive
-      return lastPartNormalized.toLowerCase() === suffixNormalized.toLowerCase();
-    });
+    const isGenSuffix = isGenerationalSuffix(lastPart);
     
-    if (isGenerationalSuffix && parts.length > 2) {
+    if (isGenSuffix && parts.length > 2) {
       // Extract the suffix and use the previous part as last name
       suffixPart = lastPart;
       lastPartIndex = parts.length - 2;
@@ -325,11 +328,11 @@ export class NameEnhanced {
       const candidate = parts[i].toLowerCase();
       const candidate2 = i > 0 ? `${parts[i - 1]} ${parts[i]}`.toLowerCase() : candidate;
 
-      if (nameConfig.LAST_NAME_PREFIXES.includes(candidate2)) {
+      if (LAST_NAME_PREFIXES.includes(candidate2 as any)) {
         lastNameParts = [...parts.slice(i - 1, i + 1), ...lastNameParts];
         middleParts = parts.slice(1, i - 1);
         i -= 1;
-      } else if (nameConfig.LAST_NAME_PREFIXES.includes(candidate)) {
+      } else if (LAST_NAME_PREFIXES.includes(candidate as any)) {
         lastNameParts = [parts[i], ...lastNameParts];
         middleParts = parts.slice(1, i);
       } else {
