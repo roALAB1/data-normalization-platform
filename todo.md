@@ -198,3 +198,7 @@
 
 ## Critical Bugs (Fixed)
 - [x] Deployment failing - Cannot find package '@shared/const' - fixed by adding @shared/* path mapping to tsconfig.json
+
+
+## Critical Bugs (Fixed)
+- [x] Vite HMR WebSocket connection failing - fixed by adding HMR config with wss protocol and port 443
