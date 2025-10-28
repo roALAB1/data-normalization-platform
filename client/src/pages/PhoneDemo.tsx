@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { NameEnhanced, parseBatch, ParseResult } from '@/lib/NameEnhanced';
+import { PhoneNormalizer, parsePhoneBatch, PhoneBatchResult } from '@/lib/PhoneNormalizer';
+import { phoneConfig } from '@/lib/phoneConfig';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,33 +8,32 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  AlertCircle, CheckCircle2, User, FileText, Sparkles, 
+  AlertCircle, CheckCircle2, Phone, FileText, 
   Copy, Download, Upload, Settings, BarChart3, 
-  Clock, Zap, Moon, Sun, HelpCircle, Code
+  Clock, Zap, Globe, Code
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
-import { useTheme } from '@/contexts/ThemeContext';
 
-const exampleNames = [
-  "Dr. John Paul Smith Jr.",
-  "María De La Cruz García",
-  "François van der Berg",
-  'John "Johnny" Smith',
-  "Fran?ois Mu?oz",
-  "Chief Executive Officer",
-  "John and Jane Smith",
-  "Björn Søren O'Brien PhD CPA",
-  "Mr. Thomas Alva Edison",
-  "Jose Garcia MBA"
+const examplePhones = [
+  "+1 (555) 123-4567",
+  "555-123-4567",
+  "+44 20 7946 0958",
+  "+61 2 1234 5678",
+  "+49 30 12345678",
+  "1-800-FLOWERS",
+  "(555) 0100",
+  "123-456-7890 ext 123",
+  "+86 138 0000 0000",
+  "invalid phone",
 ];
 
 interface BatchResult {
-  results: ParseResult[];
+  results: PhoneBatchResult[];
   stats: {
     total: number;
     valid: number;
@@ -43,32 +43,37 @@ interface BatchResult {
   };
 }
 
-export default function HomeEnhanced() {
+export default function PhoneDemo() {
   const [mode, setMode] = useState<'single' | 'batch'>('single');
-  const [inputName, setInputName] = useState('');
+  const [inputPhone, setInputPhone] = useState('');
   const [batchInput, setBatchInput] = useState('');
-  const [parsedName, setParsedName] = useState<NameEnhanced | null>(null);
+  const [parsedPhone, setParsedPhone] = useState<PhoneNormalizer | null>(null);
   const [batchResults, setBatchResults] = useState<BatchResult | null>(null);
-  const [preserveAccents, setPreserveAccents] = useState(false);
+  const [defaultCountry, setDefaultCountry] = useState('US');
+  const [allowExtensions, setAllowExtensions] = useState(true);
+  const [strictValidation, setStrictValidation] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   const handleParse = () => {
-    if (inputName.trim()) {
+    if (inputPhone.trim()) {
       setIsProcessing(true);
       setTimeout(() => {
-        const name = new NameEnhanced(inputName, { preserveAccents });
-        setParsedName(name);
+        const phone = new PhoneNormalizer(inputPhone, {
+          defaultCountry,
+          allowExtensions,
+          strictValidation
+        });
+        setParsedPhone(phone);
         setIsProcessing(false);
-        toast.success('Name parsed successfully');
+        toast.success('Phone number parsed successfully');
       }, 100);
     }
   };
 
   const handleBatchParse = () => {
-    const names = batchInput.split('\n').filter(n => n.trim());
-    if (names.length === 0) {
-      toast.error('Please enter at least one name');
+    const phones = batchInput.split('\n').filter(p => p.trim());
+    if (phones.length === 0) {
+      toast.error('Please enter at least one phone number');
       return;
     }
 
@@ -76,27 +81,35 @@ export default function HomeEnhanced() {
     const startTime = performance.now();
     
     setTimeout(() => {
-      const results = parseBatch(names, { preserveAccents });
+      const results = parsePhoneBatch(phones, {
+        defaultCountry,
+        allowExtensions,
+        strictValidation
+      });
       const totalTime = performance.now() - startTime;
       
       const stats = {
         total: results.length,
-        valid: results.filter(r => r.name.isValid).length,
-        invalid: results.filter(r => !r.name.isValid).length,
+        valid: results.filter(r => r.phone.isValid).length,
+        invalid: results.filter(r => !r.phone.isValid).length,
         avgParseTime: results.reduce((sum, r) => sum + r.performance.parseTime, 0) / results.length,
         totalTime
       };
 
       setBatchResults({ results, stats });
       setIsProcessing(false);
-      toast.success(`Processed ${results.length} names in ${totalTime.toFixed(2)}ms`);
+      toast.success(`Processed ${results.length} phone numbers in ${totalTime.toFixed(2)}ms`);
     }, 100);
   };
 
   const handleExampleClick = (example: string) => {
-    setInputName(example);
-    const name = new NameEnhanced(example, { preserveAccents });
-    setParsedName(name);
+    setInputPhone(example);
+    const phone = new PhoneNormalizer(example, {
+      defaultCountry,
+      allowExtensions,
+      strictValidation
+    });
+    setParsedPhone(phone);
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -108,40 +121,40 @@ export default function HomeEnhanced() {
     if (!batchResults) return;
     
     const csv = [
-      NameEnhanced.csvHeader(),
-      ...batchResults.results.map(r => r.name.toCSVRow())
+      PhoneNormalizer.csvHeader(),
+      ...batchResults.results.map(r => r.phone.toCSVRow())
     ].join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `name-normalization-${Date.now()}.csv`;
+    a.download = `phone-normalization-${Date.now()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success('CSV downloaded');
   };
 
   const downloadJSON = () => {
-    if (mode === 'single' && parsedName) {
-      const blob = new Blob([parsedName.toJSON()], { type: 'application/json' });
+    if (mode === 'single' && parsedPhone) {
+      const blob = new Blob([parsedPhone.toJSON()], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `name-${Date.now()}.json`;
+      a.download = `phone-${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success('JSON downloaded');
     } else if (mode === 'batch' && batchResults) {
       const data = {
         stats: batchResults.stats,
-        results: batchResults.results.map(r => r.name.toObject())
+        results: batchResults.results.map(r => r.phone.toObject())
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `batch-results-${Date.now()}.json`;
+      a.download = `phone-batch-results-${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success('JSON downloaded');
@@ -157,68 +170,45 @@ export default function HomeEnhanced() {
       const text = event.target?.result as string;
       const lines = text.split('\n').filter(l => l.trim());
       
-      // If it's a CSV, try to extract names from first column
       if (file.name.endsWith('.csv')) {
-        const names = lines.slice(1).map(line => {
+        const phones = lines.slice(1).map(line => {
           const match = line.match(/^"?([^",]+)"?/);
           return match ? match[1] : line.split(',')[0];
         });
-        setBatchInput(names.join('\n'));
+        setBatchInput(phones.join('\n'));
       } else {
         setBatchInput(lines.join('\n'));
       }
       
       setMode('batch');
-      toast.success(`Loaded ${lines.length} names from file`);
+      toast.success(`Loaded ${lines.length} phone numbers from file`);
     };
     reader.readAsText(file);
   };
 
-  const highlightedParts = useMemo(() => {
-    if (!parsedName || !parsedName.isValid) return null;
-    return parsedName.getHighlightedParts();
-  }, [parsedName]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Header */}
       <header className="border-b bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10 transition-colors duration-300">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg">
-                <User className="w-6 h-6 text-white" />
+              <div className="p-2 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-lg">
+                <Phone className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Enhanced Name Normalization
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  Phone Number Normalization
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Combining data cleaning power with flexible formatting
+                  International phone validation and formatting
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              <Link href="/phone">
-                <Button variant="outline" size="sm">Phone Demo →</Button>
-              </Link>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleTheme}
-                      className="transition-transform hover:scale-110"
-                    >
-                      {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    </Button>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>Toggle dark mode</TooltipContent>
-              </Tooltip>
-            </div>
+            <Link href="/">
+              <Button variant="outline">← Back to Name Demo</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -230,7 +220,7 @@ export default function HomeEnhanced() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Processing Mode</CardTitle>
-                <CardDescription>Choose between single name or batch processing</CardDescription>
+                <CardDescription>Choose between single phone or batch processing</CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -238,7 +228,7 @@ export default function HomeEnhanced() {
                   onClick={() => setMode('single')}
                   className="transition-all duration-200"
                 >
-                  <User className="w-4 h-4 mr-2" />
+                  <Phone className="w-4 h-4 mr-2" />
                   Single
                 </Button>
                 <Button
@@ -263,41 +253,62 @@ export default function HomeEnhanced() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="preserve-accents" className="text-base">
-                  Preserve Accents
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Keep international characters instead of converting to ASCII
-                </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="default-country">Default Country</Label>
+                <Select value={defaultCountry} onValueChange={setDefaultCountry}>
+                  <SelectTrigger id="default-country">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {phoneConfig.COUNTRY_CODES.map(country => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.dialCode} {country.country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Switch
-                id="preserve-accents"
-                checked={preserveAccents}
-                onCheckedChange={setPreserveAccents}
-              />
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="allow-extensions">Allow Extensions</Label>
+                  <Switch
+                    id="allow-extensions"
+                    checked={allowExtensions}
+                    onCheckedChange={setAllowExtensions}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="strict-validation">Strict Validation</Label>
+                  <Switch
+                    id="strict-validation"
+                    checked={strictValidation}
+                    onCheckedChange={setStrictValidation}
+                  />
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {mode === 'single' ? (
-          /* Single Name Mode */
+          /* Single Phone Mode */
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Left Column - Input */}
             <div className="space-y-6">
               <Card className="transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
-                  <CardTitle>Input Name</CardTitle>
+                  <CardTitle>Input Phone Number</CardTitle>
                   <CardDescription>
-                    Enter a name to parse and normalize
+                    Enter a phone number to validate and format
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Textarea
-                    placeholder="Enter a name (e.g., Dr. John Paul Smith Jr.)"
-                    value={inputName}
-                    onChange={(e) => setInputName(e.target.value)}
+                    placeholder="Enter a phone number (e.g., +1 555-123-4567)"
+                    value={inputPhone}
+                    onChange={(e) => setInputPhone(e.target.value)}
                     className="min-h-[100px] font-mono transition-all duration-200"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
@@ -320,30 +331,30 @@ export default function HomeEnhanced() {
                     ) : (
                       <>
                         <Zap className="w-4 h-4 mr-2" />
-                        Parse Name
+                        Parse Phone
                       </>
                     )}
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* Example Names */}
+              {/* Example Phones */}
               <Card className="transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
-                  <CardTitle>Example Names</CardTitle>
+                  <CardTitle>Example Phone Numbers</CardTitle>
                   <CardDescription>
                     Click any example to test the parser
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {exampleNames.map((example, idx) => (
+                    {examplePhones.map((example, idx) => (
                       <Button
                         key={idx}
                         variant="outline"
                         size="sm"
                         onClick={() => handleExampleClick(example)}
-                        className="text-xs transition-all duration-200 hover:scale-105"
+                        className="text-xs transition-all duration-200 hover:scale-105 font-mono"
                       >
                         {example}
                       </Button>
@@ -355,99 +366,60 @@ export default function HomeEnhanced() {
 
             {/* Right Column - Results */}
             <div className="space-y-6">
-              {parsedName ? (
+              {parsedPhone ? (
                 <>
                   {/* Validation Status */}
-                  <Card className={`transition-all duration-300 ${parsedName.isValid ? 'border-green-200 bg-green-50/50 dark:bg-green-900/10' : 'border-red-200 bg-red-50/50 dark:bg-red-900/10'}`}>
+                  <Card className={`transition-all duration-300 ${parsedPhone.isValid ? 'border-green-200 bg-green-50/50 dark:bg-green-900/10' : 'border-red-200 bg-red-50/50 dark:bg-red-900/10'}`}>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        {parsedName.isValid ? (
+                        {parsedPhone.isValid ? (
                           <>
                             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                            <span className="text-green-700 dark:text-green-300">Valid Name</span>
+                            <span className="text-green-700 dark:text-green-300">Valid Phone</span>
                           </>
                         ) : (
                           <>
                             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                            <span className="text-red-700 dark:text-red-300">Invalid Entry</span>
+                            <span className="text-red-700 dark:text-red-300">Invalid Phone</span>
                           </>
                         )}
                         <Badge variant="outline" className="ml-auto">
                           <Clock className="w-3 h-3 mr-1" />
-                          {parsedName.parseTime.toFixed(2)}ms
+                          {parsedPhone.parseTime.toFixed(2)}ms
                         </Badge>
                       </CardTitle>
                       <CardDescription>
-                        {parsedName.isValid
-                          ? 'Successfully parsed and normalized'
-                          : 'This entry was filtered out (job title, multi-person, or invalid format)'}
+                        {parsedPhone.isValid
+                          ? `Successfully validated and formatted`
+                          : 'This phone number could not be validated'}
                       </CardDescription>
                     </CardHeader>
                   </Card>
 
-                  {/* Highlighted Input */}
-                  {parsedName.isValid && highlightedParts && (
-                    <Card className="transition-all duration-300 hover:shadow-lg">
-                      <CardHeader>
-                        <CardTitle>Name Part Highlighting</CardTitle>
-                        <CardDescription>Visual breakdown of detected parts</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-wrap gap-2 p-4 bg-muted rounded-lg">
-                          {highlightedParts.map((part, idx) => (
-                            <Tooltip key={idx}>
-                              <TooltipTrigger asChild>
-                                <span
-                                  className={`px-2 py-1 rounded transition-all duration-200 cursor-help ${
-                                    part.type === 'first' ? 'bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100' :
-                                    part.type === 'middle' ? 'bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-100' :
-                                    part.type === 'last' ? 'bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-100' :
-                                    part.type === 'nickname' ? 'bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100' :
-                                    'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                  }`}
-                                >
-                                  {part.text}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>{part.type}</TooltipContent>
-                            </Tooltip>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {parsedName.isValid && (
+                  {parsedPhone.isValid && (
                     <>
-                      {/* Parsed Parts */}
+                      {/* Phone Details */}
                       <Card className="transition-all duration-300 hover:shadow-lg">
                         <CardHeader>
-                          <CardTitle>Parsed Name Parts</CardTitle>
-                          <CardDescription>Extracted components</CardDescription>
+                          <CardTitle className="flex items-center gap-2">
+                            <Globe className="w-5 h-5" />
+                            Phone Details
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-3">
                             {[
-                              { label: 'First Name', value: parsedName.firstName },
-                              { label: 'Middle Name', value: parsedName.middleName },
-                              { label: 'Last Name', value: parsedName.lastName },
-                              { label: 'Nickname', value: parsedName.nickname },
+                              { label: 'Country', value: parsedPhone.country?.country },
+                              { label: 'Country Code', value: parsedPhone.countryCode },
+                              { label: 'National Number', value: parsedPhone.nationalNumber },
+                              { label: 'Type', value: parsedPhone.type },
+                              { label: 'Extension', value: parsedPhone.extension },
                             ].map(({ label, value }) => (
                               <div key={label} className="flex justify-between items-center border-b pb-2 last:border-0">
                                 <span className="text-sm text-muted-foreground">{label}:</span>
                                 <div className="flex items-center gap-2">
                                   {value ? (
-                                    <>
-                                      <Badge variant="secondary" className="font-mono">{value}</Badge>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6 transition-transform hover:scale-110"
-                                        onClick={() => copyToClipboard(value, label)}
-                                      >
-                                        <Copy className="w-3 h-3" />
-                                      </Button>
-                                    </>
+                                    <Badge variant="secondary" className="font-mono">{value}</Badge>
                                   ) : (
                                     <span className="text-muted-foreground italic text-sm">—</span>
                                   )}
@@ -462,16 +434,15 @@ export default function HomeEnhanced() {
                       <Card className="transition-all duration-300 hover:shadow-lg">
                         <CardHeader>
                           <CardTitle>Formatted Outputs</CardTitle>
-                          <CardDescription>Various name formats</CardDescription>
+                          <CardDescription>Various phone number formats</CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-3">
                             {[
-                              { label: 'Full', value: parsedName.full },
-                              { label: 'Short', value: parsedName.short },
-                              { label: 'Initials', value: parsedName.initials.join('. ') + '.' },
-                              { label: 'Last, First', value: parsedName.format('l, f') },
-                              { label: 'LAST, First Middle', value: parsedName.format('L, f m') },
+                              { label: 'E.164', value: parsedPhone.e164 },
+                              { label: 'International', value: parsedPhone.international },
+                              { label: 'National', value: parsedPhone.national },
+                              { label: 'RFC3966', value: parsedPhone.rfc3966 },
                             ].map(({ label, value }) => (
                               <div key={label} className="flex justify-between items-center text-sm border-b pb-2 last:border-0">
                                 <span className="text-muted-foreground">{label}:</span>
@@ -492,7 +463,7 @@ export default function HomeEnhanced() {
                         </CardContent>
                       </Card>
 
-                      {/* Export Options */}
+                      {/* Export */}
                       <Card className="transition-all duration-300 hover:shadow-lg">
                         <CardHeader>
                           <CardTitle>Export</CardTitle>
@@ -512,7 +483,7 @@ export default function HomeEnhanced() {
                   )}
 
                   {/* Repair Log */}
-                  {parsedName.parseLog.length > 0 && (
+                  {parsedPhone.repairLog.length > 0 && (
                     <Card className="transition-all duration-300 hover:shadow-lg">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -520,12 +491,12 @@ export default function HomeEnhanced() {
                           Repair Log
                         </CardTitle>
                         <CardDescription>
-                          {parsedName.parseLog.length} repair(s) applied
+                          {parsedPhone.repairLog.length} repair(s) applied
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          {parsedName.parseLog.map((log, idx) => (
+                          {parsedPhone.repairLog.map((log, idx) => (
                             <div key={idx} className="p-3 bg-muted rounded-lg text-sm transition-all duration-200 hover:shadow-md">
                               <div className="flex items-center gap-2 mb-2">
                                 <Badge variant="outline" className="text-xs">
@@ -540,11 +511,6 @@ export default function HomeEnhanced() {
                                   <span className="opacity-50">+ </span>{log.repaired}
                                 </div>
                               </div>
-                              {log.changes && log.changes.length > 0 && (
-                                <div className="mt-2 text-xs text-muted-foreground">
-                                  Changes: {log.changes.map(c => c.text).join(', ')}
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
@@ -555,9 +521,9 @@ export default function HomeEnhanced() {
               ) : (
                 <Card className="border-dashed transition-all duration-300">
                   <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                    <User className="w-12 h-12 text-muted-foreground mb-4 animate-pulse" />
+                    <Phone className="w-12 h-12 text-muted-foreground mb-4 animate-pulse" />
                     <p className="text-muted-foreground">
-                      Enter a name or click an example to see the results
+                      Enter a phone number or click an example to see the results
                     </p>
                   </CardContent>
                 </Card>
@@ -574,7 +540,7 @@ export default function HomeEnhanced() {
                   <div>
                     <CardTitle>Batch Input</CardTitle>
                     <CardDescription>
-                      Enter multiple names (one per line) or upload a file
+                      Enter multiple phone numbers (one per line) or upload a file
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
@@ -598,7 +564,7 @@ export default function HomeEnhanced() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Textarea
-                  placeholder="Enter names, one per line..."
+                  placeholder="Enter phone numbers, one per line..."
                   value={batchInput}
                   onChange={(e) => setBatchInput(e.target.value)}
                   className="min-h-[200px] font-mono transition-all duration-200"
@@ -639,7 +605,7 @@ export default function HomeEnhanced() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center p-4 bg-muted rounded-lg transition-all duration-200 hover:shadow-md">
                         <div className="text-2xl font-bold">{batchResults.stats.total}</div>
-                        <div className="text-sm text-muted-foreground">Total Names</div>
+                        <div className="text-sm text-muted-foreground">Total Phones</div>
                       </div>
                       <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg transition-all duration-200 hover:shadow-md">
                         <div className="text-2xl font-bold text-green-600 dark:text-green-400">{batchResults.stats.valid}</div>
@@ -698,7 +664,7 @@ export default function HomeEnhanced() {
                   <CardHeader>
                     <CardTitle>Results</CardTitle>
                     <CardDescription>
-                      Showing {batchResults.results.length} processed names
+                      Showing {batchResults.results.length} processed phone numbers
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -707,9 +673,10 @@ export default function HomeEnhanced() {
                         <thead>
                           <tr className="border-b">
                             <th className="text-left p-2">Original</th>
-                            <th className="text-left p-2">First</th>
-                            <th className="text-left p-2">Middle</th>
-                            <th className="text-left p-2">Last</th>
+                            <th className="text-left p-2">E.164</th>
+                            <th className="text-left p-2">National</th>
+                            <th className="text-left p-2">Country</th>
+                            <th className="text-left p-2">Type</th>
                             <th className="text-left p-2">Status</th>
                             <th className="text-right p-2">Time</th>
                           </tr>
@@ -720,18 +687,21 @@ export default function HomeEnhanced() {
                               key={idx} 
                               className="border-b transition-colors duration-200 hover:bg-muted/50"
                             >
-                              <td className="p-2 font-mono text-xs">{result.name.rawName}</td>
-                              <td className="p-2">{result.name.firstName || '—'}</td>
-                              <td className="p-2">{result.name.middleName || '—'}</td>
-                              <td className="p-2">{result.name.lastName || '—'}</td>
+                              <td className="p-2 font-mono text-xs">{result.phone.rawPhone}</td>
+                              <td className="p-2 font-mono text-xs">{result.phone.e164 || '—'}</td>
+                              <td className="p-2 font-mono text-xs">{result.phone.national || '—'}</td>
+                              <td className="p-2 text-xs">{result.phone.country?.country || '—'}</td>
                               <td className="p-2">
-                                {result.name.isValid ? (
+                                <Badge variant="outline" className="text-xs">{result.phone.type}</Badge>
+                              </td>
+                              <td className="p-2">
+                                {result.phone.isValid ? (
                                   <Badge variant="default" className="bg-green-500">Valid</Badge>
                                 ) : (
                                   <Badge variant="destructive">Invalid</Badge>
                                 )}
                               </td>
-                              <td className="p-2 text-right text-muted-foreground">
+                              <td className="p-2 text-right text-muted-foreground text-xs">
                                 {result.performance.parseTime.toFixed(2)}ms
                               </td>
                             </tr>
@@ -746,14 +716,14 @@ export default function HomeEnhanced() {
           </div>
         )}
 
-        {/* Documentation */}
+        {/* API Documentation */}
         <Card className="mt-8 transition-all duration-300 hover:shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code className="w-5 h-5" />
               API Documentation
             </CardTitle>
-            <CardDescription>How to use the Name class programmatically</CardDescription>
+            <CardDescription>How to use the PhoneNormalizer class programmatically</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="usage">
@@ -764,98 +734,66 @@ export default function HomeEnhanced() {
               </TabsList>
               <TabsContent value="usage" className="space-y-4 mt-4">
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                  <pre>{`import { NameEnhanced } from './lib/NameEnhanced';
+                  <pre>{`import { PhoneNormalizer } from './lib/PhoneNormalizer';
 
-// Parse a single name
-const name = new NameEnhanced("Dr. John Paul Smith Jr.");
+// Parse a phone number
+const phone = new PhoneNormalizer("+1 (555) 123-4567");
 
-// Access parsed parts
-console.log(name.firstName);  // "John"
-console.log(name.lastName);   // "Smith"
-console.log(name.full);       // "John Paul Smith"
-console.log(name.short);      // "John Smith"
+// Check validity
+console.log(phone.isValid);  // true
 
-// Custom formatting
-console.log(name.format('L, f m'));  // "SMITH, John Paul"
+// Get formatted outputs
+console.log(phone.e164);          // "+15551234567"
+console.log(phone.international); // "+1 (555) 123-4567"
+console.log(phone.national);      // "(555) 123-4567"
 
-// Get initials
-console.log(name.initials);  // ["J", "P", "S"]`}</pre>
+// Get details
+console.log(phone.country?.country);  // "United States"
+console.log(phone.type);              // "UNKNOWN"
+console.log(phone.extension);         // null`}</pre>
                 </div>
               </TabsContent>
               <TabsContent value="batch" className="space-y-4 mt-4">
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                  <pre>{`import { parseBatch } from './lib/NameEnhanced';
+                  <pre>{`import { parsePhoneBatch } from './lib/PhoneNormalizer';
 
-const names = [
-  "John Smith",
-  "María García",
-  "François Dubois"
+const phones = [
+  "+1 555-123-4567",
+  "+44 20 7946 0958",
+  "+61 2 1234 5678"
 ];
 
-const results = parseBatch(names);
+const results = parsePhoneBatch(phones, {
+  defaultCountry: 'US'
+});
 
 results.forEach(result => {
-  console.log(result.name.full);
+  console.log(result.phone.e164);
   console.log(\`Parsed in \${result.performance.parseTime}ms\`);
 });`}</pre>
                 </div>
               </TabsContent>
               <TabsContent value="options" className="space-y-4 mt-4">
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                  <pre>{`// Preserve accents
-const name = new NameEnhanced("José García", {
-  preserveAccents: true
+                  <pre>{`// Configure default country
+const phone = new PhoneNormalizer("555-123-4567", {
+  defaultCountry: 'US'  // Assumes US if no country code
 });
-console.log(name.firstName);  // "José" (not "Jose")
+
+// Allow extensions
+const phone2 = new PhoneNormalizer("555-123-4567 ext 123", {
+  allowExtensions: true
+});
+console.log(phone2.extension);  // "123"
 
 // Export to JSON
-const json = name.toJSON();
+const json = phone.toJSON();
 
 // Export to CSV row
-const csvRow = name.toCSVRow();
-
-// Get highlighted parts for UI
-const parts = name.getHighlightedParts();`}</pre>
+const csvRow = phone.toCSVRow();`}</pre>
                 </div>
               </TabsContent>
             </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Test Suite */}
-        <Card className="mt-8 transition-all duration-300 hover:shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-              Test Coverage
-            </CardTitle>
-            <CardDescription>Example test cases demonstrating parser robustness</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {[
-                { input: "Dr. John Paul Smith Jr.", expected: "John Paul Smith", status: "pass" },
-                { input: "María De La Cruz García", expected: "María De La Cruz García", status: "pass" },
-                { input: "François van der Berg", expected: "François van der Berg", status: "pass" },
-                { input: 'John "Johnny" Smith', expected: "John Smith (nickname: Johnny)", status: "pass" },
-                { input: "Chief Executive Officer", expected: "Rejected (job title)", status: "pass" },
-                { input: "John and Jane Smith", expected: "Rejected (multi-person)", status: "pass" },
-              ].map((test, idx) => (
-                <div 
-                  key={idx} 
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg transition-all duration-200 hover:shadow-md"
-                >
-                  <div className="flex-1">
-                    <div className="font-mono text-sm">{test.input}</div>
-                    <div className="text-xs text-muted-foreground mt-1">→ {test.expected}</div>
-                  </div>
-                  <Badge variant="default" className="bg-green-500">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    {test.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
           </CardContent>
         </Card>
       </main>
@@ -864,7 +802,7 @@ const parts = name.getHighlightedParts();`}</pre>
       <footer className="border-t bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm mt-12 transition-colors duration-300">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
           <p>
-            Enhanced Name Normalization Demo • Combining Python data cleaning with Namefully-inspired formatting
+            Phone Number Normalization • International validation and formatting
           </p>
         </div>
       </footer>
