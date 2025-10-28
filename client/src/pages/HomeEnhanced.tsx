@@ -72,25 +72,37 @@ export default function HomeEnhanced() {
       return;
     }
 
+    if (names.length > 10000) {
+      toast.error('Maximum 10,000 names per batch. Please split your file.');
+      return;
+    }
+
     setIsProcessing(true);
     const startTime = performance.now();
     
+    // Use requestIdleCallback for better UI responsiveness
     setTimeout(() => {
-      const results = parseBatch(names, { preserveAccents });
-      const totalTime = performance.now() - startTime;
-      
-      const stats = {
-        total: results.length,
-        valid: results.filter(r => r.name.isValid).length,
-        invalid: results.filter(r => !r.name.isValid).length,
-        avgParseTime: results.reduce((sum, r) => sum + r.performance.parseTime, 0) / results.length,
-        totalTime
-      };
+      try {
+        const results = parseBatch(names, { preserveAccents });
+        const totalTime = performance.now() - startTime;
+        
+        const stats = {
+          total: results.length,
+          valid: results.filter(r => r.name.isValid).length,
+          invalid: results.filter(r => !r.name.isValid).length,
+          avgParseTime: results.reduce((sum, r) => sum + r.performance.parseTime, 0) / results.length,
+          totalTime
+        };
 
-      setBatchResults({ results, stats });
-      setIsProcessing(false);
-      toast.success(`Processed ${results.length} names in ${totalTime.toFixed(2)}ms`);
-    }, 100);
+        setBatchResults({ results, stats });
+        setIsProcessing(false);
+        toast.success(`Processed ${results.length} names in ${totalTime.toFixed(2)}ms`);
+      } catch (error) {
+        console.error('Batch processing error:', error);
+        setIsProcessing(false);
+        toast.error('Error processing names. Please check your input.');
+      }
+    }, 50);
   };
 
   const handleExampleClick = (example: string) => {
@@ -154,22 +166,45 @@ export default function HomeEnhanced() {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const text = event.target?.result as string;
-      const lines = text.split('\n').filter(l => l.trim());
-      
-      // If it's a CSV, try to extract names from first column
-      if (file.name.endsWith('.csv')) {
-        const names = lines.slice(1).map(line => {
-          const match = line.match(/^"?([^",]+)"?/);
-          return match ? match[1] : line.split(',')[0];
-        });
-        setBatchInput(names.join('\n'));
-      } else {
-        setBatchInput(lines.join('\n'));
+      try {
+        const text = event.target?.result as string;
+        const lines = text.split('\n').filter(l => l.trim());
+        
+        if (lines.length === 0) {
+          toast.error('File is empty');
+          return;
+        }
+
+        if (lines.length > 10000) {
+          toast.error('File too large. Maximum 10,000 names.');
+          return;
+        }
+        
+        // If it's a CSV, try to extract names from first column
+        if (file.name.endsWith('.csv')) {
+          const names = lines.slice(1).map(line => {
+            const match = line.match(/^"?([^",]+)"?/);
+            return match ? match[1] : line.split(',')[0];
+          });
+          setBatchInput(names.join('\n'));
+          toast.success(`Loaded ${names.length} names from CSV`);
+        } else {
+          setBatchInput(lines.join('\n'));
+          toast.success(`Loaded ${lines.length} names from file`);
+        }
+        
+        setMode('batch');
+      } catch (error) {
+        console.error('File upload error:', error);
+        toast.error('Error reading file. Please check the format.');
+      } finally {
+        // Reset file input
+        e.target.value = '';
       }
-      
-      setMode('batch');
-      toast.success(`Loaded ${lines.length} names from file`);
+    };
+    reader.onerror = () => {
+      toast.error('Failed to read file');
+      e.target.value = '';
     };
     reader.readAsText(file);
   };

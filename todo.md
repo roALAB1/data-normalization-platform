@@ -53,3 +53,6 @@
 - [x] Create phone number demo page
 - [x] Add batch phone number processing
 - [x] Integrate phone normalizer into main dashboard
+
+## Bug Fixes (Completed)
+- [x] Fix CSV upload stuck on processing in name demo
