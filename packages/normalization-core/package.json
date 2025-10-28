@@ -1,0 +1,77 @@
+{
+  "name": "@normalization/core",
+  "version": "1.0.0",
+  "description": "Comprehensive normalization library for names, phones, emails, companies, and addresses",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./names": {
+      "import": "./dist/names/index.mjs",
+      "require": "./dist/names/index.js",
+      "types": "./dist/names/index.d.ts"
+    },
+    "./phones": {
+      "import": "./dist/phones/index.mjs",
+      "require": "./dist/phones/index.js",
+      "types": "./dist/phones/index.d.ts"
+    },
+    "./emails": {
+      "import": "./dist/emails/index.mjs",
+      "require": "./dist/emails/index.js",
+      "types": "./dist/emails/index.d.ts"
+    },
+    "./companies": {
+      "import": "./dist/companies/index.mjs",
+      "require": "./dist/companies/index.js",
+      "types": "./dist/companies/index.d.ts"
+    },
+    "./addresses": {
+      "import": "./dist/addresses/index.mjs",
+      "require": "./dist/addresses/index.js",
+      "types": "./dist/addresses/index.d.ts"
+    },
+    "./common": {
+      "import": "./dist/common/index.mjs",
+      "require": "./dist/common/index.js",
+      "types": "./dist/common/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "normalization",
+    "data-cleaning",
+    "name-parser",
+    "phone-parser",
+    "email-validator",
+    "data-quality"
+  ],
+  "author": "Your Organization",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  }
+}

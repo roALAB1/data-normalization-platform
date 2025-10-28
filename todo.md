@@ -183,3 +183,14 @@
 ## Critical Bugs (Fixed)
 - [x] Hyphenated names being split incorrectly - "Meng-Ling Erik Kuo" now correctly parses as First: "Meng-Ling", Middle: "Erik", Last: "Kuo" (fixed credential matching to not match within hyphenated names)
 - [x] Excel formula injection - values starting with "-" no longer occur since hyphenated names are preserved
+
+
+## Platform Architecture (Completed - Hybrid Monorepo)
+- [x] Extract normalization libraries into @normalization/core package (750+ credentials)
+- [x] Package built successfully (CJS + ESM + TypeScript declarations)
+- [x] Restore main app to root level (webdev compatible)
+- [x] Keep packages/normalization-core as workspace package
+- [x] Update imports in main app to use @normalization/core
+- [x] Configure simplified Turborepo for package builds only
+- [x] Test webdev tooling - all systems operational (preview, database UI, deployment)
+- [x] Hybrid monorepo structure complete and functional
