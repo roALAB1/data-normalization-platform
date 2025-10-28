@@ -73,3 +73,6 @@
 - [x] Add S3 file storage for uploads and results
 - [x] Create user job history page UI
 - [x] Add data quality scoring and statistics
+
+## Bug Fixes (In Progress)
+- [x] Add better error logging for batch upload errors (now shows specific error message)

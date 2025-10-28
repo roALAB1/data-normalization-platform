@@ -99,8 +99,11 @@ export default function HomeEnhanced() {
         toast.success(`Processed ${results.length} names in ${totalTime.toFixed(2)}ms`);
       } catch (error) {
         console.error('Batch processing error:', error);
+        console.error('Error details:', error instanceof Error ? error.message : String(error));
+        console.error('Stack:', error instanceof Error ? error.stack : 'No stack trace');
         setIsProcessing(false);
-        toast.error('Error processing names. Please check your input.');
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        toast.error(`Error processing names: ${errorMessage}`);
       }
     }, 50);
   };
