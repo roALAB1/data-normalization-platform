@@ -292,11 +292,35 @@ export class NameEnhanced {
     }
 
     this.firstName = parts[0];
-    let lastNameParts = [parts[parts.length - 1]];
-    let middleParts = parts.slice(1, -1);
+    
+    // Check if the last part is a generational suffix (Jr., Sr., II, III, etc.)
+    let suffixPart: string | null = null;
+    let lastPartIndex = parts.length - 1;
+    const lastPart = parts[lastPartIndex];
+    const lastPartNormalized = lastPart.replace(/\./g, '');
+    
+    // Check if it matches a generational suffix (case-insensitive for Jr/Sr, case-sensitive for Roman numerals)
+    const isGenerationalSuffix = nameConfig.GENERATIONAL_SUFFIXES.some(suffix => {
+      const suffixNormalized = suffix.replace(/\./g, '');
+      // For Roman numerals (I, II, III, etc.), match exactly
+      if (/^[IVX]+$/.test(suffix)) {
+        return lastPart === suffix;
+      }
+      // For Jr/Sr/Junior/Senior, case-insensitive
+      return lastPartNormalized.toLowerCase() === suffixNormalized.toLowerCase();
+    });
+    
+    if (isGenerationalSuffix && parts.length > 2) {
+      // Extract the suffix and use the previous part as last name
+      suffixPart = lastPart;
+      lastPartIndex = parts.length - 2;
+    }
+    
+    let lastNameParts = [parts[lastPartIndex]];
+    let middleParts = parts.slice(1, lastPartIndex);
 
-    // Detect last name prefixes
-    let i = parts.length - 2;
+    // Detect last name prefixes (start from the position before the last name)
+    let i = lastPartIndex - 1;
     while (i >= 1) {
       const candidate = parts[i].toLowerCase();
       const candidate2 = i > 0 ? `${parts[i - 1]} ${parts[i]}`.toLowerCase() : candidate;
@@ -316,6 +340,17 @@ export class NameEnhanced {
 
     this.lastName = lastNameParts.join(' ');
     this.middleName = middleParts.length > 0 ? middleParts.join(' ') : null;
+    
+    // Assign generational suffix if detected (combine with credential suffix if both exist)
+    if (suffixPart) {
+      if (this.suffix) {
+        // Combine generational suffix with credential suffix
+        this.suffix = `${suffixPart} ${this.suffix}`;
+      } else {
+        this.suffix = suffixPart;
+      }
+    }
+    
     this.isValid = true;
     this.parseTime = performance.now() - startTime;
   }

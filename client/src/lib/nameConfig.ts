@@ -13,6 +13,13 @@ export const nameConfig = {
     "Prof", "Prof.", "Mx", "Mx.", "Revd", "Rev", "Rev.", "Sir", "Lady"
   ],
   
+  GENERATIONAL_SUFFIXES: [
+    "Jr", "Jr.", "Junior",
+    "Sr", "Sr.", "Senior",
+    "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+    "1st", "2nd", "3rd", "4th", "5th"
+  ],
+  
   JOB_WORDS: [
     "Chief", "Officer", "Director", "Manager", "President", "Chair", "Board",
     "Founder", "CEO", "CFO", "COO", "CTO", "VP", "Specialist", "Consultant",

@@ -146,3 +146,6 @@
 
 ## Enhancements (Completed)
 - [x] Handle multiple sets of parentheses like "John Doe (he/him) (Ph.D.)" - now properly removes pronouns and credentials in correct order
+
+## Critical Bugs (Fixed)
+- [x] Generational suffixes (III, II, IV, Jr., Sr.) being treated as last names instead of suffixes - "Albert L Gaffney III" now correctly parses as First: Albert, Middle: L, Last: Gaffney, Suffix: III
