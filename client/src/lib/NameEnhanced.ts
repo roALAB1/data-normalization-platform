@@ -9,7 +9,7 @@ import {
   isTitle,
   LAST_NAME_PREFIXES,
   isLastNamePrefix
-} from '@normalization/core/names';
+} from '@shared/normalization/names';
 
 export interface RepairLog {
   original: string;

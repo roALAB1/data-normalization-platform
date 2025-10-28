@@ -18,8 +18,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./client/src/*"],
-      "@normalization/core": ["../../packages/normalization-core/src"],
-      "@normalization/core/*": ["../../packages/normalization-core/src/*"]
+      "@shared/*": ["./shared/*"],
+      "@normalization/core": ["./packages/normalization-core/src"],
+      "@normalization/core/*": ["./packages/normalization-core/src/*"]
     }
   },
   "include": ["client/src", "server"],
