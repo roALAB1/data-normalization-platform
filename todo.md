@@ -149,3 +149,6 @@
 
 ## Critical Bugs (Fixed)
 - [x] Generational suffixes (III, II, IV, Jr., Sr.) being treated as last names instead of suffixes - "Albert L Gaffney III" now correctly parses as First: Albert, Middle: L, Last: Gaffney, Suffix: III
+
+## Critical Bugs (Fixed)
+- [x] Credentials in comma-separated list not fully removed - "Chaitanya Saha CSCP, CPIM, CTSC" now correctly parses as First: Chaitanya, Last: Saha, Suffix: CSCP CPIM CTSC (added missing supply chain credentials)

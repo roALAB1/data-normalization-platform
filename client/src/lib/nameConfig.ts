@@ -5,7 +5,8 @@ export const nameConfig = {
     "PhD", "Ph.D.", "EdD", "D.Ed.", "MD", "M.D.", "DO", "D.O.", "DDS", "D.D.S.", "DMD", "D.M.D.", "JD", "J.D.", "DrPH", "D.PH.", "DVM", "D.V.M.", "PsyD", "Psy.D.", "DC", "D.C.", "LLD", "LL.D.", "QC",
     "CPA", "CFA", "CFP", "CFP®", "PE", "PMP", "LEED AP", "ACC", "CEM", "CMM", "CGMP", "HCIB", "CHRM", "CPP", "CAIA", "PACE", "OBE", "CB", "KBE", "MBE", "CBE", "CMG", "RN", "RGN", "FRCP", "FRCS", "Engr", "Esq",
     "CHIA", "CSP", "CSM", "FCCA", "CMgr", "MCMI", "GAICD", "MIRHR", "CHRL", "APMA", "C.M.C.", "PPM", "CSPO", "ICD.D", "CFRE", "CPFA", "CCEP", "DBA", "SMIEEE", "ACA", "SPHR", "FCIM", "M.IDST", "MAHRI", "FACHE", "MBACP", "CPTD", "LCPC", "LPHA", "CADC", "CODP", "P.E", "CPT", "FRSA", "FCA", "ANIPR", "PME", "ASEAN", "CISA", "CISM", "FRM", "ACII",
-    "DACM", "BCTMB", "FAIHM", "LAc", "L.Ac.", "OMD", "MSOM", "DAOM", "NCCAOM", "Dipl.Ac.", "Dipl.OM", "LMHC", "LCSW", "LMFT", "LPC", "LPCC", "LMSW", "LSW", "LISW", "LICSW", "ABD"
+    "DACM", "BCTMB", "FAIHM", "LAc", "L.Ac.", "OMD", "MSOM", "DAOM", "NCCAOM", "Dipl.Ac.", "Dipl.OM", "LMHC", "LCSW", "LMFT", "LPC", "LPCC", "LMSW", "LSW", "LISW", "LICSW", "ABD",
+    "CSCP", "CPIM", "CTSC", "CLTD", "SCPM", "CPSM", "CPM", "CSCMP", "Six Sigma", "Lean Six Sigma", "Black Belt", "Green Belt", "CSSBB", "CSSGB"
   ],
   
   TITLES: [
