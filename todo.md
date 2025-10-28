@@ -139,3 +139,7 @@
 - [ ] Fuzzy matching against known name databases
 - [ ] Context-aware parsing using other CSV columns
 - [ ] Character set validation (mixed scripts detection)
+
+## Active Bugs
+- [x] Credentials with modifiers like "DBA (ABD)" - now fully removed
+- [x] Hyphens before credentials - now properly cleaned (e.g., "Nancy Kurts - DBA (ABD)")

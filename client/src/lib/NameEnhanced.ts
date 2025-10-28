@@ -192,23 +192,38 @@ export class NameEnhanced {
     }
 
     // 6. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
+    let credentialsRemoved: string[] = [];
+    let previousText = textNoNicknames;
+    
+    // First, remove credential modifiers in parentheses like (ABD), (c), (ret.)
+    const modifierPattern = /\(\s*(ABD|c|ret\.?|retired|candidate|cand\.)\s*\)/gi;
+    const modifierMatches = textNoNicknames.match(modifierPattern);
+    if (modifierMatches) {
+      credentialsRemoved.push(...modifierMatches.map(m => m.replace(/[()]/g, '')));
+      textNoNicknames = textNoNicknames.replace(modifierPattern, '').trim();
+    }
+    
     // Build pattern for credentials as standalone words
     const credentialPattern = new RegExp(
       `\\b(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b`,
       'gi'
     );
-    let credentialsRemoved: string[] = [];
-    let previousText = textNoNicknames;
     
     // Find all credentials
     const matches = textNoNicknames.match(credentialPattern);
     if (matches) {
-      credentialsRemoved = matches;
+      credentialsRemoved.push(...matches);
       // Remove all credentials
       textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
-      // Clean up multiple spaces
-      textNoNicknames = textNoNicknames.replace(/\s+/g, ' ').trim();
-      
+    }
+    
+    // Remove trailing hyphens/dashes that were before credentials
+    textNoNicknames = textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim();
+    
+    // Clean up multiple spaces
+    textNoNicknames = textNoNicknames.replace(/\s+/g, ' ').trim();
+    
+    if (credentialsRemoved.length > 0) {
       this.suffix = credentialsRemoved.join(' ');
       this.recordRepair(previousText, textNoNicknames, 'credentials_removed');
       text = textNoNicknames;
