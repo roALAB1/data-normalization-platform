@@ -103,3 +103,6 @@
 - [ ] Push to GitHub (requires user authentication)
 - [ ] Set up branch protection rules (post-push)
 - [ ] Configure automated deployment (post-push)
+
+## Critical Bugs (Fixed)
+- [x] Fix server-side job processor regex error causing all names to be marked invalid (server restarted to pick up fix)
