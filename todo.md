@@ -106,3 +106,6 @@
 
 ## Critical Bugs (Fixed)
 - [x] Fix server-side job processor regex error causing all names to be marked invalid (server restarted to pick up fix)
+
+## Critical Bugs (Fixed)
+- [x] Batch jobs not using intelligent CSV parser - now correctly parses CSV columns

@@ -3,6 +3,7 @@ import { getJobById, updateJobProgress, addJobResultsBatch } from "./jobDb";
 import { storagePut, storageGet } from "./storage";
 import { NameEnhanced } from "../client/src/lib/NameEnhanced";
 import { PhoneNormalizer } from "../client/src/lib/PhoneNormalizer";
+import { parseCSVForNames } from "../client/src/lib/csvParser";
 
 /**
  * Process a single normalization job
@@ -35,7 +36,17 @@ export async function processJob(jobId: number): Promise<void> {
     }
 
     const inputData = await downloadInputFile(job.inputFileKey);
-    const lines = inputData.split('\n').filter(l => l.trim());
+    
+    // Use intelligent CSV parser to extract names
+    let lines: string[];
+    if (job.type === "name") {
+      const parseResult = parseCSVForNames(inputData);
+      lines = parseResult.names;
+      console.log(`[JobProcessor] Parsed CSV: format: ${parseResult.detectedFormat}, hasHeader: ${parseResult.hasHeader}, total: ${parseResult.totalRows}, skipped: ${parseResult.skippedRows}`);
+    } else {
+      // For other types, use simple line splitting for now
+      lines = inputData.split('\n').filter(l => l.trim());
+    }
 
     console.log(`[JobProcessor] Processing ${lines.length} rows for job ${jobId}`);
 
