@@ -85,3 +85,6 @@
 - [x] Auto-detect header row vs data row
 - [x] Support multiple name column formats
 - [x] Clean credentials from combined first/last names
+
+## Critical Bugs (Fixed)
+- [x] Fix regex error: "Invalid regular expression: /?/g: Nothing to repeat" in batch processing (escaped special regex characters)

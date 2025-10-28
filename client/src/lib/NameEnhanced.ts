@@ -102,6 +102,10 @@ export class NameEnhanced {
     return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   private keepLettersAndAllowed(ch: string): boolean {
     return /[a-zA-ZÀ-ÿ\s\-']/.test(ch);
   }
@@ -121,7 +125,8 @@ export class NameEnhanced {
     // 1. Fix mis-encoded characters
     const repairStart = performance.now();
     for (const [bad, fix] of Object.entries(nameConfig.COMMON_LATIN_FIXES)) {
-      const regex = new RegExp(`\\b${bad}\\b`, 'gi');
+      const escapedBad = this.escapeRegex(bad);
+      const regex = new RegExp(`\\b${escapedBad}\\b`, 'gi');
       if (regex.test(text)) {
         const before = text;
         text = text.replace(regex, fix.fixed);
@@ -134,7 +139,8 @@ export class NameEnhanced {
     for (const [bad, good] of Object.entries(nameConfig.MISENCODED_MAP)) {
       if (text.includes(bad)) {
         const before = text;
-        text = text.replace(new RegExp(bad, 'g'), good);
+        const escapedBad = this.escapeRegex(bad);
+        text = text.replace(new RegExp(escapedBad, 'g'), good);
         if (text !== before) {
           this.recordRepair(before, text, 'symbol_cleanup');
         }
