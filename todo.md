@@ -179,3 +179,7 @@
 ## Critical Bugs (Fixed)
 - [x] Missing navigation - no way to return to homepage from Phone Demo or Batch Jobs pages - added Home button to Batch Jobs page header
 - [x] Add consistent navigation header across all pages - Phone Demo already had back button, Batch Jobs now has Home button
+
+## Critical Bugs (Fixed)
+- [x] Hyphenated names being split incorrectly - "Meng-Ling Erik Kuo" now correctly parses as First: "Meng-Ling", Middle: "Erik", Last: "Kuo" (fixed credential matching to not match within hyphenated names)
+- [x] Excel formula injection - values starting with "-" no longer occur since hyphenated names are preserved

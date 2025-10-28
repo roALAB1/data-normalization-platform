@@ -230,8 +230,9 @@ export class NameEnhanced {
     let previousText = textNoNicknames;
     
     // Build pattern for credentials as standalone words
+    // Use lookahead/lookbehind to ensure not part of hyphenated names
     const credentialPattern = new RegExp(
-      `\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b`,
+      `(?<![-])\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b(?![-])`,
       'gi'
     );
     
