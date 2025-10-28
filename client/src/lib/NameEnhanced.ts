@@ -183,25 +183,24 @@ export class NameEnhanced {
       text = textNoNicknames;
     }
 
-    // 5. Remove suffixes/credentials (MD, PhD, CFP, etc.)
-    // Build pattern for credentials at the end of the name
+    // 5. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
+    // Build pattern for credentials as standalone words
     const credentialPattern = new RegExp(
-      `\\s+(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})$`,
-      'i'
+      `\\b(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b`,
+      'gi'
     );
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
     
-    // Keep removing credentials until none are found (handles multiple like "MD PhD")
-    while (credentialPattern.test(textNoNicknames)) {
-      const match = textNoNicknames.match(credentialPattern);
-      if (match) {
-        credentialsRemoved.push(match[1]);
-        textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
-      }
-    }
-    
-    if (credentialsRemoved.length > 0) {
+    // Find all credentials
+    const matches = textNoNicknames.match(credentialPattern);
+    if (matches) {
+      credentialsRemoved = matches;
+      // Remove all credentials
+      textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
+      // Clean up multiple spaces
+      textNoNicknames = textNoNicknames.replace(/\s+/g, ' ').trim();
+      
       this.suffix = credentialsRemoved.join(' ');
       this.recordRepair(previousText, textNoNicknames, 'credentials_removed');
       text = textNoNicknames;

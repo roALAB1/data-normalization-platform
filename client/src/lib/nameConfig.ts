@@ -3,8 +3,9 @@ export const nameConfig = {
     "BA", "B.A.", "BSc", "B.Sc.", "BEng", "B.E.", "BCom", "B.Com.", "BMus", "B.Mus.", "BFA", "B.F.A.", "BBA", "B.B.A.", "BEd", "B.Ed.", "BS", "B.S.",
     "MA", "M.A.", "MSc", "M.Sc.", "MEng", "M.E.", "MCom", "M.Com.", "MFA", "M.F.A.", "MBA", "M.B.A.", "MEd", "M.Ed.", "MS", "M.S.", "MPhil", "M.Phil.", "LLM", "LL.M.", "MPH", "M.P.H.", "MPA", "M.P.A.", "MMus", "M.Mus.",
     "PhD", "Ph.D.", "EdD", "D.Ed.", "MD", "M.D.", "DO", "D.O.", "DDS", "D.D.S.", "DMD", "D.M.D.", "JD", "J.D.", "DrPH", "D.PH.", "DVM", "D.V.M.", "PsyD", "Psy.D.", "DC", "D.C.", "LLD", "LL.D.", "QC",
-    "CPA", "CFA", "CFP", "PE", "PMP", "LEED AP", "ACC", "CEM", "CMM", "CGMP", "HCIB", "CHRM", "CPP", "CAIA", "PACE", "OBE", "CB", "KBE", "MBE", "CBE", "CMG", "RN", "RGN", "FRCP", "FRCS", "Engr", "Esq",
-    "CHIA", "CSP", "CSM", "FCCA", "CMgr", "MCMI", "GAICD", "MIRHR", "CHRL", "APMA", "C.M.C.", "PPM", "CSPO", "ICD.D", "CFRE", "CPFA", "CCEP", "DBA", "SMIEEE", "ACA", "SPHR", "FCIM", "M.IDST", "MAHRI", "FACHE", "MBACP", "CPTD", "LCPC", "LPHA", "CADC", "CODP", "P.E", "CPT", "FRSA", "FCA", "ANIPR", "PME", "ASEAN", "CISA", "CISM", "FRM", "ACII"
+    "CPA", "CFA", "CFP", "CFP®", "PE", "PMP", "LEED AP", "ACC", "CEM", "CMM", "CGMP", "HCIB", "CHRM", "CPP", "CAIA", "PACE", "OBE", "CB", "KBE", "MBE", "CBE", "CMG", "RN", "RGN", "FRCP", "FRCS", "Engr", "Esq",
+    "CHIA", "CSP", "CSM", "FCCA", "CMgr", "MCMI", "GAICD", "MIRHR", "CHRL", "APMA", "C.M.C.", "PPM", "CSPO", "ICD.D", "CFRE", "CPFA", "CCEP", "DBA", "SMIEEE", "ACA", "SPHR", "FCIM", "M.IDST", "MAHRI", "FACHE", "MBACP", "CPTD", "LCPC", "LPHA", "CADC", "CODP", "P.E", "CPT", "FRSA", "FCA", "ANIPR", "PME", "ASEAN", "CISA", "CISM", "FRM", "ACII",
+    "DACM", "BCTMB", "FAIHM", "LAc", "L.Ac.", "OMD", "MSOM", "DAOM", "NCCAOM", "Dipl.Ac.", "Dipl.OM", "LMHC", "LCSW", "LMFT", "LPC", "LPCC", "LMSW", "LSW", "LISW", "LICSW"
   ],
   
   TITLES: [

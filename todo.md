@@ -115,3 +115,8 @@
 
 ## Bugs Fixed
 - [x] Suffixes/credentials (MD, PhD, CFP, etc.) being treated as last names - now properly stripped
+
+## Critical Bugs (Fixed)
+- [x] Credentials appearing in middle/last name positions - now stripped from all positions
+- [x] Credential removal now works anywhere in the name, not just the end
+- [x] Added missing credentials (DACM, BCTMB, FAIHM, CFP®, LAc, LMHC, LCSW, etc.)
