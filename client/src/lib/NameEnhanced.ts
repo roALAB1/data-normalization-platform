@@ -183,7 +183,31 @@ export class NameEnhanced {
       text = textNoNicknames;
     }
 
-    // 5. Filter out job titles
+    // 5. Remove suffixes/credentials (MD, PhD, CFP, etc.)
+    // Build pattern for credentials at the end of the name
+    const credentialPattern = new RegExp(
+      `\\s+(${nameConfig.CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})$`,
+      'i'
+    );
+    let credentialsRemoved: string[] = [];
+    let previousText = textNoNicknames;
+    
+    // Keep removing credentials until none are found (handles multiple like "MD PhD")
+    while (credentialPattern.test(textNoNicknames)) {
+      const match = textNoNicknames.match(credentialPattern);
+      if (match) {
+        credentialsRemoved.push(match[1]);
+        textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
+      }
+    }
+    
+    if (credentialsRemoved.length > 0) {
+      this.suffix = credentialsRemoved.join(' ');
+      this.recordRepair(previousText, textNoNicknames, 'credentials_removed');
+      text = textNoNicknames;
+    }
+
+    // 6. Filter out job titles
     const hasJobWord = nameConfig.JOB_WORDS.some(word => 
       new RegExp(`\\b${word}\\b`, 'i').test(textNoNicknames)
     );

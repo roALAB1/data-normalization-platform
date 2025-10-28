@@ -112,3 +112,6 @@
 
 ## Bugs Fixed
 - [x] Titles like "Dr" being treated as first names - now properly removed
+
+## Bugs Fixed
+- [x] Suffixes/credentials (MD, PhD, CFP, etc.) being treated as last names - now properly stripped
