@@ -257,6 +257,9 @@ export default function HomeEnhanced() {
               <Link href="/phone">
                 <Button variant="outline" size="sm">Phone Demo →</Button>
               </Link>
+              <Link href="/email">
+                <Button variant="outline" size="sm">Email Demo →</Button>
+              </Link>
               <Link href="/jobs">
                 <Button variant="outline" size="sm">Batch Jobs →</Button>
               </Link>

@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import HomeEnhanced from "./pages/HomeEnhanced";
 import PhoneDemoEnhanced from "./pages/PhoneDemoEnhanced";
 import JobDashboard from "./pages/JobDashboard";
+import EmailDemo from "./pages/EmailDemo";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -16,6 +17,7 @@ function Router() {
       <Route path={"/"} component={HomeEnhanced} />
       <Route path={"/phone"} component={PhoneDemoEnhanced} />
       <Route path={"/jobs"} component={JobDashboard} />
+      <Route path={"/email"} component={EmailDemo} />
       <Route path={"/demo"} component={Home} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
