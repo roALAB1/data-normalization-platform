@@ -32,3 +32,6 @@ export function isValidPhone(phone: string, country: string = 'US'): boolean {
   const format = PHONE_FORMATS[country];
   return format ? format.test(phone) : false;
 }
+
+// Export PhoneEnhanced class (enterprise-grade phone normalization)
+export { PhoneEnhanced, type PhoneParseOptions, type PhoneParseResult } from './PhoneEnhanced';

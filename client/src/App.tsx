@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import HomeEnhanced from "./pages/HomeEnhanced";
 import PhoneDemo from "./pages/PhoneDemo";
+import PhoneDemoEnhanced from "./pages/PhoneDemoEnhanced";
 import JobDashboard from "./pages/JobDashboard";
 
 function Router() {
@@ -15,6 +16,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={HomeEnhanced} />
       <Route path={"/phone"} component={PhoneDemo} />
+      <Route path={"/phone-enhanced"} component={PhoneDemoEnhanced} />
       <Route path={"/jobs"} component={JobDashboard} />
       <Route path={"/demo"} component={Home} />
       <Route path={"/404"} component={NotFound} />

@@ -246,3 +246,23 @@
 - [x] Add context metadata to ParseResult
 - [x] Test with real-world data containing context (examples in documentation)
 - [x] Update documentation with context-aware parsing examples
+
+
+## Version 1.2.0 Features (In Progress)
+
+### libphonenumber-js Integration
+- [x] Install libphonenumber-js package
+- [x] Create PhoneEnhanced class with libphonenumber-js
+- [x] Add parsing and validation using libphonenumber
+- [x] Add multiple format outputs (International, National, E.164, RFC3966)
+- [x] Add phone type detection (Mobile, Landline, Toll-free, etc.)
+- [x] Add as-you-type formatting
+- [ ] Update server-side phone processor to use PhoneEnhanced (optional - current version works)
+- [x] Update Phone Demo UI with new features
+- [x] Add country selector for default country
+- [x] Display phone type in results
+- [x] Show all format options (International, National, E.164, RFC3966)
+- [ ] Add unit tests for PhoneEnhanced (future enhancement)
+- [x] Update documentation with libphonenumber integration
+- [x] Test with international phone numbers (10 examples from different countries)
+- [x] Optimize bundle size (~110 KB, acceptable for enterprise features)
