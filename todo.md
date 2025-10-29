@@ -205,7 +205,7 @@
 
 
 ## Post-GitHub Push Tasks (In Progress)
-- [ ] Update README.md to reflect new features (750+ credentials, hybrid monorepo, bug fixes)
-- [ ] Create release/tag v1.0.0 to mark this milestone
+- [x] Update README.md to reflect new features (750+ credentials, hybrid monorepo, bug fixes)
+- [x] Create release/tag v1.0.0 to mark this milestone
 - [ ] Set up branch protection rules on GitHub
 - [ ] Publish the app via webdev UI for public access
