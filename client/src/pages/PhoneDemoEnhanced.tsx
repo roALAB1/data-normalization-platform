@@ -224,28 +224,131 @@ export default function PhoneDemoEnhanced() {
                       )}
                       Validation Result
                     </CardTitle>
+                    <CardDescription>
+                      {parsedPhone.result.isValid 
+                        ? "This number is valid and can be dialed"
+                        : parsedPhone.result.isPossible
+                        ? "This number has valid length but may not be assigned"
+                        : "This number is invalid for the detected region"}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Valid:</span>
-                      <Badge variant={parsedPhone.result.isValid ? "default" : "destructive"}>
-                        {parsedPhone.result.isValid ? "✓ Valid" : "✗ Invalid"}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Possible:</span>
-                      <Badge variant={parsedPhone.result.isPossible ? "default" : "secondary"}>
-                        {parsedPhone.result.isPossible ? "✓ Possible" : "✗ Not Possible"}
-                      </Badge>
-                    </div>
-                    {parsedPhone.result.countryCode && (
+                  <CardContent className="space-y-4">
+                    {/* Overall Status */}
+                    <div className="p-3 rounded-lg border-2 space-y-2" style={{
+                      borderColor: parsedPhone.result.isValid ? 'rgb(34 197 94)' : parsedPhone.result.isPossible ? 'rgb(234 179 8)' : 'rgb(239 68 68)',
+                      backgroundColor: parsedPhone.result.isValid ? 'rgb(240 253 244)' : parsedPhone.result.isPossible ? 'rgb(254 252 232)' : 'rgb(254 242 242)'
+                    }}>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Country:</span>
-                        <Badge variant="outline">
-                          {parsedPhone.result.countryCode} ({PhoneEnhanced.getCountryName(parsedPhone.result.countryCode)})
+                        <span className="text-sm font-semibold">Overall Status:</span>
+                        <Badge variant={parsedPhone.result.isValid ? "default" : parsedPhone.result.isPossible ? "secondary" : "destructive"} className="text-xs">
+                          {parsedPhone.result.isValid ? "✓ VALID" : parsedPhone.result.isPossible ? "⚠ POSSIBLE" : "✗ INVALID"}
                         </Badge>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        {parsedPhone.result.isValid 
+                          ? "Number passes all validation checks and is dialable"
+                          : parsedPhone.result.isPossible
+                          ? "Number has correct length but assignment is uncertain"
+                          : "Number does not match valid patterns for any region"}
+                      </p>
+                    </div>
+
+                    {/* Detailed Validation */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between py-2 border-b">
+                        <div>
+                          <span className="text-sm font-medium">Strictly Valid:</span>
+                          <p className="text-xs text-muted-foreground">Can be dialed right now</p>
+                        </div>
+                        <Badge variant={parsedPhone.result.isValid ? "default" : "outline"}>
+                          {parsedPhone.result.isValid ? "✓ Yes" : "✗ No"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b">
+                        <div>
+                          <span className="text-sm font-medium">Possibly Valid:</span>
+                          <p className="text-xs text-muted-foreground">Has valid length/format</p>
+                        </div>
+                        <Badge variant={parsedPhone.result.isPossible ? "default" : "outline"}>
+                          {parsedPhone.result.isPossible ? "✓ Yes" : "✗ No"}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Region Information */}
+                    {parsedPhone.result.countryCode && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between py-2 border-b">
+                          <div>
+                            <span className="text-sm font-medium">Detected Region:</span>
+                            <p className="text-xs text-muted-foreground">Country from number analysis</p>
+                          </div>
+                          <Badge variant="outline" className="font-mono">
+                            {parsedPhone.result.countryCode}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between py-2 border-b">
+                          <div>
+                            <span className="text-sm font-medium">Country Name:</span>
+                            <p className="text-xs text-muted-foreground">Full country name</p>
+                          </div>
+                          <span className="text-sm">{PhoneEnhanced.getCountryName(parsedPhone.result.countryCode)}</span>
+                        </div>
+                        <div className="flex items-center justify-between py-2 border-b">
+                          <div>
+                            <span className="text-sm font-medium">Calling Code:</span>
+                            <p className="text-xs text-muted-foreground">International prefix</p>
+                          </div>
+                          <Badge variant="outline" className="font-mono">
+                            +{PhoneEnhanced.getCallingCode(parsedPhone.result.countryCode)}
+                          </Badge>
+                        </div>
+                      </div>
                     )}
+
+                    {/* Validation Quality Indicator */}
+                    {parsedPhone.result.isValid && parsedPhone.result.countryCode && (
+                      <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-green-900 dark:text-green-100">Valid for {PhoneEnhanced.getCountryName(parsedPhone.result.countryCode)}</p>
+                            <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                              This number meets all validation criteria for the {parsedPhone.result.countryCode} region and can be used for calls, SMS, or storage.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!parsedPhone.result.isValid && parsedPhone.result.isPossible && (
+                      <div className="p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100">Possibly Valid</p>
+                            <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                              The number has a valid length and format, but may not be currently assigned or in use. Use with caution.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!parsedPhone.result.isValid && !parsedPhone.result.isPossible && (
+                      <div className="p-3 bg-red-50 dark:bg-red-950 rounded-lg border border-red-200 dark:border-red-800">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-red-600 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-red-900 dark:text-red-100">Invalid Number</p>
+                            <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                              This number does not match valid patterns for any region. Please check the input and try again.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {parsedPhone.result.typeDescription && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Type:</span>
