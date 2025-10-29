@@ -103,11 +103,14 @@ export default function PhoneDemoEnhanced() {
             </div>
             
             <div className="flex gap-2">
-              <Link href="/phone">
-                <Button variant="outline">Old Version</Button>
-              </Link>
               <Link href="/">
-                <Button variant="outline">← Back to Home</Button>
+                <Button variant="outline" size="sm">Home</Button>
+              </Link>
+              <Link href="/email">
+                <Button variant="outline" size="sm">Email Demo</Button>
+              </Link>
+              <Link href="/jobs">
+                <Button variant="outline" size="sm">Batch Jobs</Button>
               </Link>
             </div>
           </div>

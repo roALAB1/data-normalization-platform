@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLoginUrl } from '@/const';
+import { Link } from 'wouter';
 
 export default function JobDashboard() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -229,10 +230,15 @@ export default function JobDashboard() {
                 {isConnected ? 'Live' : 'Offline'}
               </Badge>
               <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
-              <Button variant="outline" size="sm" onClick={() => window.location.href = '/'}>
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Button>
+              <Link href="/">
+                <Button variant="outline" size="sm">Home</Button>
+              </Link>
+              <Link href="/phone">
+                <Button variant="outline" size="sm">Phone Demo</Button>
+              </Link>
+              <Link href="/email">
+                <Button variant="outline" size="sm">Email Demo</Button>
+              </Link>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh

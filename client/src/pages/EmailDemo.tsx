@@ -264,12 +264,17 @@ export default function EmailDemo() {
                 </p>
               </div>
             </div>
-            <Link href="/">
-              <Button variant="outline" size="sm">
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/">
+                <Button variant="outline" size="sm">Home</Button>
+              </Link>
+              <Link href="/phone">
+                <Button variant="outline" size="sm">Phone Demo</Button>
+              </Link>
+              <Link href="/jobs">
+                <Button variant="outline" size="sm">Batch Jobs</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
