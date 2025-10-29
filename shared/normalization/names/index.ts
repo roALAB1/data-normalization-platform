@@ -29,6 +29,9 @@ export * from './suffixes';
 // Export all prefixes
 export * from './prefixes';
 
+// Export context analysis
+export * from './context-analysis';
+
 // Export Asian surnames
 export * from './asian-surnames';
 
@@ -66,3 +69,15 @@ export {
   detectAsianCulture,
   getAsianSurnameConfidence
 } from './asian-surnames';
+
+export {
+  extractEmailDomain,
+  detectCultureFromEmail,
+  extractPhoneCountryCode,
+  detectCultureFromPhone,
+  detectCultureFromCompany,
+  analyzeContext,
+  boostConfidenceWithContext
+} from './context-analysis';
+
+export type { NameContext, ContextAnalysis } from './context-analysis';

@@ -233,6 +233,16 @@
 - [x] Add flag for family-name-first pattern
 - [x] Handle mixed cases (e.g., "John Kim" vs "Kim Min-jun")
 - [x] Update NameEnhanced to support name order detection
-- [ ] Add option to preserve original order vs auto-reorder
-- [ ] Test with real Asian names dataset
-- [ ] Update documentation with Asian name handling
+- [ ] Add option to preserve original order vs auto-reorder (future enhancement)
+- [x] Test with real Asian names dataset (added 7 test examples)
+- [x] Update documentation with Asian name handling
+
+### Context-Aware Parsing
+- [x] Add email domain analysis for cultural hints (.cn, .kr, .jp, .vn)
+- [x] Add phone country code detection (+86, +82, +81, +84)
+- [x] Add company name analysis for cultural context
+- [x] Extend ParseOptions to accept context fields (email, phone, company)
+- [x] Improve Asian name detection confidence using context
+- [x] Add context metadata to ParseResult
+- [x] Test with real-world data containing context (examples in documentation)
+- [x] Update documentation with context-aware parsing examples

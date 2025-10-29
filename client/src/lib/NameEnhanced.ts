@@ -11,8 +11,11 @@ import {
   isLastNamePrefix,
   isAsianSurname,
   detectAsianCulture,
-  getAsianSurnameConfidence
+  getAsianSurnameConfidence,
+  analyzeContext,
+  boostConfidenceWithContext
 } from '@shared/normalization/names';
+import type { NameContext, ContextAnalysis } from '@shared/normalization/names';
 
 export interface RepairLog {
   original: string;
@@ -36,6 +39,7 @@ export interface NameParts {
 export interface ParseOptions {
   preserveAccents?: boolean;
   trackPerformance?: boolean;
+  context?: NameContext;  // Additional context for improved parsing
 }
 
 export interface ParseResult {
@@ -45,6 +49,7 @@ export interface ParseResult {
     repairTime: number;
     totalTime: number;
   };
+  contextAnalysis?: ContextAnalysis;  // Context analysis results
 }
 
 export class NameEnhanced {
@@ -58,6 +63,7 @@ export class NameEnhanced {
   nameOrder: 'western' | 'eastern' = 'western';
   asianCulture: 'chinese' | 'korean' | 'japanese' | 'vietnamese' | null = null;
   nameOrderConfidence: number = 0;
+  contextAnalysis: ContextAnalysis | null = null;
   isValid: boolean = false;
   parseLog: RepairLog[] = [];
   options: ParseOptions;
@@ -312,20 +318,37 @@ export class NameEnhanced {
       return;
     }
 
+    // Context analysis (if provided)
+    if (this.options.context) {
+      this.contextAnalysis = analyzeContext(this.options.context);
+      if (this.contextAnalysis.detectedCulture && this.contextAnalysis.confidence >= 60) {
+        this.recordRepair(text, text, `context_detected_${this.contextAnalysis.detectedCulture}_from_${this.contextAnalysis.sources.join('_and_')}`);
+      }
+    }
+    
     // Asian name order detection
     // Check if the first part is an Asian surname (family-name-first pattern)
-    const firstPartConfidence = getAsianSurnameConfidence(parts[0]);
+    let firstPartConfidence = getAsianSurnameConfidence(parts[0]);
     const lastPartConfidence = parts.length > 1 ? getAsianSurnameConfidence(parts[parts.length - 1]) : 0;
+    
+    // Boost confidence using context if available
+    if (this.contextAnalysis && this.contextAnalysis.confidence >= 60) {
+      firstPartConfidence = boostConfidenceWithContext(firstPartConfidence, this.contextAnalysis);
+    }
     
     // Heuristics for name order detection:
     // 1. If first part is a high-confidence Asian surname AND last part is not, likely family-name-first
     // 2. If both are Asian surnames, check which has higher confidence
     // 3. If name has 2 parts and first is Asian surname, likely family-name-first
     // 4. If name has 3+ parts and first is Asian surname, check for Western given names
+    // 5. Context (email domain, phone country code, company) can boost confidence
     
     let shouldReorder = false;
     
-    if (firstPartConfidence >= 85) {
+    // Lower threshold if context strongly suggests Asian culture
+    const confidenceThreshold = (this.contextAnalysis && this.contextAnalysis.confidence >= 80) ? 70 : 85;
+    
+    if (firstPartConfidence >= confidenceThreshold) {
       // First part is a known Asian surname
       const culture = detectAsianCulture(parts[0]);
       this.asianCulture = culture;
