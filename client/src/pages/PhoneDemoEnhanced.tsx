@@ -260,7 +260,7 @@ export default function PhoneDemoEnhanced() {
                           <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-sm font-medium">Strictly Valid:</span>
                             <div className="group relative">
-                              <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                              <HelpCircle className="w-4 h-4 text-blue-500 cursor-help hover:text-blue-600" />
                               <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-72 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
                                 <p className="font-semibold mb-2 text-foreground">What is Strictly Valid?</p>
                                 <p className="text-muted-foreground mb-2">
@@ -287,7 +287,7 @@ export default function PhoneDemoEnhanced() {
                           <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-sm font-medium">Possibly Valid:</span>
                             <div className="group relative">
-                              <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                              <HelpCircle className="w-4 h-4 text-blue-500 cursor-help hover:text-blue-600" />
                               <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-72 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
                                 <p className="font-semibold mb-2 text-foreground">What is Possibly Valid?</p>
                                 <p className="text-muted-foreground mb-2">
