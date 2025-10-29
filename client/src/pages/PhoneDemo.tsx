@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   AlertCircle, CheckCircle2, Phone, FileText, 
   Copy, Download, Upload, Settings, BarChart3, 
-  Clock, Zap, Globe, Code
+  Clock, Zap, Globe, Code, HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
@@ -255,7 +255,28 @@ export default function PhoneDemo() {
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="default-country">Default Country</Label>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Label htmlFor="default-country">Default Country</Label>
+                  <div className="group relative">
+                    <HelpCircle className="w-4 h-4 text-blue-500 cursor-help hover:text-blue-600" />
+                    <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-80 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
+                      <p className="font-semibold mb-2 text-foreground">What is Default Country?</p>
+                      <p className="text-muted-foreground mb-2">
+                        The country used as context when parsing phone numbers <strong>without country codes</strong>.
+                      </p>
+                      <p className="font-semibold mb-1 text-foreground">Examples:</p>
+                      <ul className="list-disc list-inside text-muted-foreground space-y-1 mb-2">
+                        <li>With US selected: "(213) 373-4253" → Parsed as US number</li>
+                        <li>With UK selected: "020 7946 0958" → Parsed as UK number</li>
+                        <li>Numbers with "+" prefix ignore this setting</li>
+                      </ul>
+                      <p className="font-semibold mb-1 text-foreground">When it matters:</p>
+                      <p className="text-muted-foreground">
+                        Critical for parsing local/national format numbers. Always include country codes (+1, +44, etc.) for best accuracy.
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Select value={defaultCountry} onValueChange={setDefaultCountry}>
                   <SelectTrigger id="default-country">
                     <SelectValue />
@@ -272,7 +293,23 @@ export default function PhoneDemo() {
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="allow-extensions">Allow Extensions</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor="allow-extensions">Allow Extensions</Label>
+                    <div className="group relative">
+                      <HelpCircle className="w-4 h-4 text-blue-500 cursor-help hover:text-blue-600" />
+                      <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-72 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
+                        <p className="font-semibold mb-2 text-foreground">Allow Extensions</p>
+                        <p className="text-muted-foreground mb-2">
+                          Parse phone extensions like "ext 123" or "x456" at the end of numbers.
+                        </p>
+                        <p className="font-semibold mb-1 text-foreground">Examples:</p>
+                        <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                          <li>"555-1234 ext 100" → Extracts extension</li>
+                          <li>"555-1234 x99" → Extracts extension</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                   <Switch
                     id="allow-extensions"
                     checked={allowExtensions}
@@ -280,7 +317,26 @@ export default function PhoneDemo() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="strict-validation">Strict Validation</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor="strict-validation">Strict Validation</Label>
+                    <div className="group relative">
+                      <HelpCircle className="w-4 h-4 text-blue-500 cursor-help hover:text-blue-600" />
+                      <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-72 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
+                        <p className="font-semibold mb-2 text-foreground">Strict Validation</p>
+                        <p className="text-muted-foreground mb-2">
+                          When enabled, only accepts numbers that pass <strong>all validation rules</strong> and are definitely dialable.
+                        </p>
+                        <p className="font-semibold mb-1 text-foreground">When to use:</p>
+                        <ul className="list-disc list-inside text-muted-foreground space-y-1 mb-2">
+                          <li><strong>ON:</strong> Banking, emergency services, real-time calling</li>
+                          <li><strong>OFF:</strong> Data collection, contact forms, lenient parsing</li>
+                        </ul>
+                        <p className="text-muted-foreground">
+                          When OFF, accepts numbers with correct format but may not be assigned.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                   <Switch
                     id="strict-validation"
                     checked={strictValidation}
