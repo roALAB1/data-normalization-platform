@@ -246,3 +246,5 @@
 - [x] Add context metadata to ParseResult
 - [x] Test with real-world data containing context (examples in documentation)
 - [x] Update documentation with context-aware parsing examples
+- [ ] Set up branch protection rules on GitHub
+- [ ] Publish the app via webdev UI for public access
