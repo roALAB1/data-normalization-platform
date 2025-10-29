@@ -279,3 +279,4 @@
 - [x] Add tooltip for "Strictly Valid" explaining when to use it
 - [x] Add tooltip for "Possibly Valid" explaining the difference
 - [x] Include use case examples in tooltips
+- [x] Add tooltip to Configuration section explaining Default Country setting

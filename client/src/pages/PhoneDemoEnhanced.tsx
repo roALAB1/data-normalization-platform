@@ -125,7 +125,28 @@ export default function PhoneDemoEnhanced() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="default-country">Default Country</Label>
+              <div className="flex items-center gap-1.5 mb-2">
+                <Label htmlFor="default-country">Default Country</Label>
+                <div className="group relative">
+                  <HelpCircle className="w-4 h-4 text-blue-500 cursor-help hover:text-blue-600" />
+                  <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-80 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
+                    <p className="font-semibold mb-2 text-foreground">What is Default Country?</p>
+                    <p className="text-muted-foreground mb-2">
+                      The country used as context when parsing phone numbers <strong>without country codes</strong>.
+                    </p>
+                    <p className="font-semibold mb-1 text-foreground">Examples:</p>
+                    <ul className="list-disc list-inside text-muted-foreground space-y-1 mb-2">
+                      <li>With US selected: "(213) 373-4253" → Parsed as US number</li>
+                      <li>With UK selected: "020 7946 0958" → Parsed as UK number</li>
+                      <li>Numbers with "+" prefix ignore this setting</li>
+                    </ul>
+                    <p className="font-semibold mb-1 text-foreground">When it matters:</p>
+                    <p className="text-muted-foreground">
+                      Critical for parsing local/national format numbers. Always include country codes (+1, +44, etc.) for best accuracy.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <Select value={defaultCountry} onValueChange={(v) => setDefaultCountry(v as CountryCode)}>
                 <SelectTrigger id="default-country">
                   <SelectValue />
