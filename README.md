@@ -6,7 +6,7 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 This platform provides specialized normalizers for common data types found in business datasets:
 
-- **Name Normalization**: Handles credentials, nicknames, prefixes, multi-person detection, encoding issues
+- **Name Normalization**: Handles credentials, nicknames, prefixes, multi-person detection, encoding issues, pronouns, generational suffixes
 - **Phone Normalization**: International format support, carrier detection, validation
 - **Email Normalization**: *(Coming soon)*
 - **Company Normalization**: *(Coming soon)*
@@ -14,15 +14,28 @@ This platform provides specialized normalizers for common data types found in bu
 
 ### Key Features
 
+✅ **750+ Professional Credentials**: Comprehensive coverage across healthcare, finance, IT, engineering, supply chain, legal, education, and more  
 ✅ **Intelligent CSV Parsing**: Auto-detects column structure (single full name, first/last split, multi-column)  
 ✅ **Batch Processing**: Server-side job queue handles unlimited dataset sizes  
 ✅ **Real-time Processing**: Interactive demo for testing individual records  
+✅ **Hybrid Monorepo**: Publishable `@normalization/core` package for reuse across projects  
+✅ **Optimized Performance**: O(1) credential lookups using Sets and Maps  
 ✅ **Accent Handling**: Configurable accent preservation or ASCII conversion  
-✅ **Comprehensive Cleaning**: Removes credentials, job titles, fixes encoding issues  
+✅ **Comprehensive Cleaning**: Removes credentials, job titles, pronouns, fixes encoding issues  
 ✅ **Multiple Export Formats**: CSV, JSON with detailed repair logs  
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
+
+### Recent Improvements (v1.0.0)
+
+🎉 **Major Update**: This release includes significant enhancements and bug fixes:
+
+- **750+ Credentials**: Expanded from ~100 to 750+ professional credentials across all industries
+- **Hybrid Monorepo**: Refactored into publishable `@normalization/core` package
+- **Bug Fixes**: Fixed hyphenated names, generational suffixes, pronouns, multiple parentheses
+- **Performance**: Optimized with Sets/Maps for O(1) credential lookups
+- **Architecture**: Modular library organization by domain (names, phones, emails, companies, addresses)
 
 ## 🚀 Quick Start
 
@@ -30,13 +43,13 @@ This platform provides specialized normalizers for common data types found in bu
 
 - Node.js 22.x
 - pnpm 9.x
-- PostgreSQL (for production)
+- MySQL/PostgreSQL (for production)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/data-normalization-platform.git
+git clone https://github.com/roALAB1/data-normalization-platform.git
 cd data-normalization-platform
 
 # Install dependencies
@@ -93,13 +106,14 @@ The application will be available at `http://localhost:3000`
 - Node.js with Express
 - tRPC for API layer
 - Drizzle ORM
-- PostgreSQL database
+- MySQL database
 - Background job queue
 
 **Infrastructure**:
 - S3-compatible storage
 - OAuth authentication
 - Real-time progress tracking
+- Hybrid monorepo with pnpm workspaces + Turborepo
 
 ### Project Structure
 
@@ -122,9 +136,36 @@ The application will be available at `http://localhost:3000`
 │   └── jobDb.ts           # Database operations
 ├── drizzle/               # Database schema
 │   └── schema.ts
-├── shared/                # Shared types and constants
+├── shared/                # Shared types and platform-wide normalization library
+│   └── normalization/     # 750+ credentials organized by domain
+│       ├── names/         # Name normalization (credentials, titles, prefixes, suffixes)
+│       ├── phones/        # Phone normalization
+│       ├── emails/        # Email normalization (coming soon)
+│       ├── companies/     # Company normalization (coming soon)
+│       └── addresses/     # Address normalization (coming soon)
+├── packages/              # Publishable packages
+│   └── normalization-core/ # @normalization/core npm package
 └── docs/                  # Additional documentation
 ```
+
+## 📦 Publishable Package
+
+The normalization library is available as a standalone package:
+
+```bash
+# Install from the monorepo
+pnpm add @normalization/core
+
+# Use in your project
+import { isCredential, ALL_CREDENTIALS } from '@normalization/core/names';
+```
+
+**Package Features**:
+- 750+ professional credentials
+- CJS + ESM + TypeScript declarations
+- O(1) lookup performance
+- Modular imports by domain
+- Zero dependencies
 
 ## 🔧 Configuration
 
@@ -134,7 +175,7 @@ Required environment variables (see `.env.example`):
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:password@localhost:5432/normalization
+DATABASE_URL=mysql://user:password@localhost:3306/normalization
 
 # S3 Storage
 S3_ENDPOINT=https://s3.amazonaws.com
@@ -153,23 +194,35 @@ VITE_APP_LOGO=/logo.png
 
 ### Customizing Normalizers
 
-Edit configuration files in `client/src/lib/`:
+Edit configuration files in `shared/normalization/`:
 
-- `nameConfig.ts`: Credentials, job titles, last name prefixes
-- `phoneConfig.ts`: Country codes, formats, carrier patterns
+- `names/credentials.ts`: Professional credentials by industry
+- `names/titles.ts`: Name titles and prefixes
+- `names/suffixes.ts`: Generational suffixes
+- `phones/config.ts`: Country codes, formats, carrier patterns
 
 ## 📊 Normalizer Details
 
 ### Name Normalizer
 
 **Handles**:
-- Credentials (PhD, MD, MBA, CPA, etc.) - 100+ patterns
-- Job titles (CEO, Director, Manager, etc.)
-- Nicknames in quotes or parentheses
-- Last name prefixes (van, de, von, etc.) - 80+ prefixes
-- Multi-person detection ("John and Jane")
-- Encoding issues (Fran?ois → François)
-- Accent normalization (configurable)
+- **Credentials**: 750+ professional credentials across all industries
+  - Healthcare: MD, DO, RN, NP, PA, DDS, PharmD, etc. (150+)
+  - Finance: CPA, CFA, CFP, ChFC, CLU, etc. (80+)
+  - IT/Tech: CISSP, CEH, CCNA, AWS, Azure, CompTIA, etc. (200+)
+  - Engineering: PE, EIT, PMP, Six Sigma, etc. (100+)
+  - Supply Chain: CSCP, CPIM, CTSC, CLTD, etc. (50+)
+  - Legal: JD, LLM, Esq, etc. (40+)
+  - Education: PhD, EdD, MA, MS, BA, BS, etc. (60+)
+- **Pronouns**: Automatically removes (she/her), (he/him), (they/them), etc.
+- **Generational Suffixes**: Jr., Sr., II, III, IV, V, etc.
+- **Job Titles**: CEO, Director, Manager, etc.
+- **Nicknames**: In quotes or parentheses
+- **Last Name Prefixes**: van, de, von, etc. (80+ prefixes)
+- **Multi-person Detection**: "John and Jane"
+- **Hyphenated Names**: Preserves "Meng-Ling", "Jean-Paul", etc.
+- **Encoding Issues**: Fran?ois → François
+- **Accent Normalization**: Configurable
 
 **Output Formats**:
 - Full: "Dr. John Paul Smith Jr."
@@ -206,6 +259,9 @@ pnpm type-check
 
 # Lint code
 pnpm lint
+
+# Build packages
+pnpm build
 ```
 
 ## 🚢 Deployment
@@ -252,9 +308,17 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 - Use meaningful variable names
 - Keep functions focused and testable
 
-## 🐛 Known Issues
+## 🐛 Bug Fixes (v1.0.0)
 
-See [Issues](https://github.com/YOUR_USERNAME/data-normalization-platform/issues) for current bugs and feature requests.
+All critical bugs have been fixed:
+
+- ✅ Hyphenated names ("Meng-Ling Erik Kuo" now parses correctly)
+- ✅ Generational suffixes (III, Jr., Sr. detected as suffixes, not last names)
+- ✅ Pronouns removal ((she/her), (he/him), (they/them) automatically stripped)
+- ✅ Supply chain credentials (CSCP, CPIM, CTSC now recognized)
+- ✅ Multiple parentheses handling ("John Doe (he/him) (Ph.D.)" works correctly)
+- ✅ Vite HMR WebSocket configuration (no console errors)
+- ✅ Deployment path mappings (all imports resolved correctly)
 
 ## 📚 Documentation
 
@@ -263,6 +327,7 @@ See [Issues](https://github.com/YOUR_USERNAME/data-normalization-platform/issues
 - [CSV Format Guide](docs/csv-formats.md)
 - [Batch Processing Guide](docs/batch-processing.md)
 - [Deployment Guide](docs/deployment.md)
+- [Monorepo Architecture](MONOREPO.md)
 
 ## 🔐 Security
 
@@ -278,12 +343,14 @@ See [Issues](https://github.com/YOUR_USERNAME/data-normalization-platform/issues
 - **Server-side**: Processes 100K rows in ~30-60 seconds
 - **Chunked processing**: 1000 rows per chunk to prevent memory issues
 - **Progress tracking**: Real-time updates via polling
+- **Optimized lookups**: O(1) credential matching using Sets and Maps
 
 ## 🙏 Acknowledgments
 
 - Original Python script inspired by hours of iteration with Gemini and ChatGPT
 - [Namefully](https://namefully.netlify.app/) JavaScript library for name formatting patterns
 - shadcn/ui for beautiful component library
+- Credential data sourced from Wikipedia, FDA, CompTIA, Cisco, Microsoft, AWS, (ISC)², ISACA, APICS, ASQ, and other professional organizations
 
 ## 📄 License
 
@@ -291,9 +358,9 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## 🤝 Support
 
-- Create an [Issue](https://github.com/YOUR_USERNAME/data-normalization-platform/issues)
+- Create an [Issue](https://github.com/roALAB1/data-normalization-platform/issues)
 - Email: your-email@example.com
-- Documentation: [Wiki](https://github.com/YOUR_USERNAME/data-normalization-platform/wiki)
+- Documentation: [Wiki](https://github.com/roALAB1/data-normalization-platform/wiki)
 
 ---
 
