@@ -15,6 +15,10 @@
 export { EmailEnhanced } from './EmailEnhanced';
 export type { EmailProvider, ProviderRules, EmailNormalizationResult } from './EmailEnhanced';
 
+// Export EmailVerification class
+export { EmailVerification } from './EmailVerification';
+export type { VerificationResult, VerificationOptions, CheckResult } from './EmailVerification';
+
 // Common email providers
 export const EMAIL_PROVIDERS = new Set([
   'gmail.com',

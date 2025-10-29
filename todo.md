@@ -306,3 +306,31 @@
 - [ ] Update server-side email processor (optional)
 - [x] Update documentation with email normalization guide
 - [x] Test with various email formats
+
+### Email Demo Enhancements (v1.3.1)
+- [x] Add CSV upload functionality to Email Demo page
+- [x] Parse CSV to extract email column
+- [x] Batch normalize all emails from CSV
+- [x] Display results table with original, normalized, provider, status
+- [x] Add download normalized CSV button
+- [x] Show statistics (total, valid, invalid, by provider)
+- [x] Add progress indicator for large files
+- [x] Handle invalid emails gracefully in results
+
+### Enterprise Email Verification (v1.4.0)
+- [x] Add MX record validation (DNS lookup for mail exchange records)
+- [x] Implement SMTP connection test (verify mail server is reachable)
+- [x] Add mailbox verification (RCPT TO command to check if email exists)
+- [x] Implement disposable email detection (temporary/throwaway email services)
+- [x] Add catch-all domain detection (domains that accept all emails)
+- [x] Implement role-based email detection (info@, admin@, support@, etc.)
+- [x] Add free email provider detection (Gmail, Yahoo, etc. vs corporate)
+- [x] Implement email reputation scoring (combine all verification signals)
+- [x] Add server-side verification API endpoint
+- [x] Create verification results display in UI
+- [x] Add verification status badges (verified, risky, invalid, unknown)
+- [x] Implement batch verification with progress tracking
+- [x] Add verification caching to avoid redundant checks
+- [x] Create detailed verification report with all checks
+- [x] Add timeout handling for slow SMTP servers
+- [x] Implement retry logic for transient failures
