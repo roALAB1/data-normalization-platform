@@ -281,3 +281,4 @@
 - [x] Include use case examples in tooltips
 - [x] Add tooltip to Configuration section explaining Default Country setting
 - [x] Add tooltips to original Phone Demo page (/phone) - Default Country, Allow Extensions, Strict Validation
+- [x] Remove old Phone Demo page (PhoneDemo.tsx) and make PhoneDemoEnhanced the default at /phone
