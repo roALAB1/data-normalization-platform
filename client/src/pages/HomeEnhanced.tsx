@@ -30,7 +30,15 @@ const exampleNames = [
   "John and Jane Smith",
   "Björn Søren O'Brien PhD CPA",
   "Mr. Thomas Alva Edison",
-  "Jose Garcia MBA"
+  "Jose Garcia MBA",
+  // Asian names (family-name-first pattern)
+  "Li Wei",
+  "Kim Min-jun",
+  "Tanaka Hiroshi",
+  "Nguyen Thi Mai",
+  "Wang Li Ming",
+  "Park Ji-hoon",
+  "Sato Yuki"
 ];
 
 interface BatchResult {

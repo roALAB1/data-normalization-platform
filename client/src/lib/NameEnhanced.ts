@@ -8,7 +8,10 @@ import {
   TITLES,
   isTitle,
   LAST_NAME_PREFIXES,
-  isLastNamePrefix
+  isLastNamePrefix,
+  isAsianSurname,
+  detectAsianCulture,
+  getAsianSurnameConfidence
 } from '@shared/normalization/names';
 
 export interface RepairLog {
@@ -25,6 +28,9 @@ export interface NameParts {
   nickname: string | null;
   prefix: string | null;
   suffix: string | null;
+  nameOrder?: 'western' | 'eastern';  // western: given-family, eastern: family-given
+  asianCulture?: 'chinese' | 'korean' | 'japanese' | 'vietnamese' | null;
+  nameOrderConfidence?: number;  // 0-100
 }
 
 export interface ParseOptions {
@@ -49,6 +55,9 @@ export class NameEnhanced {
   nickname: string | null = null;
   prefix: string | null = null;
   suffix: string | null = null;
+  nameOrder: 'western' | 'eastern' = 'western';
+  asianCulture: 'chinese' | 'korean' | 'japanese' | 'vietnamese' | null = null;
+  nameOrderConfidence: number = 0;
   isValid: boolean = false;
   parseLog: RepairLog[] = [];
   options: ParseOptions;
@@ -303,6 +312,73 @@ export class NameEnhanced {
       return;
     }
 
+    // Asian name order detection
+    // Check if the first part is an Asian surname (family-name-first pattern)
+    const firstPartConfidence = getAsianSurnameConfidence(parts[0]);
+    const lastPartConfidence = parts.length > 1 ? getAsianSurnameConfidence(parts[parts.length - 1]) : 0;
+    
+    // Heuristics for name order detection:
+    // 1. If first part is a high-confidence Asian surname AND last part is not, likely family-name-first
+    // 2. If both are Asian surnames, check which has higher confidence
+    // 3. If name has 2 parts and first is Asian surname, likely family-name-first
+    // 4. If name has 3+ parts and first is Asian surname, check for Western given names
+    
+    let shouldReorder = false;
+    
+    if (firstPartConfidence >= 85) {
+      // First part is a known Asian surname
+      const culture = detectAsianCulture(parts[0]);
+      this.asianCulture = culture;
+      this.nameOrderConfidence = firstPartConfidence;
+      
+      if (parts.length === 2) {
+        // Two-part name with Asian surname first: likely family-name-first
+        // e.g., "Kim Min-jun", "Li Wei", "Tanaka Hiroshi"
+        shouldReorder = true;
+        this.nameOrder = 'eastern';
+        this.recordRepair(text, text, `asian_name_order_detected_${culture}`);
+      } else if (parts.length === 3 && lastPartConfidence < 50) {
+        // Three-part name: Asian surname + given name + middle/given name
+        // e.g., "Wang Li Ming" (Chinese: Wang is surname, Li Ming is given name)
+        shouldReorder = true;
+        this.nameOrder = 'eastern';
+        this.recordRepair(text, text, `asian_name_order_detected_${culture}`);
+      } else if (parts.length > 1 && lastPartConfidence >= 85) {
+        // Both first and last are Asian surnames - use confidence scores
+        if (firstPartConfidence > lastPartConfidence) {
+          shouldReorder = true;
+          this.nameOrder = 'eastern';
+          this.recordRepair(text, text, `asian_name_order_detected_${culture}`);
+        }
+      }
+    }
+    
+    // Reorder if family-name-first pattern detected
+    if (shouldReorder && parts.length >= 2) {
+      // For 2-part names: swap family and given
+      // For 3+ part names: first part is family, rest are given names
+      const familyName = parts[0];
+      const givenNames = parts.slice(1);
+      
+      // Reassign parts in Western order (given-family)
+      if (givenNames.length === 1) {
+        this.firstName = givenNames[0];
+        this.lastName = familyName;
+        this.isValid = true;
+        this.parseTime = performance.now() - startTime;
+        return;
+      } else {
+        // Multiple given names: first is firstName, middle ones are middleName, last is still family
+        this.firstName = givenNames[0];
+        this.middleName = givenNames.slice(1).join(' ');
+        this.lastName = familyName;
+        this.isValid = true;
+        this.parseTime = performance.now() - startTime;
+        return;
+      }
+    }
+    
+    // Standard Western name order parsing
     this.firstName = parts[0];
     
     // Check if the last part is a generational suffix (Jr., Sr., II, III, etc.)

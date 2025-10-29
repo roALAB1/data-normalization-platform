@@ -225,3 +225,14 @@
 - [x] Add error handling for WebSocket failures (connection errors, reconnection logic)
 - [ ] Test with multiple concurrent jobs (needs real batch job upload)
 - [x] Update documentation with WebSocket architecture
+
+### Asian Name Order Detection
+- [x] Create comprehensive list of common Asian surnames (Chinese, Korean, Japanese, Vietnamese)
+- [x] Add name order detection heuristics
+- [x] Implement confidence scoring for detection
+- [x] Add flag for family-name-first pattern
+- [x] Handle mixed cases (e.g., "John Kim" vs "Kim Min-jun")
+- [x] Update NameEnhanced to support name order detection
+- [ ] Add option to preserve original order vs auto-reorder
+- [ ] Test with real Asian names dataset
+- [ ] Update documentation with Asian name handling

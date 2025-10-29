@@ -29,6 +29,9 @@ export * from './suffixes';
 // Export all prefixes
 export * from './prefixes';
 
+// Export Asian surnames
+export * from './asian-surnames';
+
 // Re-export commonly used items for convenience
 export {
   ALL_CREDENTIALS,
@@ -52,3 +55,14 @@ export {
   LAST_NAME_PREFIXES_SET,
   isLastNamePrefix
 } from './prefixes';
+
+export {
+  CHINESE_SURNAMES,
+  KOREAN_SURNAMES,
+  JAPANESE_SURNAMES,
+  VIETNAMESE_SURNAMES,
+  ALL_ASIAN_SURNAMES,
+  isAsianSurname,
+  detectAsianCulture,
+  getAsianSurnameConfidence
+} from './asian-surnames';
