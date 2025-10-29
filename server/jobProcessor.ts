@@ -72,6 +72,19 @@ export async function processJob(jobId: number): Promise<void> {
         validRows,
         invalidRows,
       });
+      
+      // Emit real-time progress via WebSocket
+      const io = (global as any).io;
+      if (io) {
+        io.emit('job:progress', {
+          jobId,
+          processedRows,
+          validRows,
+          invalidRows,
+          totalRows: lines.length,
+          progress: Math.round((processedRows / lines.length) * 100)
+        });
+      }
 
       // Store results in database (optional - can be skipped for very large jobs)
       if (lines.length < 10000) {
@@ -105,14 +118,39 @@ export async function processJob(jobId: number): Promise<void> {
       outputFileUrl,
     });
 
+    // Emit job completion via WebSocket
+    const io = (global as any).io;
+    if (io) {
+      io.emit('job:completed', {
+        jobId,
+        status: 'completed',
+        processedRows,
+        validRows,
+        invalidRows,
+        outputFileUrl
+      });
+    }
+    
     console.log(`[JobProcessor] Job ${jobId} completed successfully`);
   } catch (error) {
     console.error(`[JobProcessor] Job ${jobId} failed:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
     await updateJobProgress(jobId, {
       status: "failed",
       completedAt: new Date(),
-      errorMessage: error instanceof Error ? error.message : String(error),
+      errorMessage,
     });
+    
+    // Emit job failure via WebSocket
+    const io = (global as any).io;
+    if (io) {
+      io.emit('job:failed', {
+        jobId,
+        status: 'failed',
+        errorMessage
+      });
+    }
   }
 }
 

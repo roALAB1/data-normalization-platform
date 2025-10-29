@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
+import { io, Socket } from 'socket.io-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,10 +28,12 @@ export default function JobDashboard() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [jobType, setJobType] = useState<'name' | 'phone' | 'email' | 'company' | 'address'>('name');
   const [isUploading, setIsUploading] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   const { data: jobs, isLoading, refetch } = trpc.jobs.list.useQuery(
     { limit: 50 },
-    { enabled: isAuthenticated, refetchInterval: 5000 } // Auto-refresh every 5 seconds
+    { enabled: isAuthenticated, refetchInterval: false } // Disable polling, use WebSocket instead
   );
 
   const createJobMutation = trpc.jobs.create.useMutation({
@@ -112,6 +115,64 @@ export default function JobDashboard() {
     );
   };
 
+  // WebSocket connection setup
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    // Connect to Socket.IO server
+    const socketUrl = window.location.origin;
+    const newSocket = io(socketUrl, {
+      path: '/socket.io/',
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
+    
+    newSocket.on('connect', () => {
+      console.log('[Socket.IO] Connected');
+      setIsConnected(true);
+      toast.success('Real-time updates connected');
+    });
+    
+    newSocket.on('disconnect', () => {
+      console.log('[Socket.IO] Disconnected');
+      setIsConnected(false);
+    });
+    
+    newSocket.on('connect_error', (error) => {
+      console.error('[Socket.IO] Connection error:', error);
+      setIsConnected(false);
+    });
+    
+    // Listen for job progress updates
+    newSocket.on('job:progress', (data: any) => {
+      console.log('[Socket.IO] Job progress:', data);
+      refetch(); // Refresh job list
+    });
+    
+    // Listen for job completion
+    newSocket.on('job:completed', (data: any) => {
+      console.log('[Socket.IO] Job completed:', data);
+      toast.success(`Job #${data.jobId} completed successfully!`);
+      refetch();
+    });
+    
+    // Listen for job failure
+    newSocket.on('job:failed', (data: any) => {
+      console.log('[Socket.IO] Job failed:', data);
+      toast.error(`Job #${data.jobId} failed: ${data.errorMessage}`);
+      refetch();
+    });
+    
+    setSocket(newSocket);
+    
+    // Cleanup on unmount
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [isAuthenticated, refetch]);
+  
   const getProgress = (job: any) => {
     if (job.totalRows === 0) return 0;
     return Math.round((job.processedRows / job.totalRows) * 100);
@@ -162,6 +223,11 @@ export default function JobDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              {/* Connection Status Indicator */}
+              <Badge variant={isConnected ? 'default' : 'secondary'} className="flex items-center gap-1">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+                {isConnected ? 'Live' : 'Offline'}
+              </Badge>
               <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
               <Button variant="outline" size="sm" onClick={() => window.location.href = '/'}>
                 <Home className="w-4 h-4 mr-2" />

@@ -208,4 +208,20 @@
 - [x] Update README.md to reflect new features (750+ credentials, hybrid monorepo, bug fixes)
 - [x] Create release/tag v1.0.0 to mark this milestone
 - [x] Set up branch protection rules on GitHub (guide created - user needs to apply via GitHub UI)
-- [ ] Publish the app via webdev UI for public access
+- [x] Publish the app via webdev UI for public access (checkpoint created - user can now click Publish button)
+- [x] Create GitHub Release for v1.0.0 with comprehensive release notes
+
+
+## Version 1.1.0 Features (In Progress)
+
+### WebSocket Progress Tracking
+- [x] Install and configure Socket.IO library (server + client)
+- [x] Create WebSocket server endpoint in Express
+- [x] Add job progress event emitter in job processor
+- [x] Update client to connect to WebSocket server
+- [x] Replace polling with WebSocket listeners
+- [x] Add connection status indicator in UI
+- [x] Handle reconnection logic
+- [x] Add error handling for WebSocket failures (connection errors, reconnection logic)
+- [ ] Test with multiple concurrent jobs (needs real batch job upload)
+- [x] Update documentation with WebSocket architecture

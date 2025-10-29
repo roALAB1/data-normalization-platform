@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import { Server as SocketIOServer } from "socket.io";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -30,6 +31,29 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Initialize Socket.IO
+  const io = new SocketIOServer(server, {
+    cors: {
+      origin: process.env.NODE_ENV === "development" 
+        ? ["http://localhost:3000", "http://localhost:5173"]
+        : true,
+      credentials: true
+    },
+    path: "/socket.io/"
+  });
+  
+  // Make io available globally for job processor
+  (global as any).io = io;
+  
+  // Socket.IO connection handling
+  io.on("connection", (socket) => {
+    console.log(`[Socket.IO] Client connected: ${socket.id}`);
+    
+    socket.on("disconnect", () => {
+      console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
+    });
+  });
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
