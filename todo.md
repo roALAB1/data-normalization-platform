@@ -274,3 +274,8 @@
 - [x] Display validation status with visual indicators
 - [x] Show possible vs valid distinction clearly
 - [x] Add validation confidence/quality indicators
+
+### Phone Demo Enhanced - Validation Tooltips
+- [x] Add tooltip for "Strictly Valid" explaining when to use it
+- [x] Add tooltip for "Possibly Valid" explaining the difference
+- [x] Include use case examples in tooltips

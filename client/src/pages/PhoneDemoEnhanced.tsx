@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  AlertCircle, CheckCircle2, Phone, Copy, Globe, Smartphone
+  AlertCircle, CheckCircle2, Phone, Copy, Globe, Smartphone, HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
@@ -256,18 +256,58 @@ export default function PhoneDemoEnhanced() {
                     {/* Detailed Validation */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between py-2 border-b">
-                        <div>
-                          <span className="text-sm font-medium">Strictly Valid:</span>
-                          <p className="text-xs text-muted-foreground">Can be dialed right now</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-sm font-medium">Strictly Valid:</span>
+                            <div className="group relative">
+                              <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-72 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
+                                <p className="font-semibold mb-2 text-foreground">What is Strictly Valid?</p>
+                                <p className="text-muted-foreground mb-2">
+                                  The number passes <strong>all validation rules</strong> and is definitely assigned and dialable.
+                                </p>
+                                <p className="font-semibold mb-1 text-foreground">When to use:</p>
+                                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                                  <li>Critical applications (emergency services, banking)</li>
+                                  <li>Real-time calling/SMS systems</li>
+                                  <li>Payment processing with phone verification</li>
+                                  <li>When you need 100% confidence the number works</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Guaranteed to be dialable</p>
                         </div>
                         <Badge variant={parsedPhone.result.isValid ? "default" : "outline"}>
                           {parsedPhone.result.isValid ? "✓ Yes" : "✗ No"}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between py-2 border-b">
-                        <div>
-                          <span className="text-sm font-medium">Possibly Valid:</span>
-                          <p className="text-xs text-muted-foreground">Has valid length/format</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-sm font-medium">Possibly Valid:</span>
+                            <div className="group relative">
+                              <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-72 p-3 bg-popover border rounded-lg shadow-lg z-50 text-xs">
+                                <p className="font-semibold mb-2 text-foreground">What is Possibly Valid?</p>
+                                <p className="text-muted-foreground mb-2">
+                                  The number has <strong>correct length and format</strong> for the region, but may not be currently assigned or in service.
+                                </p>
+                                <p className="font-semibold mb-1 text-foreground">When to use:</p>
+                                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                                  <li>Data collection and storage</li>
+                                  <li>Contact forms and lead generation</li>
+                                  <li>Historical data migration</li>
+                                  <li>When you'll verify the number later</li>
+                                </ul>
+                                <p className="font-semibold mt-2 mb-1 text-foreground">Note:</p>
+                                <p className="text-muted-foreground">
+                                  Use with caution for real-time calling - the number might not connect.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Correct format, may not be assigned</p>
                         </div>
                         <Badge variant={parsedPhone.result.isPossible ? "default" : "outline"}>
                           {parsedPhone.result.isPossible ? "✓ Yes" : "✗ No"}
