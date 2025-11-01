@@ -340,3 +340,10 @@
 - [x] Add full navigation menu to all pages (Home, Phone, Email, Batch Jobs)
 - [x] Create consistent header navigation component
 - [x] Ensure all pages can navigate to any other page
+
+### Phone Normalization Output Format (v1.4.2)
+- [x] Change default phone output to digits-only format (no hyphens, parentheses, spaces)
+- [x] Keep E.164 format as primary output (+14155552671)
+- [x] Update UI to show clean format prominently
+- [x] Update CSV export to use clean format
+- [x] Update batch processing to output clean format

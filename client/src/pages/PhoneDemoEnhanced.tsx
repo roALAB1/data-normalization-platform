@@ -433,6 +433,25 @@ export default function PhoneDemoEnhanced() {
                       <CardDescription>Multiple format options</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
+                      {parsedPhone.result.digitsOnly && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-muted-foreground">Digits Only (Recommended):</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyToClipboard(parsedPhone.result.digitsOnly!, "Digits only format")}
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
+                          <div className="p-2 bg-primary/10 border border-primary/20 rounded font-mono text-sm font-semibold">
+                            {parsedPhone.result.digitsOnly}
+                          </div>
+                          <p className="text-xs text-muted-foreground">Clean format with no hyphens, parentheses, or spaces</p>
+                        </div>
+                      )}
+
                       {parsedPhone.result.internationalFormat && (
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">

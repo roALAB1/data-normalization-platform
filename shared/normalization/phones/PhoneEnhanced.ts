@@ -24,6 +24,7 @@ export interface PhoneParseResult {
   nationalFormat?: string; // (213) 373-4253
   e164Format?: string; // +12133734253
   rfc3966Format?: string; // tel:+1-213-373-4253
+  digitsOnly?: string; // 12133734253 (no special characters)
   type?: NumberType;
   typeDescription?: string;
   parseLog: string[];
@@ -92,6 +93,9 @@ export class PhoneEnhanced {
         }
       }
 
+      // Create digits-only format (remove all non-digits)
+      const digitsOnly = phoneNumber.number?.replace(/\D/g, '') || '';
+      
       return {
         isValid,
         isPossible,
@@ -101,6 +105,7 @@ export class PhoneEnhanced {
         nationalFormat: phoneNumber.formatNational(),
         e164Format: phoneNumber.number,
         rfc3966Format: phoneNumber.getURI(),
+        digitsOnly,
         type,
         typeDescription,
         metadata: {
@@ -136,7 +141,7 @@ export class PhoneEnhanced {
   }
 
   // Get formatted phone number in specific format
-  format(format: 'international' | 'national' | 'e164' | 'rfc3966'): string {
+  format(format: 'international' | 'national' | 'e164' | 'rfc3966' | 'digitsOnly'): string {
     if (!this.phoneNumber) return this.rawPhone;
     
     switch (format) {
@@ -148,6 +153,8 @@ export class PhoneEnhanced {
         return this.phoneNumber.number || this.rawPhone;
       case 'rfc3966':
         return this.phoneNumber.getURI();
+      case 'digitsOnly':
+        return this.phoneNumber.number?.replace(/\D/g, '') || this.rawPhone;
       default:
         return this.rawPhone;
     }
