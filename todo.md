@@ -804,3 +804,9 @@
 - [x] Last Name CSV column has credentials that are not being stripped - Fixed by combining all name columns before parsing
 - [x] Worker now combines First Name + Last Name values before parsing to give full context to NameEnhanced
 - [x] NameEnhanced parser can now properly identify and strip credentials from combined names
+
+
+## v3.2.8 UI Improvement - Context-Aware Dropdown Labels
+- [x] First Name column dropdown now shows "First Name"
+- [x] Last Name column dropdown now shows "Last Name"
+- [x] Name column shows "Name (Full Name + First + Last)" to clarify output
