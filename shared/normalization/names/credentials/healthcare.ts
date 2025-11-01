@@ -10,8 +10,8 @@ export const HEALTHCARE_CREDENTIALS = [
   "DHANP", "DHt", "DNBHE", "ND", "NMD", "HMD", "MDH",
   
   // Nursing
-  "RN", "RN-C", "RN-CS", "RN/NP", "NP", "APRN", "BSN", "MSN", "DNP", "FNP", "CRNP", "CRRN",
-  "CNM", "APN", "LPN", "LVN", "MNNP",
+  "RN", "RN-C", "RN-CS", "RN/NP", "NP", "APRN", "ARNP", "BSN", "MSN", "DNP", "FNP", "CRNP", "CRRN",
+  "CNM", "APN", "LPN", "LVN", "MNNP", "PMHNP-BC", "PMH-C",
   
   // Physician Assistants
   "PA", "PA-C",
@@ -42,14 +42,14 @@ export const HEALTHCARE_CREDENTIALS = [
   // Medical Specialties & Board Certifications
   "DABFM", "DABFP", "DABHP", "DABIM", "DABMP", "DABR", "DABSNM",
   "FAAEM", "FAAFP", "FAAN", "FAANS", "FAAOS", "FAAP", "FACC", "FACD", "FACE", "FACEP",
-  "FACFAS", "FACFO", "FACHA", "FACHE", "FACOFP", "FACOG", "FACP", "FACS", "FAEMS",
-  "FAGD", "FAGO", "FAHA", "FAIHM", "FAOM", "FASHP", "FASPEN", "FAWM", "FIDSA",
+  "FACFAS", "FACFO", "FACHA", "FACHE", "FACOFP", "FACOG", "FACOP", "FACOOG", "FACP", "FACS", "FAEMS",
+  "FAGD", "FAGO", "FAHA", "FAIHM", "FAOM", "FASHP", "FASPEN", "FAWM", "FIDSA", "FPMRS",
   
   // Alternative & Complementary Medicine
   "DACM", "BCTMB", "FAIHM", "LMT", "LCMT",
   
   // Nutrition & Dietetics
-  "RD", "LN", "LNC", "DACBN",
+  "RD", "RDN", "LDN", "LN", "LNC", "DACBN", "CHES",
   
   // Other Healthcare
   "BHMS", "BLS-I", "CCH", "CAAPM", "CRNP", "CSPOMM", "DAAPM", "DABFP", "DABIM",

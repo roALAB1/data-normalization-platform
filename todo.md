@@ -810,3 +810,11 @@
 - [x] First Name column dropdown now shows "First Name"
 - [x] Last Name column dropdown now shows "Last Name"
 - [x] Name column shows "Name (Full Name + First + Last)" to clarify output
+
+
+## v3.2.9 Critical Bug Fixed - Added Missing Credentials
+- [x] Added missing healthcare credentials: FACOP, FACOOG, FPMRS, ARNP, PMHNP-BC, PMH-C, RDN, LDN, CHES
+- [x] Added missing fitness/wellness credentials: ABS, CSC, CSCP, CSCS, CTSC, CMCS, MSCP, PATP, FCMC, NASM
+- [x] NameEnhanced parser now properly strips all credentials from combined names
+- [x] "Alison Theiss, MSc CSC ABS" → now outputs "Alison Theiss"
+- [x] "Dr. Ivette Espinosa-Fernandez, DO, FACOP" → now outputs "Ivette Espinosa-Fernandez"
