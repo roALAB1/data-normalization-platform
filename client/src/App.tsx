@@ -4,7 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import JobDashboard from "./pages/JobDashboard";
+import JobDashboardEnhanced from "./pages/JobDashboardEnhanced";
 import IntelligentNormalization from "./pages/IntelligentNormalization";
 
 function Router() {
@@ -12,7 +12,7 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={IntelligentNormalization} />
-      <Route path={"/jobs"} component={JobDashboard} />
+      <Route path={"/jobs"} component={JobDashboardEnhanced} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

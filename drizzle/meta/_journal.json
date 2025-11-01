@@ -15,6 +15,20 @@
       "when": 1761677622356,
       "tag": "0001_cloudy_marten_broadcloak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1761966680184,
+      "tag": "0002_glorious_toad_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1761966842165,
+      "tag": "0003_jittery_the_stranger",
+      "breakpoints": true
     }
   ]
 }

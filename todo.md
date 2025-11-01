@@ -650,3 +650,41 @@
 - [x] Update styling to match Option B mockup
 - [x] Test responsive layout
 - [x] Save checkpoint for v2.3.0
+
+
+## Server-Side Batch Processing System - v3.0.0
+
+### Phase 1: Database Schema & Dependencies
+- [x] Install Bull/BullMQ for job queue
+- [x] Install Redis for queue backend
+- [x] Design database schema (jobs, schedules, api_keys tables)
+- [x] Create Drizzle migrations
+
+### Phase 2: Core Infrastructure (Parallel)
+- [x] Build JobQueue service with Bull
+- [x] Create BatchNormalizationWorker
+- [x] Build JobStorage service (S3 integration)
+- [x] Create tRPC API endpoints (submit, status, list, download)
+- [x] Implement WebSocket job status updates
+
+### Phase 3: Enhanced Job Dashboard UI
+- [x] Job submission form with file upload
+- [x] Job list with filtering/search
+- [x] Real-time status updates
+- [x] Job details view with logs
+- [x] Download results button
+- [x] Job statistics cards
+
+### Phase 4: Advanced Features
+- [ ] Scheduled jobs (cron-based)
+- [ ] Email verification (MX/SMTP)
+- [ ] Deduplication engine
+- [ ] Data quality reports
+- [ ] API key management
+- [ ] Webhook notifications
+
+### Phase 5: Testing & Documentation
+- [ ] End-to-end testing
+- [ ] API documentation
+- [ ] User guide updates
+- [ ] Save checkpoint for v3.0.0

@@ -171,4 +171,203 @@ export const jobRouter = router({
         message: "Job cancelled successfully",
       };
     }),
+
+  /**
+   * Submit intelligent batch job (multi-column normalization)
+   */
+  submitBatch: protectedProcedure
+    .input(
+      z.object({
+        fileContent: z.string(),
+        fileName: z.string(),
+        config: z.object({
+          preserveAccents: z.boolean().optional(),
+          defaultCountry: z.string().optional(),
+        }).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { jobQueue } = await import('./queue/JobQueue');
+      
+      // Upload input file to S3
+      const inputFileKey = `jobs/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+      const { url: inputFileUrl } = await storagePut(
+        inputFileKey,
+        input.fileContent,
+        "text/csv"
+      );
+
+      // Count rows
+      const lines = input.fileContent.split('\n').filter(l => l.trim());
+      const totalRows = lines.length - 1;
+
+      if (totalRows === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "File is empty",
+        });
+      }
+
+      if (totalRows > 1000000) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "File too large. Maximum 1,000,000 rows.",
+        });
+      }
+
+      // Create job record
+      const jobId = await createJob({
+        userId: ctx.user.id,
+        type: "intelligent" as any,
+        totalRows,
+        inputFileKey,
+        inputFileUrl,
+        config: input.config || {},
+      });
+
+      // Add to queue
+      await jobQueue.addJob({
+        jobId,
+        userId: ctx.user.id,
+        type: "intelligent",
+        inputFileKey,
+        inputFileUrl,
+        config: input.config,
+      });
+
+      return {
+        jobId,
+        totalRows,
+        message: `Intelligent batch job created. Processing ${totalRows} rows.`,
+      };
+    }),
+
+  /**
+   * Get job statistics
+   */
+  getStats: protectedProcedure
+    .query(async ({ ctx }) => {
+      const { db } = await import('./db');
+      const { jobs } = await import('../drizzle/schema');
+      const { eq, count, sql } = await import('drizzle-orm');
+
+      const [totalJobs] = await db
+        .select({ count: count() })
+        .from(jobs)
+        .where(eq(jobs.userId, ctx.user.id));
+
+      const [completedJobs] = await db
+        .select({ count: count() })
+        .from(jobs)
+        .where(sql`${jobs.userId} = ${ctx.user.id} AND ${jobs.status} = 'completed'`);
+
+      const [failedJobs] = await db
+        .select({ count: count() })
+        .from(jobs)
+        .where(sql`${jobs.userId} = ${ctx.user.id} AND ${jobs.status} = 'failed'`);
+
+      const [processingJobs] = await db
+        .select({ count: count() })
+        .from(jobs)
+        .where(sql`${jobs.userId} = ${ctx.user.id} AND ${jobs.status} = 'processing'`);
+
+      const successRate = totalJobs.count > 0
+        ? Math.round((completedJobs.count / totalJobs.count) * 100)
+        : 0;
+
+      return {
+        total: totalJobs.count,
+        completed: completedJobs.count,
+        failed: failedJobs.count,
+        processing: processingJobs.count,
+        successRate,
+      };
+    }),
+
+  /**
+   * Retry a failed job
+   */
+  retry: protectedProcedure
+    .input(z.object({ jobId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const job = await getJobById(input.jobId);
+      
+      if (!job) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Job not found",
+        });
+      }
+
+      if (job.userId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have access to this job",
+        });
+      }
+
+      if (job.status !== "failed") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Only failed jobs can be retried",
+        });
+      }
+
+      const { jobQueue } = await import('./queue/JobQueue');
+      await jobQueue.retryJob(input.jobId);
+      
+      return {
+        success: true,
+        message: "Job queued for retry",
+      };
+    }),
+
+  /**
+   * Subscribe to job status updates (WebSocket)
+   */
+  onJobUpdate: protectedProcedure
+    .input(z.object({ jobId: z.number() }))
+    .subscription(async ({ ctx, input }) => {
+      const { observable } = await import('@trpc/server/observable');
+      
+      return observable<any>((emit) => {
+        // Poll job status every 2 seconds
+        const interval = setInterval(async () => {
+          try {
+            const job = await getJobById(input.jobId);
+            
+            if (!job) {
+              emit.error(new TRPCError({
+                code: "NOT_FOUND",
+                message: "Job not found",
+              }));
+              return;
+            }
+
+            if (job.userId !== ctx.user.id) {
+              emit.error(new TRPCError({
+                code: "FORBIDDEN",
+                message: "Access denied",
+              }));
+              return;
+            }
+
+            emit.next(job);
+
+            // Stop polling if job is completed or failed
+            if (job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled') {
+              clearInterval(interval);
+              emit.complete();
+            }
+          } catch (error) {
+            emit.error(error);
+          }
+        }, 2000);
+
+        // Cleanup on unsubscribe
+        return () => {
+          clearInterval(interval);
+        };
+      });
+    }),
 });
