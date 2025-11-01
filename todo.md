@@ -798,3 +798,9 @@
 
 ## v3.2.6 Enhancement Completed
 - [x] Updated dropdown label to clarify that "Name" type outputs all three columns (Full Name + First + Last)
+
+
+## v3.2.7 Critical Bug Fixed - Credentials in Last Name Column
+- [x] Last Name CSV column has credentials that are not being stripped - Fixed by combining all name columns before parsing
+- [x] Worker now combines First Name + Last Name values before parsing to give full context to NameEnhanced
+- [x] NameEnhanced parser can now properly identify and strip credentials from combined names

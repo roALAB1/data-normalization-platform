@@ -82,24 +82,29 @@ function processChunk(
   return chunk.map((row) => {
     const normalizedRow: any = {};
 
-    // Track if we've already processed a name column
-    let nameProcessed = false;
-
-    for (const column of strategy.columns) {
-      const value = row[column.name];
+    // Collect all name column values first
+    const nameColumns = strategy.columns.filter(col => col.type === 'name');
+    
+    if (nameColumns.length > 0) {
+      // Combine all name column values into a single full name for parsing
+      const combinedName = nameColumns
+        .map(col => row[col.name] || '')
+        .filter(val => val.trim())
+        .join(' ')
+        .trim();
       
-      if (column.type === 'name' && !nameProcessed) {
-        // Process name column - output 3 columns
-        const nameResult = normalizeValue('name', value || '');
-        normalizedRow['Full Name'] = nameResult.fullName;
-        normalizedRow['First Name'] = nameResult.firstName;
-        normalizedRow['Last Name'] = nameResult.lastName;
-        nameProcessed = true;
-      } else if (column.type !== 'name' && column.type !== 'unknown') {
-        // Process other column types normally
-        normalizedRow[column.name] = normalizeValue(column.type, value || '');
+      // Parse the combined name once
+      const nameResult = normalizeValue('name', combinedName);
+      normalizedRow['Full Name'] = nameResult.fullName;
+      normalizedRow['First Name'] = nameResult.firstName;
+      normalizedRow['Last Name'] = nameResult.lastName;
+    }
+
+    // Process non-name columns
+    for (const column of strategy.columns) {
+      if (column.type !== 'name' && column.type !== 'unknown') {
+        normalizedRow[column.name] = normalizeValue(column.type, row[column.name] || '');
       }
-      // Skip name columns after first one and skip unknown columns completely
     }
 
     return normalizedRow;
