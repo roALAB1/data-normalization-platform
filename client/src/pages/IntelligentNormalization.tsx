@@ -396,6 +396,21 @@ export default function IntelligentNormalization() {
                   <li>• Context-aware parsing for compound names</li>
                   <li>• Nickname and alias normalization</li>
                 </ul>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">Dr. John Smith, PhD</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">John Smith</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">WANG, Wei</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">Wei Wang</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Emails */}
@@ -410,6 +425,21 @@ export default function IntelligentNormalization() {
                   <li>• MX/SMTP server verification for deliverability</li>
                   <li>• Disposable and temporary email detection</li>
                 </ul>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">John.Smith@GMAIL.COM</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">johnsmith@gmail.com</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">user+tag@domain.com</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">user@domain.com</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Phone Numbers */}
@@ -424,6 +454,21 @@ export default function IntelligentNormalization() {
                   <li>• Multiple format outputs (E.164, national, international)</li>
                   <li>• Carrier and region identification</li>
                 </ul>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">(415) 555-1234</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">+1 415-555-1234</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">44 20 7946 0958</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">+44 20 7946 0958</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Addresses */}
@@ -438,6 +483,21 @@ export default function IntelligentNormalization() {
                   <li>• Directional normalization (N, S, E, W, NE, etc.)</li>
                   <li>• Unit type handling (Apt, Suite, Floor, etc.)</li>
                 </ul>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">123 MAIN STREET</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">123 Main St</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">456 n elm ave apt 2b</span>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-indigo-600 font-medium">456 N Elm Ave Apt 2B</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 

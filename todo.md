@@ -697,3 +697,13 @@
 - [x] Update Addresses feature description
 - [x] Test updated descriptions
 - [x] Save checkpoint for v3.0.1
+
+
+## Visual Examples in Feature Cards - v3.0.2
+- [x] Add before/after examples to Names feature card
+- [x] Add before/after examples to Emails feature card
+- [x] Add before/after examples to Phone Numbers feature card
+- [x] Add before/after examples to Addresses feature card
+- [x] Style examples with proper formatting
+- [x] Test visual appearance
+- [x] Save checkpoint for v3.0.2
