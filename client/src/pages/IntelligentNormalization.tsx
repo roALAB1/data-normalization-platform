@@ -615,11 +615,7 @@ export default function IntelligentNormalization() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="name">
-                              {mapping.columnName.toLowerCase().includes('first') ? 'First Name' : 
-                               mapping.columnName.toLowerCase().includes('last') ? 'Last Name' : 
-                               'Full Name'}
-                            </SelectItem>
+                            <SelectItem value="name">Name (Full Name + First + Last)</SelectItem>
                             <SelectItem value="email">Email</SelectItem>
                             <SelectItem value="phone">Phone</SelectItem>
                             <SelectItem value="address">Address</SelectItem>

@@ -794,3 +794,7 @@
 ## v3.2.5 Bugs Fixed
 - [x] Full Name column still showing middle initials/credentials - Fixed worker to concatenate only firstName + lastName (no middle name)
 - [x] Dropdown labels showing generic "Name" - Now shows "First Name", "Last Name", or "Full Name" based on column name
+
+
+## v3.2.6 Enhancement Completed
+- [x] Updated dropdown label to clarify that "Name" type outputs all three columns (Full Name + First + Last)
