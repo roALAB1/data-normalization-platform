@@ -10,6 +10,7 @@ import PhoneDemoEnhanced from "./pages/PhoneDemoEnhanced";
 import JobDashboard from "./pages/JobDashboard";
 import EmailDemo from "./pages/EmailDemo";
 import AddressDemo from "./pages/AddressDemo";
+import IntelligentNormalization from "./pages/IntelligentNormalization";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/jobs"} component={JobDashboard} />
       <Route path={"/email"} component={EmailDemo} />
       <Route path={"/address"} component={AddressDemo} />
+      <Route path={"/intelligent"} component={IntelligentNormalization} />
       <Route path={"/demo"} component={Home} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

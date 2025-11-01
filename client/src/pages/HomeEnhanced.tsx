@@ -263,6 +263,9 @@ export default function HomeEnhanced() {
               <Link href="/address">
                 <Button variant="outline" size="sm">Address Demo →</Button>
               </Link>
+              <Link href="/intelligent">
+                <Button variant="outline" size="sm">Intelligent →</Button>
+              </Link>
               <Link href="/jobs">
                 <Button variant="outline" size="sm">Batch Jobs →</Button>
               </Link>

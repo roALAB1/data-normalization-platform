@@ -565,3 +565,18 @@
 - [x] Generate normalization strategies
 - [x] Estimate processing time
 - [x] Create comprehensive documentation
+
+
+### Intelligent Normalization UI v2.0.1
+- [x] Create IntelligentNormalization page component
+- [x] Add CSV upload with drag-and-drop
+- [x] Implement column detection display with confidence scores
+- [x] Add column type override/confirmation UI
+- [x] Create unified processing with progress tracking
+- [x] Display results table with all normalized columns
+- [x] Add download normalized CSV button
+- [x] Show statistics (columns detected, rows processed, success rate)
+- [x] Add route to App.tsx (/intelligent)
+- [x] Add navigation link to all pages
+- [ ] Test with multi-column CSV files
+- [ ] Update documentation

@@ -9,11 +9,14 @@ This platform provides specialized normalizers for common data types found in bu
 - **Name Normalization**: Handles credentials, nicknames, prefixes, multi-person detection, encoding issues, pronouns, generational suffixes, **Asian name order detection**, **context-aware parsing**
 - **Phone Normalization**: International format support (250+ countries), carrier detection, validation, as-you-type formatting
 - **Email Normalization**: RFC 5322 validation, provider-specific normalization, **enterprise verification** with MX/SMTP checks
+- **Address Normalization**: Simple format standardization with Title Case and 27+ abbreviations (v1.5.0)
+- **Intelligent Platform**: Auto-detect data types and normalize multiple columns simultaneously (v2.0.0)
 - **Company Normalization**: *(Coming soon)*
-- **Address Normalization**: *(Coming soon)*
 
 ### Key Features
 
+✅ **Intelligent Multi-Type Platform** 🤖: Auto-detect data types (name, email, phone, address) with 95%+ accuracy and normalize multiple columns (v2.0.0)  
+✅ **Address Normalization** 🏠: Title Case conversion, 27+ street suffix abbreviations, 10,000+ addresses/second (v1.5.0)  
 ✅ **750+ Professional Credentials**: Comprehensive coverage across healthcare, finance, IT, engineering, supply chain, legal, education, and more  
 ✅ **Enterprise Email Verification** 📧: MX record validation, SMTP testing, disposable detection, reputation scoring (v1.4.0)  
 ✅ **Email CSV Batch Processing** 📊: Upload CSV files with up to 10,000 emails for bulk normalization (v1.3.1)  
@@ -33,6 +36,16 @@ This platform provides specialized normalizers for common data types found in bu
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
+
+### What's New in v2.0.0 🚀
+
+**Intelligent Multi-Type Normalization Platform** 🤖  
+Automatic data type detection with 95%+ accuracy using DataTypeDetector. Supports 12 data types (name, email, phone, address, city, state, zip, country, company, etc.) with confidence scoring. UnifiedNormalizationEngine routes data to appropriate normalizers with multi-column processing, progress tracking, and caching. SmartCSVProcessor auto-detects CSV structure and generates normalization strategies.
+
+### What's New in v1.5.0 🚀
+
+**Address Normalization** 🏠  
+Simple format standardization with AddressFormatter class. Title Case conversion ("143 WEST SIDLEE STREET" → "143 West Sidlee St"), 27 street suffix abbreviations (Street → St, Avenue → Ave, Boulevard → Blvd), 8 directional abbreviations (North → N), 7 unit type abbreviations (Apartment → Apt). Performance: 10,000+ addresses/second, zero dependencies, zero cost. Includes Address Demo page with single/batch modes and CSV upload.
 
 ### What's New in v1.4.0 🚀
 
@@ -124,6 +137,13 @@ The application will be available at `http://localhost:3000`
 4. View original vs normalized email, provider detection, plus tag extraction
 5. Switch to **Batch** mode to upload CSV files (up to 10,000 emails)
 
+**Address Normalization:**
+1. Click "Address Demo" in the header
+2. Choose **Single** mode for individual addresses
+3. Enter an address and click "Format Address"
+4. View original vs formatted address with Title Case and abbreviations
+5. Switch to **Batch** mode to upload CSV files (up to 10,000 addresses)
+
 ### Batch Processing (Browser-based, up to 10K rows)
 
 1. Switch to **Batch** mode on any demo page
@@ -172,6 +192,7 @@ The application will be available at `http://localhost:3000`
 │   │   │   ├── HomeEnhanced.tsx       # Name normalization demo
 │   │   │   ├── PhoneDemoEnhanced.tsx  # Phone normalization demo
 │   │   │   ├── EmailDemo.tsx          # Email normalization demo
+│   │   │   ├── AddressDemo.tsx        # Address normalization demo
 │   │   │   └── JobDashboard.tsx       # Batch job dashboard
 │   │   ├── components/    # Reusable UI components
 │   │   └── hooks/         # Custom React hooks
@@ -197,8 +218,13 @@ The application will be available at `http://localhost:3000`
 │       ├── emails/        # Email normalization
 │       │   ├── EmailEnhanced.ts       # validator.js integration
 │       │   └── EmailVerification.ts   # Enterprise verification
-│       ├── companies/     # Company normalization (coming soon)
-│       └── addresses/     # Address normalization (coming soon)
+│       ├── addresses/     # Address normalization
+│       │   └── AddressFormatter.ts    # Simple format standardization
+│       ├── intelligent/   # Intelligent platform
+│       │   ├── DataTypeDetector.ts    # Auto column type detection
+│       │   ├── UnifiedNormalizationEngine.ts  # Multi-type routing
+│       │   └── SmartCSVProcessor.ts   # CSV analysis
+│       └── companies/     # Company normalization (coming soon)
 ├── packages/              # Publishable packages
 │   └── normalization-core/ # @normalization/core npm package
 └── docs/                  # Additional documentation
@@ -219,6 +245,8 @@ pnpm add @normalization/core
 import { NameEnhanced } from '@normalization/core/names';
 import { PhoneEnhanced } from '@normalization/core/phones';
 import { EmailEnhanced } from '@normalization/core/emails';
+import { AddressFormatter } from '@normalization/core/addresses';
+import { DataTypeDetector, UnifiedNormalizationEngine } from '@normalization/core/intelligent';
 ```
 
 **Package Features**:
