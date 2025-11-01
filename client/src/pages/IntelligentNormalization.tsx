@@ -354,28 +354,14 @@ export default function IntelligentNormalization() {
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <Sparkles className="h-6 w-6 text-indigo-600" />
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Intelligent Normalization</h1>
-                <p className="text-sm text-gray-600">Enterprise-scale processing • 100k+ rows</p>
-              </div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-6 w-6 text-indigo-600" />
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Data Normalization Platform</h1>
+              <p className="text-sm text-gray-600">Enterprise-scale processing • 100k+ rows</p>
             </div>
-          </Link>
+          </div>
           <div className="flex gap-2">
-            <Link href="/">
-              <Button variant="ghost" size="sm">Home</Button>
-            </Link>
-            <Link href="/phone">
-              <Button variant="ghost" size="sm">Phone</Button>
-            </Link>
-            <Link href="/email">
-              <Button variant="ghost" size="sm">Email</Button>
-            </Link>
-            <Link href="/address">
-              <Button variant="ghost" size="sm">Address</Button>
-            </Link>
             <Link href="/jobs">
               <Button variant="ghost" size="sm">Batch Jobs</Button>
             </Link>

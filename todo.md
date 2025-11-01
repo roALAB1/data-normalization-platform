@@ -629,3 +629,14 @@
 - [x] Test with 100k+ row CSV files
 - [x] Update documentation with streaming architecture
 - [x] Save checkpoint for v2.1.0
+
+
+## Platform Simplification - v2.2.0
+- [x] Remove individual demo pages (Phone, Email, Address)
+- [x] Update App.tsx routing to remove demo routes
+- [x] Redesign home page to focus on Intelligent Normalization
+- [x] Remove navigation links to individual demos
+- [x] Update Intelligent Normalization header (remove demo links)
+- [x] Update README.md to reflect simplified structure
+- [x] Test user flow from home to Intelligent Normalization
+- [x] Save checkpoint for v2.2.0

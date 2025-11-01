@@ -4,14 +4,17 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-This platform provides specialized normalizers for common data types found in business datasets:
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow:
 
-- **Name Normalization**: Handles credentials, nicknames, prefixes, multi-person detection, encoding issues, pronouns, generational suffixes, **Asian name order detection**, **context-aware parsing**
-- **Phone Normalization**: International format support (250+ countries), carrier detection, validation, as-you-type formatting
-- **Email Normalization**: RFC 5322 validation, provider-specific normalization, **enterprise verification** with MX/SMTP checks
-- **Address Normalization**: Simple format standardization with Title Case and 27+ abbreviations (v1.5.0)
-- **Intelligent Platform**: Auto-detect data types and normalize multiple columns simultaneously (v2.0.0)
-- **Company Normalization**: *(Coming soon)*
+- **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
+- **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
+- **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v2.1.0)
+- **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
+- **Specialized Normalizers**:
+  - **Names**: 750+ credentials, Asian name detection, context-aware parsing
+  - **Phones**: 250+ countries, type detection, multiple formats
+  - **Emails**: RFC 5322 validation, provider-specific rules, MX/SMTP verification
+  - **Addresses**: Title Case, 27+ abbreviations, standardization
 
 ### Key Features
 
@@ -36,6 +39,16 @@ This platform provides specialized normalizers for common data types found in bu
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
+
+### What's New in v2.2.0 🚀
+
+**Simplified Single-Page Platform** 🎯  
+Streamlined user experience with unified Data Normalization Platform page. Removed redundant individual demo pages - all normalization happens in one powerful interface.
+
+### What's New in v2.1.0 🚀
+
+**Enterprise-Scale CSV Streaming** ⚡  
+Process 100k+ row CSV files with streaming architecture. StreamingCSVProcessor with PapaParse, ChunkedNormalizer with Web Worker pool (4-8 workers), ProgressiveDownloader for memory-efficient downloads, real-time progress tracking (rows/sec, ETA, memory), pause/resume/cancel controls. Performance: 1,000-5,000 rows/second with constant memory footprint.
 
 ### What's New in v2.0.0 🚀
 
