@@ -1,7 +1,10 @@
 /**
  * Web Worker for parallel normalization processing
  * Handles chunks of data in background thread
+ * Version: 3.5.2 - Ben Brausen + Meng-Ling fixes
  */
+
+console.log('[Worker v3.5.2] Loaded - Ben prefix fix + hyphen formula fix applied');
 
 // Import normalizers directly (will be bundled by Vite)
 import { NameEnhanced } from '../lib/NameEnhanced';

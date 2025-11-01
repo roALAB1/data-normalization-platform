@@ -928,3 +928,8 @@
 ## v3.5.1 Final Two Bugs Fixed
 - [x] Row 120: "Ben Brausen" → Fixed by restricting last name prefix detection to 3+ part names only
 - [x] Row 170: "Meng-Ling Erik Kuo" → Fixed by removing hyphen from Excel formula prevention pattern
+
+
+## v3.5.2 Browser Cache Issue
+- [x] Fixes not loading due to browser caching worker file
+- [x] Added console.log with version to worker to force cache invalidation
