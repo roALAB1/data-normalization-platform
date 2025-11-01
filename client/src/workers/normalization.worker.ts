@@ -33,8 +33,9 @@ export interface WorkerResponse {
 
 /**
  * Normalize a single value based on type
+ * For names, returns an object with fullName, firstName, lastName
  */
-function normalizeValue(type: string, value: string): string {
+function normalizeValue(type: string, value: string): any {
   if (!value) return '';
 
   try {
@@ -82,12 +83,30 @@ function processChunk(
   strategy: { columns: Array<{ name: string; type: string }> }
 ): any[] {
   return chunk.map((row) => {
-    const normalizedRow: any = { ...row };
+    const normalizedRow: any = {};
 
+    // Collect all name column values first
+    const nameColumns = strategy.columns.filter(col => col.type === 'name');
+    
+    if (nameColumns.length > 0) {
+      // Combine all name column values into a single full name for parsing
+      const combinedName = nameColumns
+        .map(col => row[col.name] || '')
+        .filter(val => val.trim())
+        .join(' ')
+        .trim();
+      
+      // Parse the combined name once
+      const nameResult = normalizeValue('name', combinedName);
+      normalizedRow['Full Name'] = nameResult.fullName;
+      normalizedRow['First Name'] = nameResult.firstName;
+      normalizedRow['Last Name'] = nameResult.lastName;
+    }
+
+    // Process non-name columns
     for (const column of strategy.columns) {
-      const value = row[column.name];
-      if (value && column.type !== 'unknown') {
-        normalizedRow[column.name] = normalizeValue(column.type, value);
+      if (column.type !== 'name' && column.type !== 'unknown') {
+        normalizedRow[column.name] = normalizeValue(column.type, row[column.name] || '');
       }
     }
 

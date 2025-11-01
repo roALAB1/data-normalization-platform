@@ -15,6 +15,7 @@ import { StreamingCSVProcessor, type StreamingStats } from "@shared/normalizatio
 import { ChunkedNormalizer } from "@shared/normalization/intelligent/ChunkedNormalizer";
 import { ProgressiveDownloader } from "@/lib/ProgressiveDownloader";
 import type { NormalizationStrategy } from "@shared/normalization/intelligent/UnifiedNormalizationEngine";
+import { ColumnTransformationsSummary, type ColumnTransformation } from "@/components/ColumnTransformationsSummary";
 
 interface ColumnMapping {
   columnName: string;
@@ -576,6 +577,18 @@ export default function IntelligentNormalization() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Column Headers */}
+                <div className="flex items-center justify-between px-4 pb-3 border-b mb-4">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-700">Input Column</p>
+                    <p className="text-xs text-gray-500">From your CSV file</p>
+                  </div>
+                  <div className="w-[280px] text-right">
+                    <p className="text-sm font-semibold text-gray-700">Output Type</p>
+                    <p className="text-xs text-gray-500">Normalized to</p>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   {columnMappings.map((mapping, idx) => (
                     <div
@@ -603,7 +616,11 @@ export default function IntelligentNormalization() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="name">Name</SelectItem>
+                            <SelectItem value="name">
+                              {mapping.columnName.toLowerCase().includes('first') ? 'First Name' : 
+                               mapping.columnName.toLowerCase().includes('last') ? 'Last Name' : 
+                               'Name (Full Name + First + Last)'}
+                            </SelectItem>
                             <SelectItem value="email">Email</SelectItem>
                             <SelectItem value="phone">Phone</SelectItem>
                             <SelectItem value="address">Address</SelectItem>
@@ -618,6 +635,41 @@ export default function IntelligentNormalization() {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Transformation Preview */}
+                <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                  <h4 className="text-sm font-semibold text-indigo-900 mb-3">Preview: Column Transformations</h4>
+                  <div className="space-y-2">
+                    {columnMappings
+                      .filter(mapping => {
+                        const type = mapping.overrideType || mapping.detectedType;
+                        return type !== 'unknown';
+                      })
+                      .map((mapping, idx) => {
+                        const type = mapping.overrideType || mapping.detectedType;
+                        if (type === 'name') {
+                          return (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-gray-700">{mapping.columnName}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-indigo-600 font-medium">Full Name + First Name + Last Name</span>
+                              <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">split</span>
+                            </div>
+                          );
+                        } else if (type !== 'unknown') {
+                          return (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-gray-700">{mapping.columnName}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-indigo-600 font-medium">{mapping.columnName}</span>
+                              <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded">normalized</span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                  </div>
                 </div>
 
                 <div className="flex gap-3 mt-6">
@@ -703,6 +755,46 @@ export default function IntelligentNormalization() {
         {/* Results Section */}
         {results.length > 0 && stats && (
           <div className="space-y-6">
+            {/* Column Transformations Summary */}
+            <ColumnTransformationsSummary
+              transformations={columnMappings
+                .filter(mapping => {
+                  const type = mapping.overrideType || mapping.detectedType;
+                  return type !== 'unknown' && type !== 'unchanged';
+                })
+                .map(mapping => {
+                const transformation: ColumnTransformation = {
+                  inputColumn: mapping.columnName,
+                  outputColumns: [],
+                  transformationType: 'unchanged',
+                };
+
+                if (mapping.detectedType === 'name' || mapping.overrideType === 'name') {
+                  transformation.outputColumns = ['Full Name', 'First Name', 'Last Name'];
+                  transformation.transformationType = 'split';
+                  transformation.description = 'Split and normalize into Full Name, First Name, and Last Name';
+                } else if (mapping.detectedType === 'email' || mapping.overrideType === 'email') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'normalized';
+                  transformation.description = 'Email normalized (lowercase, provider rules applied)';
+                } else if (mapping.detectedType === 'phone' || mapping.overrideType === 'phone') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'normalized';
+                  transformation.description = 'Phone normalized (digits only, no formatting)';
+                } else if (mapping.detectedType === 'address' || mapping.overrideType === 'address') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'normalized';
+                  transformation.description = 'Address normalized (title case, abbreviations)';
+                } else if (mapping.detectedType !== 'unknown') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'unchanged';
+                }
+
+                return transformation;
+              })
+              .filter(t => t.transformationType !== 'unchanged')}
+            />
+
             {/* Statistics */}
             <div className="grid grid-cols-4 gap-4">
               <Card>
@@ -830,6 +922,34 @@ export default function IntelligentNormalization() {
           </Card>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
+        <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
+          <span>v3.3.0</span>
+          <span>•</span>
+          <a
+            href="https://github.com/roALAB1/data-normalization-platform"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-foreground transition-colors"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
