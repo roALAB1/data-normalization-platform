@@ -874,3 +874,10 @@
 - [ ] Row 404: RYT - Registered Yoga Teacher
 - [ ] Row 405: WIMICP - needs investigation
 - [ ] Row 410: CPC - Certified Professional Coder (or Certified Pelvic Coach)
+
+
+## v3.3.1 Footer Enhancements
+- [x] Add version number to page footer (v3.3.0)
+- [x] Add GitHub icon link to repository in footer
+- [x] Update README with v3.3.0 changelog
+- [x] Push to GitHub with v3.3.1 tag
