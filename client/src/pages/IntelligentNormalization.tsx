@@ -632,6 +632,41 @@ export default function IntelligentNormalization() {
                   ))}
                 </div>
 
+                {/* Transformation Preview */}
+                <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                  <h4 className="text-sm font-semibold text-indigo-900 mb-3">Preview: Column Transformations</h4>
+                  <div className="space-y-2">
+                    {columnMappings
+                      .filter(mapping => {
+                        const type = mapping.overrideType || mapping.detectedType;
+                        return type !== 'unknown';
+                      })
+                      .map((mapping, idx) => {
+                        const type = mapping.overrideType || mapping.detectedType;
+                        if (type === 'name') {
+                          return (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-gray-700">{mapping.columnName}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-indigo-600 font-medium">Full Name + First Name + Last Name</span>
+                              <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">split</span>
+                            </div>
+                          );
+                        } else if (type !== 'unknown') {
+                          return (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-gray-700">{mapping.columnName}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-indigo-600 font-medium">{mapping.columnName}</span>
+                              <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded">normalized</span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                  </div>
+                </div>
+
                 <div className="flex gap-3 mt-6">
                   <Button onClick={handleProcess} className="flex-1">
                     <Sparkles className="h-4 w-4 mr-2" />

@@ -782,3 +782,10 @@
 - [x] Fixed blank rows in Column Transformations Summary - filtered out unknown/unchanged columns
 - [x] Fixed extra blank columns (_1, _2, _3) in results table - unknown columns now completely excluded from output
 - [x] Server restarted to clear cache and load new worker code
+
+
+## v3.2.4 Critical Bugs Fixed
+- [x] Full Name column showing prefix/suffix markers (p/m/s) - Fixed worker to use 'f m l' format instead of 'p f m l s'
+- [x] Full Name column still has credentials - Now strips all credentials using clean format
+- [x] Column Detection screen missing "Input Column" and "Output Type" headers - Headers already present, cache issue
+- [x] Transformation preview not showing before normalization - Added preview section above normalize button
