@@ -140,9 +140,9 @@ export class IntelligentBatchProcessor {
         }
 
         case 'phone': {
-          const phone = new PhoneEnhanced(value, 'US');
+          const phone = new PhoneEnhanced(value, { defaultCountry: 'US' });
           return {
-            normalized: phone.format('international'),
+            normalized: phone.format('digitsOnly'),
             isValid: phone.isValid(),
           };
         }

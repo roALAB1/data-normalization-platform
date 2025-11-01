@@ -15,6 +15,7 @@ import { StreamingCSVProcessor, type StreamingStats } from "@shared/normalizatio
 import { ChunkedNormalizer } from "@shared/normalization/intelligent/ChunkedNormalizer";
 import { ProgressiveDownloader } from "@/lib/ProgressiveDownloader";
 import type { NormalizationStrategy } from "@shared/normalization/intelligent/UnifiedNormalizationEngine";
+import { ColumnTransformationsSummary, type ColumnTransformation } from "@/components/ColumnTransformationsSummary";
 
 interface ColumnMapping {
   columnName: string;
@@ -702,6 +703,40 @@ export default function IntelligentNormalization() {
         {/* Results Section */}
         {results.length > 0 && stats && (
           <div className="space-y-6">
+            {/* Column Transformations Summary */}
+            <ColumnTransformationsSummary
+              transformations={columnMappings.map(mapping => {
+                const transformation: ColumnTransformation = {
+                  inputColumn: mapping.columnName,
+                  outputColumns: [],
+                  transformationType: 'unchanged',
+                };
+
+                if (mapping.detectedType === 'name' || mapping.overrideType === 'name') {
+                  transformation.outputColumns = ['First Name', 'Last Name'];
+                  transformation.transformationType = 'split';
+                  transformation.description = 'Full name split into first and last name';
+                } else if (mapping.detectedType === 'email' || mapping.overrideType === 'email') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'normalized';
+                  transformation.description = 'Email normalized (lowercase, provider rules applied)';
+                } else if (mapping.detectedType === 'phone' || mapping.overrideType === 'phone') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'normalized';
+                  transformation.description = 'Phone normalized (digits only, no formatting)';
+                } else if (mapping.detectedType === 'address' || mapping.overrideType === 'address') {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'normalized';
+                  transformation.description = 'Address normalized (title case, abbreviations)';
+                } else {
+                  transformation.outputColumns = [mapping.columnName];
+                  transformation.transformationType = 'unchanged';
+                }
+
+                return transformation;
+              })}
+            />
+
             {/* Statistics */}
             <div className="grid grid-cols-4 gap-4">
               <Card>

@@ -729,3 +729,16 @@
 - [x] Test with full name input
 - [x] Test with first+last name input
 - [x] Save checkpoint for v3.1.0
+
+
+## Option C: Column Transformations Summary - v3.2.0
+- [x] Create ColumnTransformationsSummary component
+- [x] Add expandable accordion showing input → output mappings
+- [x] Display "Name → First Name + Last Name (split)" transformation
+- [x] Show normalization type for each column (normalized, split, etc.)
+- [x] Integrate summary component into results section
+- [x] Update phone number format to digits-only (no parentheses, spaces, hyphens)
+- [x] Update PhoneEnhanced format method to output digits only
+- [x] Update IntelligentBatchProcessor phone normalization
+- [x] Test with various phone formats
+- [x] Save checkpoint for v3.2.0
