@@ -907,3 +907,10 @@
 - [ ] Job title "certified sex therapist" not being filtered
 - [ ] Duplicate first name bug in parsing
 - [x] Title case capitalization - Added to worker for first/last names including hyphenated names
+
+
+## v3.4.1 Credential Matching Fixed - Reverted to Regex Approach
+- [x] Reverted word-by-word matching to regex-based approach with optional periods
+- [x] Added missing credentials: AFN-C, CCM, NBC-HWC (healthcare), M.Ed/MEd (education), SRS (real estate)
+- [x] Fixed regex to make periods optional in credential patterns (e.g., "L.Ac." matches "LAc")
+- [ ] Need to test all 12 problematic rows to verify fixes

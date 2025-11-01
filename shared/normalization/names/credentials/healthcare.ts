@@ -59,7 +59,7 @@ export const HEALTHCARE_CREDENTIALS = [
   "BHMS", "BLS-I", "CCH", "CAAPM", "CRNP", "CSPOMM", "DAAPM", "DABFP", "DABIM",
   "AOBFP", "AOBSPOMM", "ASG", "HASG", "HSG", "HLL", "LL", "SG", "RS Hom",
   "NCCA", "MNNP", "MPH", "RDCS", "RDMS", "CVT", "RVT", "MScAT", "M.Sc.AT", "MSEAT", "CPC",
-  "BCS", "CHC", "CNC", "WIMI-CP", "IF"
+  "BCS", "CHC", "CNC", "WIMI-CP", "IF", "AFN-C", "CCM", "NBC-HWC"
 ] as const;
 
 export type HealthcareCredential = typeof HEALTHCARE_CREDENTIALS[number];

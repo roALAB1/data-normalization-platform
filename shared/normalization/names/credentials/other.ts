@@ -10,6 +10,9 @@ export const OTHER_CREDENTIALS = [
   // Legal
   "JD", "J.D.", "LLM", "LL.M.", "LLD", "LL.D.", "Esq", "J.P.",
   
+  // Education
+  "M.Ed", "M.ED", "MEd",
+  
   // Communications & PR
   "APR", "ABC", "PRSA", "IABC",
   
@@ -50,7 +53,7 @@ export const OTHER_CREDENTIALS = [
   "CMgr", "MCMI", "GAICD", "ChMC", "CMP", "SCMP", "PMP", "CFRM", "CSMC",
   
   // Real Estate & Sales
-  "PSA",
+  "PSA", "SRS",
   
   // Contract Management
   "CPCM", "CFCM", "CCCM",

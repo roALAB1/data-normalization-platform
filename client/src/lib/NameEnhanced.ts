@@ -244,30 +244,25 @@ export class NameEnhanced {
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
     
-    // Normalize credentials by removing periods and spaces for matching
-    const normalizedCredentials = ALL_CREDENTIALS.map(c => c.replace(/[.\s]/g, ''));
-    const credentialMap = new Map<string, string>();
-    ALL_CREDENTIALS.forEach((original, idx) => {
-      credentialMap.set(normalizedCredentials[idx].toLowerCase(), original);
-    });
+    // Build regex pattern for all credentials (case insensitive, word boundaries)
+    // Escape special regex characters and handle periods
+    const credentialPattern = new RegExp(
+      `\\b(${ALL_CREDENTIALS.map(c => {
+        // Escape special regex chars and make periods optional
+        return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\./g, '\\.?');
+      }).join('|')})\\b`,
+      'gi'
+    );
     
-    // Split text into words and check each word
-    const words = textNoNicknames.split(/\s+/);
-    const filteredWords: string[] = [];
-    
-    for (const word of words) {
-      const normalizedWord = word.replace(/[.\s]/g, '').toLowerCase();
-      if (credentialMap.has(normalizedWord)) {
-        credentialsRemoved.push(credentialMap.get(normalizedWord)!);
-      } else {
-        filteredWords.push(word);
-      }
+    // Find and remove all credentials
+    const matches = textNoNicknames.match(credentialPattern);
+    if (matches) {
+      credentialsRemoved.push(...matches);
+      textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
     }
     
-    textNoNicknames = filteredWords.join(' ').trim();
-    
-    // Remove trailing hyphens/dashes that were before credentials
-    textNoNicknames = textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim();
+    // Remove trailing hyphens/dashes/commas that were before credentials
+    textNoNicknames = textNoNicknames.replace(/\s*[,\-\u2013\u2014]\s*$/, '').trim();
     
     // Clean up multiple spaces
     textNoNicknames = textNoNicknames.replace(/\s+/g, ' ').trim();
