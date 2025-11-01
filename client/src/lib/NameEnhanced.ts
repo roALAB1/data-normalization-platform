@@ -200,7 +200,42 @@ export class NameEnhanced {
       this.recordRepair(before, text, 'credential_modifiers_removed');
     }
 
-    // 5. Remove credentials in parentheses (Ph.D.), (MD), etc.
+    // 5. SMART COMMA HANDLING: Detect "Last, First" vs "Name, Credentials"
+    const commaIndex = text.indexOf(',');
+    if (commaIndex !== -1) {
+      const beforeComma = text.substring(0, commaIndex).trim();
+      const afterComma = text.substring(commaIndex + 1).trim();
+      
+      // Heuristic: Detect if it's "Last, First" or "Name, Credentials"
+      // "Last, First" indicators:
+      // - afterComma is 1-2 words (first name, or first + middle)
+      // - afterComma doesn't contain multiple credentials/abbreviations
+      // "Name, Credentials" indicators:
+      // - afterComma has multiple abbreviations (MD, PhD, etc.)
+      // - afterComma has 3+ words with dots/abbreviations
+      
+      const afterWords = afterComma.split(/\s+/);
+      const hasMultipleAbbrevs = afterWords.filter(w => 
+        /^[A-Z]{2,}[.]?$/.test(w) || // All caps abbreviations
+        /[A-Z][.]/.test(w) || // Dotted abbreviations
+        ALL_CREDENTIALS.some(c => c.toLowerCase() === w.toLowerCase())
+      ).length >= 2;
+      
+      const isLastFirst = afterWords.length <= 2 && !hasMultipleAbbrevs;
+      
+      if (isLastFirst) {
+        // "Last, First" format - swap and continue
+        text = `${afterComma} ${beforeComma}`.trim();
+        this.recordRepair(`${beforeComma}, ${afterComma}`, text, 'last_first_swapped');
+      } else {
+        // "Name, Credentials" format - strip credentials
+        this.suffix = afterComma;
+        text = beforeComma;
+        this.recordRepair(`${beforeComma}, ${afterComma}`, text, 'comma_split_credentials');
+      }
+    }
+
+    // 6. Remove credentials in parentheses (Ph.D.), (MD), etc.
     const credInParensPattern = new RegExp(
       `\\(\\s*(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\s*\\)`,
       'gi'

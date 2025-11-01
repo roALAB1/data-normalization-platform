@@ -914,3 +914,12 @@
 - [x] Added missing credentials: AFN-C, CCM, NBC-HWC (healthcare), M.Ed/MEd (education), SRS (real estate)
 - [x] Fixed regex to make periods optional in credential patterns (e.g., "L.Ac." matches "LAc")
 - [ ] Need to test all 12 problematic rows to verify fixes
+
+
+## v3.5.0 Smart Comma Detection & Excel Formula Fix
+- [x] Implemented smart comma detection: detects "Last, First" vs "Name, Credentials" format
+- [x] "Last, First" detection: 1-2 words after comma without abbreviations → swaps to "First Last"
+- [x] "Name, Credentials" detection: multiple abbreviations after comma → strips credentials
+- [x] Excel formula prevention: prefix with ' if name starts with =, -, +, @
+- [ ] Row 120: "Ben Brausen" → duplicate bug (need to debug NameEnhanced parser)
+- [ ] Need to test all 9 problematic rows

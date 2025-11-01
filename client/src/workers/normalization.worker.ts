@@ -105,9 +105,16 @@ function processChunk(
         ).join('-');
       };
       
-      normalizedRow['Full Name'] = nameResult.fullName.split(' ').map(titleCase).join(' ');
-      normalizedRow['First Name'] = titleCase(nameResult.firstName);
-      normalizedRow['Last Name'] = titleCase(nameResult.lastName);
+      // Prevent Excel formula interpretation by prefixing with ' if starts with =, -, +, @
+      const preventFormula = (str: string) => {
+        if (!str) return str;
+        if (/^[=\-+@]/.test(str)) return `'${str}`;
+        return str;
+      };
+      
+      normalizedRow['Full Name'] = preventFormula(nameResult.fullName.split(' ').map(titleCase).join(' '));
+      normalizedRow['First Name'] = preventFormula(titleCase(nameResult.firstName));
+      normalizedRow['Last Name'] = preventFormula(titleCase(nameResult.lastName));
     }
 
     // Process non-name columns
