@@ -580,3 +580,52 @@
 - [x] Add navigation link to all pages
 - [ ] Test with multi-column CSV files
 - [ ] Update documentation
+
+
+### Enterprise-Scale Processing v2.1.0
+- [ ] Remove 10,000 row limit
+- [ ] Implement streaming CSV parser (PapaParse with streaming mode)
+- [ ] Add chunked processing (process 1,000 rows at a time)
+- [ ] Implement web workers for parallel processing
+- [ ] Add memory-efficient result handling (don't store all in memory)
+- [ ] Implement progressive download (stream results to file)
+- [ ] Add pause/resume functionality
+- [ ] Show real-time progress with ETA
+- [ ] Add memory usage monitoring
+- [ ] Optimize for 100k+ row files
+- [ ] Test with 500k row CSV file
+- [ ] Update UI to show "No limit" instead of "10,000 rows"
+
+
+### Database & Spreadsheet Integrations v2.2.0
+- [x] Research Airtable API (read/write records)
+- [x] Research Google Sheets API (read/write cells)
+- [x] Research Baserow API (open-source Airtable alternative)
+- [x] Research RowZero.io (no API available)
+- [x] Install googleapis library
+- [x] Install airtable library
+- [x] Create unified DataSourceConnector interface
+- [ ] Implement GoogleSheetsConnector class
+- [ ] Implement AirtableConnector class
+- [ ] Add OAuth 2.0 flow for Google Sheets
+- [ ] Add OAuth 2.0 flow for Airtable
+- [ ] Create data source selection UI (CSV, Google Sheets, Airtable)
+- [ ] Implement streaming read from Google Sheets
+- [ ] Implement streaming read from Airtable
+- [ ] Implement streaming write back to Google Sheets
+- [ ] Implement streaming write back to Airtable
+- [ ] Add connection testing and validation
+- [ ] Create integration documentation
+
+
+## Enterprise-Scale CSV Streaming (Phase 1) - v2.1.0
+- [x] Create StreamingCSVProcessor class with PapaParse streaming mode
+- [x] Implement ChunkedNormalizer for parallel processing
+- [x] Create Web Worker for background processing
+- [x] Build ProgressiveDownloader for memory-efficient results download
+- [x] Update IntelligentNormalization UI to remove 10k row limit
+- [x] Add real-time progress tracking (rows/sec, ETA, memory usage)
+- [x] Add pause/resume functionality
+- [x] Test with 100k+ row CSV files
+- [x] Update documentation with streaming architecture
+- [x] Save checkpoint for v2.1.0

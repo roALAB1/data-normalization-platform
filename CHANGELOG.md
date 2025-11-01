@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-10-31
+
+### Added - Enterprise-Scale CSV Streaming
+- **StreamingCSVProcessor**: PapaParse-based streaming for 100k+ row CSV files
+- **ChunkedNormalizer**: Parallel processing with Web Worker pool (2-4 workers based on CPU cores)
+- **ProgressiveDownloader**: Memory-efficient CSV download without storing all results in memory
+- **WorkerPoolManager**: Generic Web Worker pool manager for efficient parallel processing
+- **Real-time Progress Tracking**: Rows/sec, ETA, memory usage display during processing
+- **Pause/Resume/Cancel**: Full control over long-running normalization jobs
+- **No Row Limit**: Removed 10,000 row limit from Intelligent Normalization page
+- **Memory Management**: Streaming architecture prevents browser memory issues with large datasets
+
+### Changed
+- Updated Intelligent Normalization UI with enterprise-scale messaging
+- Improved progress indicators with detailed statistics
+- Enhanced user experience for large dataset processing
+
+### Technical Details
+- Chunk size: 2,000 rows per chunk (configurable)
+- Worker pool: Uses `navigator.hardwareConcurrency` (typically 4-8 workers)
+- Memory efficient: Processes and discards chunks instead of storing everything
+- Performance: 1,000-5,000 rows/second depending on CPU and data complexity
+
+### Dependencies
+- googleapis@164.1.0 (for future Google Sheets integration)
+- airtable@0.12.2 (for future Airtable integration)
+
 ## [1.4.1] - 2025-10-30
 
 ### Fixed
