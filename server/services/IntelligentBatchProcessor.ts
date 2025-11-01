@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import { NameEnhanced } from '../../shared/normalization/names/NameEnhanced';
+import { NameSplitter } from '../../shared/normalization/names/NameSplitter';
 import { PhoneEnhanced } from '../../shared/normalization/phones/PhoneEnhanced';
 import { EmailEnhanced } from '../../shared/normalization/emails/EmailEnhanced';
 import { AddressFormatter } from '../../shared/normalization/addresses/AddressFormatter';
@@ -9,7 +10,7 @@ import { AddressFormatter } from '../../shared/normalization/addresses/AddressFo
  */
 interface ColumnDetection {
   columnName: string;
-  detectedType: 'name' | 'email' | 'phone' | 'address' | 'unknown';
+  detectedType: 'name' | 'first_name' | 'last_name' | 'email' | 'phone' | 'address' | 'unknown';
   confidence: number;
 }
 
@@ -89,6 +90,13 @@ export class IntelligentBatchProcessor {
     }
     if (lowerName.includes('phone') || lowerName.includes('tel') || lowerName.includes('mobile')) {
       return { columnName, detectedType: 'phone', confidence: Math.max(phoneConf, 0.7) };
+    }
+    // Check for first name / last name columns
+    if (lowerName.match(/^(first|given)[_\s-]?name$/i) || lowerName === 'fname') {
+      return { columnName, detectedType: 'first_name', confidence: 0.95 };
+    }
+    if (lowerName.match(/^(last|sur|family)[_\s-]?name$/i) || lowerName === 'lname') {
+      return { columnName, detectedType: 'last_name', confidence: 0.95 };
     }
     if (lowerName.includes('name') || lowerName.includes('contact')) {
       return { columnName, detectedType: 'name', confidence: Math.max(nameConf, 0.7) };
@@ -210,6 +218,12 @@ export class IntelligentBatchProcessor {
           totalRows++;
         },
         complete: () => {
+          // Check if we need to handle name splitting
+          const hasFullName = detections.some(d => d.detectedType === 'name');
+          const hasFirstName = detections.some(d => d.detectedType === 'first_name');
+          const hasLastName = detections.some(d => d.detectedType === 'last_name');
+          const nameSplitter = new NameSplitter();
+
           // Second pass: normalize data
           Papa.parse(csvContent, {
             header: true,
@@ -217,12 +231,28 @@ export class IntelligentBatchProcessor {
             step: (row: any) => {
               const normalizedRow: Record<string, string> = {};
               let rowValid = true;
+              let splitName: { firstName: string; lastName: string } | null = null;
 
               headers.forEach((header, index) => {
                 const value = row.data[header] || '';
                 const detection = detections[index];
 
-                if (detection.detectedType !== 'unknown' && detection.confidence >= 0.5) {
+                if (detection.detectedType === 'name') {
+                  // Full name - split into first and last
+                  const split = nameSplitter.split(value);
+                  splitName = { firstName: split.firstName, lastName: split.lastName };
+                  // Don't add to normalizedRow yet - we'll add First Name and Last Name columns later
+                } else if (detection.detectedType === 'first_name') {
+                  // First name - normalize and store
+                  const name = new NameEnhanced(value);
+                  if (!splitName) splitName = { firstName: '', lastName: '' };
+                  splitName.firstName = name.format('f');
+                } else if (detection.detectedType === 'last_name') {
+                  // Last name - normalize and store
+                  const name = new NameEnhanced(value);
+                  if (!splitName) splitName = { firstName: '', lastName: '' };
+                  splitName.lastName = name.format('l');
+                } else if (detection.detectedType !== 'unknown' && detection.confidence >= 0.5) {
                   const { normalized, isValid } = this.normalizeValue(value, detection.detectedType);
                   normalizedRow[header] = normalized;
                   if (!isValid) rowValid = false;
@@ -231,6 +261,12 @@ export class IntelligentBatchProcessor {
                   normalizedRow[header] = value;
                 }
               });
+
+              // Add First Name and Last Name columns if we processed names
+              if (splitName) {
+                normalizedRow['First Name'] = splitName.firstName;
+                normalizedRow['Last Name'] = splitName.lastName;
+              }
 
               results.push(normalizedRow);
               processedRows++;

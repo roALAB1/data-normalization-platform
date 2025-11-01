@@ -716,3 +716,16 @@
 - [x] Test at half-screen width (960px)
 - [x] Test at various breakpoints
 - [x] Save checkpoint for v3.0.3
+
+
+## Enhanced Name Processing - v3.1.0
+- [x] Design column detection logic (full name vs first+last)
+- [x] Create NameSplitter utility for splitting full names
+- [x] Update NameEnhanced to handle both input formats
+- [x] Update DataTypeDetector to recognize first/last name columns
+- [x] Update IntelligentBatchProcessor for name splitting
+- [x] Update CSV output to always include First Name + Last Name columns
+- [x] Update UI to show name processing capabilities
+- [x] Test with full name input
+- [x] Test with first+last name input
+- [x] Save checkpoint for v3.1.0

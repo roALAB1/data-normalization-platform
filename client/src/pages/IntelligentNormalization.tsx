@@ -391,10 +391,10 @@ export default function IntelligentNormalization() {
                   <h3 className="text-lg font-semibold text-gray-900">Names</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• Accepts full name OR first+last name columns</li>
+                  <li>• Always outputs separate First Name & Last Name</li>
                   <li>• Strips 750+ credentials, honorifics, prefixes, suffixes</li>
                   <li>• Nationality and ethnicity name order nuance detection</li>
-                  <li>• Context-aware parsing for compound names</li>
-                  <li>• Nickname and alias normalization</li>
                 </ul>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
