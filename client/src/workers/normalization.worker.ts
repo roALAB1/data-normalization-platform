@@ -105,10 +105,11 @@ function processChunk(
         ).join('-');
       };
       
-      // Prevent Excel formula interpretation by prefixing with ' if starts with =, -, +, @
+      // Prevent Excel formula interpretation by prefixing with ' if starts with =, +, @
+      // NOTE: Don't prevent hyphens here as they're common in names like "Meng-Ling"
       const preventFormula = (str: string) => {
         if (!str) return str;
-        if (/^[=\-+@]/.test(str)) return `'${str}`;
+        if (/^[=+@]/.test(str)) return `'${str}`;
         return str;
       };
       

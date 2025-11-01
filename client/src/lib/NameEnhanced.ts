@@ -460,8 +460,9 @@ export class NameEnhanced {
     let middleParts = parts.slice(1, lastPartIndex);
 
     // Detect last name prefixes (start from the position before the last name)
+    // Only check for prefixes if we have 3+ parts (to avoid false positives like "Ben Brausen")
     let i = lastPartIndex - 1;
-    while (i >= 1) {
+    while (i >= 1 && parts.length >= 3) {
       const candidate = parts[i].toLowerCase();
       const candidate2 = i > 0 ? `${parts[i - 1]} ${parts[i]}`.toLowerCase() : candidate;
 

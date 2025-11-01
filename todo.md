@@ -923,3 +923,8 @@
 - [x] Excel formula prevention: prefix with ' if name starts with =, -, +, @
 - [ ] Row 120: "Ben Brausen" → duplicate bug (need to debug NameEnhanced parser)
 - [ ] Need to test all 9 problematic rows
+
+
+## v3.5.1 Final Two Bugs Fixed
+- [x] Row 120: "Ben Brausen" → Fixed by restricting last name prefix detection to 3+ part names only
+- [x] Row 170: "Meng-Ling Erik Kuo" → Fixed by removing hyphen from Excel formula prevention pattern
