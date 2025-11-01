@@ -640,3 +640,13 @@
 - [x] Update README.md to reflect simplified structure
 - [x] Test user flow from home to Intelligent Normalization
 - [x] Save checkpoint for v2.2.0
+
+
+## Hero Section Feature Showcase - v2.3.0
+- [x] Add hero section with headline and subheading
+- [x] Create feature grid showing Names, Emails, Phone Numbers, Addresses, Companies
+- [x] Add icons and detailed bullet points for each feature
+- [x] Move upload box below hero section
+- [x] Update styling to match Option B mockup
+- [x] Test responsive layout
+- [x] Save checkpoint for v2.3.0

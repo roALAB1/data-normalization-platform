@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap } from "lucide-react";
+import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { NameEnhanced } from "@/lib/NameEnhanced";
@@ -370,6 +370,95 @@ export default function IntelligentNormalization() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        {!file && (
+          <div className="max-w-5xl mx-auto mb-12">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Enterprise-Scale Data Normalization
+              </h2>
+              <p className="text-xl text-gray-600">
+                Automatically detect and normalize names, emails, phones, addresses in one workflow
+              </p>
+            </div>
+
+            {/* Feature Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {/* Names */}
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <User className="h-6 w-6 text-indigo-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Names</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• 750+ professional credentials</li>
+                  <li>• Asian name order detection</li>
+                  <li>• Context-aware parsing</li>
+                  <li>• Nickname handling</li>
+                </ul>
+              </div>
+
+              {/* Emails */}
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <Mail className="h-6 w-6 text-indigo-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Emails</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• RFC 5322 validation</li>
+                  <li>• Provider-specific rules</li>
+                  <li>• MX/SMTP verification</li>
+                  <li>• Disposable detection</li>
+                </ul>
+              </div>
+
+              {/* Phone Numbers */}
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <Phone className="h-6 w-6 text-indigo-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Phone Numbers</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• 250+ countries supported</li>
+                  <li>• Type detection (mobile/landline)</li>
+                  <li>• Multiple format outputs</li>
+                  <li>• Carrier detection</li>
+                </ul>
+              </div>
+
+              {/* Addresses */}
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <Home className="h-6 w-6 text-indigo-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Addresses</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• Title Case standardization</li>
+                  <li>• 27+ street abbreviations</li>
+                  <li>• Directional normalization</li>
+                  <li>• Unit type handling</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Companies - Coming Soon */}
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6 border border-indigo-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Building2 className="h-6 w-6 text-indigo-600" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Company Names</h3>
+                    <p className="text-sm text-gray-600">Normalize organization names • Match aliases • Standardize suffixes</p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-full">
+                  Coming Soon
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Upload Section */}
         {!file && (
           <Card className="max-w-2xl mx-auto">
