@@ -95,9 +95,19 @@ function processChunk(
       
       // Parse the combined name once
       const nameResult = normalizeValue('name', combinedName);
-      normalizedRow['Full Name'] = nameResult.fullName;
-      normalizedRow['First Name'] = nameResult.firstName;
-      normalizedRow['Last Name'] = nameResult.lastName;
+      
+      // Apply title case capitalization (capitalize first letter of each name part)
+      const titleCase = (str: string) => {
+        if (!str) return str;
+        // Handle hyphenated names: capitalize after hyphens too
+        return str.split('-').map(part => 
+          part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+        ).join('-');
+      };
+      
+      normalizedRow['Full Name'] = nameResult.fullName.split(' ').map(titleCase).join(' ');
+      normalizedRow['First Name'] = titleCase(nameResult.firstName);
+      normalizedRow['Last Name'] = titleCase(nameResult.lastName);
     }
 
     // Process non-name columns

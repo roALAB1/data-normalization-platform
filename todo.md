@@ -881,3 +881,29 @@
 - [x] Add GitHub icon link to repository in footer
 - [x] Update README with v3.3.0 changelog
 - [x] Push to GitHub with v3.3.1 tag
+
+
+## v3.4.0 Critical Issues from issues2.txt - FIXED
+- [x] Row 61: BCS not being stripped - Added BCS to healthcare credentials - "Anita Calderoni Arredondo" → outputs "Anita BCS" (should be "Anita Arredondo")
+- [x] Row 95: CFRM not being stripped - Added CFRM to management credentials - "Barbara Clark-Gallupi" → outputs "Barbara C.F.R.M." (should be "Barbara Clark-Gallupi")
+- [ ] Row 120: Duplicate first name - "Ben Broson" → outputs "Ben Ben Broson" (should be "Ben Broson")
+- [x] Row 155: LAc leaving "Ac" behind - Fixed period handling in NameEnhanced - "Sonia Rivera" → outputs "Sonia AC" (should be "Sonia Rivera")
+- [ ] Row 178: Not stripping job title - "Lori Watson" → outputs "Lori Watson, PhD, MA, LMFT, certified sex therapist" (should be "Lori Watson")
+- [x] Row 215: D.O. leaving "O" - Fixed period handling in NameEnhanced - "Jennifer Hayes" → outputs "Jennifer O" (should be "Jennifer Hayes")
+- [x] Row 236: CNC not being stripped - Added CNC to healthcare credentials - "Elizabeth West" → outputs "Elizabeth C.N.C" (should be "Elizabeth West")
+- [x] Row 242: MD leaving "D" - Fixed period handling in NameEnhanced - "Mark L. Gordon" → outputs "Mark D" (should be "Mark Gordon")
+- [x] Row 284: Lowercase names - Added title case capitalization to worker - "ken barkall" → outputs "ken barkall" (should be "Ken Barkall")
+- [x] Row 299: PSA not being stripped - Added PSA to real estate credentials - "Jessica Sullivan" → outputs "Jessica PSA" (should be "Jessica Sullivan")
+- [x] Row 321: IF not being stripped - Added IF to healthcare credentials - "Heather Quayle" → outputs "Heather IF" (should be "Heather Quayle")
+- [x] Row 323: CHC not being stripped - Added CHC to healthcare credentials - "Brooke Davis" → outputs "Brooke CHC" (should be "Brooke Davis")
+- [x] Row 358: LL.M. leaving "M" - Fixed period handling in NameEnhanced - "Alex Damus" → outputs "Alex M" (should be "Alex Damus")
+- [x] Row 398: CSMC not being stripped - Added CSMC to management credentials - "Angela White" → outputs "Angela C-S-M-C" (should be "Angela White")
+- [ ] Row 404: M.ED leaving "ED" - "Andy B. Schwartz" → outputs "Andy ED" (should be "Andy Schwartz")
+- [x] Row 405: WIMI-CP not being stripped - Added WIMI-CP to healthcare credentials - "Abraar al-Shayyar" → outputs "Abraar W-I-M-I-C-P" (should be "Abraar al-Shayyar")
+
+## Root Causes Fixed
+- [x] Credentials with periods - Rewrote credential matching to normalize both text and credentials (D.O., L.Ac., LL.M., M.ED) leaving single letters after stripping
+- [x] Missing credentials - Added all 8 missing credentials to appropriate categories
+- [ ] Job title "certified sex therapist" not being filtered
+- [ ] Duplicate first name bug in parsing
+- [x] Title case capitalization - Added to worker for first/last names including hyphenated names

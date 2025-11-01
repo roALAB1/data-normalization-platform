@@ -225,7 +225,7 @@ export class NameEnhanced {
       }
     }
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
-    textNoNicknames = text.replace(/['"(),]/g, ' ');
+    textNoNicknames = text.replace(/['"(),\.]/g, ' ').replace(/\s+/g, ' ').trim();
 
     // 7. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
@@ -244,20 +244,27 @@ export class NameEnhanced {
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
     
-    // Build pattern for credentials as standalone words
-    // Use lookahead/lookbehind to ensure not part of hyphenated names
-    const credentialPattern = new RegExp(
-      `(?<![-])\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b(?![-])`,
-      'gi'
-    );
+    // Normalize credentials by removing periods and spaces for matching
+    const normalizedCredentials = ALL_CREDENTIALS.map(c => c.replace(/[.\s]/g, ''));
+    const credentialMap = new Map<string, string>();
+    ALL_CREDENTIALS.forEach((original, idx) => {
+      credentialMap.set(normalizedCredentials[idx].toLowerCase(), original);
+    });
     
-    // Find all credentials
-    const matches = textNoNicknames.match(credentialPattern);
-    if (matches) {
-      credentialsRemoved.push(...matches);
-      // Remove all credentials
-      textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
+    // Split text into words and check each word
+    const words = textNoNicknames.split(/\s+/);
+    const filteredWords: string[] = [];
+    
+    for (const word of words) {
+      const normalizedWord = word.replace(/[.\s]/g, '').toLowerCase();
+      if (credentialMap.has(normalizedWord)) {
+        credentialsRemoved.push(credentialMap.get(normalizedWord)!);
+      } else {
+        filteredWords.push(word);
+      }
     }
+    
+    textNoNicknames = filteredWords.join(' ').trim();
     
     // Remove trailing hyphens/dashes that were before credentials
     textNoNicknames = textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim();

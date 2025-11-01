@@ -47,7 +47,10 @@ export const OTHER_CREDENTIALS = [
   "ABS", "CSC", "CSCP", "CSCS", "CTSC", "CMCS", "MSCP", "PATP", "FCMC", "NASM", "RYT",
   
   // Management & Leadership
-  "CMgr", "MCMI", "GAICD", "ChMC", "CMP", "SCMP", "PMP",
+  "CMgr", "MCMI", "GAICD", "ChMC", "CMP", "SCMP", "PMP", "CFRM", "CSMC",
+  
+  // Real Estate & Sales
+  "PSA",
   
   // Contract Management
   "CPCM", "CFCM", "CCCM",
