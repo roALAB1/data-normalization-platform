@@ -398,16 +398,16 @@ export default function IntelligentNormalization() {
                 </ul>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">Dr. John Smith, PhD</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">John Smith</span>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">Dr. John Smith, PhD</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">John Smith</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">WANG, Wei</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">Wei Wang</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">WANG, Wei</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">Wei Wang</span>
                     </div>
                   </div>
                 </div>
@@ -427,16 +427,16 @@ export default function IntelligentNormalization() {
                 </ul>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">John.Smith@GMAIL.COM</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">johnsmith@gmail.com</span>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">John.Smith@GMAIL.COM</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">johnsmith@gmail.com</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">user+tag@domain.com</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">user@domain.com</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">user+tag@domain.com</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">user@domain.com</span>
                     </div>
                   </div>
                 </div>
@@ -456,16 +456,16 @@ export default function IntelligentNormalization() {
                 </ul>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">(415) 555-1234</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">+1 415-555-1234</span>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">(415) 555-1234</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">+1 415-555-1234</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">44 20 7946 0958</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">+44 20 7946 0958</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">44 20 7946 0958</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">+44 20 7946 0958</span>
                     </div>
                   </div>
                 </div>
@@ -485,16 +485,16 @@ export default function IntelligentNormalization() {
                 </ul>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-xs font-medium text-gray-500 mb-2">Examples:</p>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">123 MAIN STREET</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">123 Main St</span>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">123 MAIN STREET</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">123 Main St</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">456 n elm ave apt 2b</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="text-indigo-600 font-medium">456 N Elm Ave Apt 2B</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="text-gray-400 truncate">456 n elm ave apt 2b</span>
+                      <span className="text-gray-300 hidden sm:inline">→</span>
+                      <span className="text-indigo-600 font-medium truncate">456 N Elm Ave Apt 2B</span>
                     </div>
                   </div>
                 </div>
