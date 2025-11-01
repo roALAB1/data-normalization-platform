@@ -14,7 +14,7 @@ A unified, enterprise-scale data normalization platform that automatically detec
 - **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
 - **Server-Side Batch System**: Robust job queue with BullMQ + Redis for large-scale processing (v3.0.0)
 - **Specialized Normalizers**:
-  - **Names**: 750+ credentials, nationality/ethnicity name order nuances, flexible input formats
+  - **Names**: 770+ credentials, nationality/ethnicity name order nuances, flexible input formats
   - **Phones**: 250+ countries, type detection, digits-only output format
   - **Emails**: RFC 5322 validation, provider-specific rules, MX/SMTP verification
   - **Addresses**: Title Case, 27+ abbreviations, standardization
@@ -34,7 +34,7 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Intelligent Multi-Type Platform** 🤖: Auto-detect data types with 95%+ accuracy (v2.0.0)  
 ✅ **Address Normalization** 🏠: Title Case, 27+ abbreviations, 10,000+ addresses/second (v1.5.0)  
 ✅ **Enterprise Email Verification** 📧: MX/SMTP validation, disposable detection, reputation scoring (v1.4.0)  
-✅ **750+ Professional Credentials**: Healthcare, finance, IT, engineering, legal, education coverage  
+✅ **770+ Professional Credentials**: Healthcare, finance, IT, engineering, legal, education coverage  
 ✅ **Asian Name Detection** 🌏: 400+ Chinese/Korean/Japanese/Vietnamese surnames  
 ✅ **Context-Aware Parsing** 🧠: Email/phone/company context for accuracy  
 ✅ **Batch Processing**: Server-side job queue for unlimited datasets  
@@ -48,6 +48,15 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
 ## 📦 What's New
+
+### v3.3.0 - Expanded Credential Database 📚
+
+**Additional Credentials**
+- Added 15+ missing healthcare credentials: IBCLC, CLC, DipABLM (Lactation), MMSc (Medical Science), CNS (Clinical Nurse Specialist), ARNP-FNP, FAANP (Advanced Nursing), MScAT/MSEAT (Athletic Training), FMACP, FCP (Physician Fellowships), CDN, CISSN, CSSD (Nutrition/Sports Dietetics), AADP, CFMP (Alternative Medicine), CPO (Prosthetist Orthotist), CPC (Professional Coder)
+- Added RYT (Registered Yoga Teacher) to fitness/wellness credentials
+- Enhanced pronoun removal to support square brackets: [She/Her], [He/Him], etc.
+- Added "Therapist" to job title filters to prevent false positives
+- Total credential database now covers 770+ professional designations
 
 ### v3.2.0 - Column Transformations Summary & Digits-Only Phone Format 🔍
 
@@ -222,7 +231,7 @@ A unified, enterprise-scale data normalization platform that automatically detec
 - **JobDashboardEnhanced**: Real-time status updates via WebSocket
 
 ### Core Normalizers
-- **NameEnhanced**: 750+ credentials, Asian name detection, context-aware parsing
+- **NameEnhanced**: 770+ credentials, Asian name detection, context-aware parsing
 - **NameSplitter**: Intelligent full name splitting (v3.1.0)
 - **PhoneEnhanced**: Google libphonenumber with 250+ countries
 - **EmailEnhanced**: RFC 5322 validation, provider rules, MX/SMTP verification
