@@ -42,8 +42,8 @@ function normalizeValue(type: string, value: string): any {
       case 'name': {
         const name = new NameEnhanced(value);
         if (name.isValid) {
-          // Use 'f m l' format for clean full name (no prefix/suffix/credentials)
-          const cleanFullName = name.format('f m l') || `${name.firstName || ''} ${name.lastName || ''}`.trim();
+          // Use only firstName + lastName for Full Name (no middle name, prefix, suffix, or credentials)
+          const cleanFullName = `${name.firstName || ''} ${name.lastName || ''}`.trim();
           return {
             fullName: cleanFullName,
             firstName: name.firstName || '',

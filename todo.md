@@ -789,3 +789,8 @@
 - [x] Full Name column still has credentials - Now strips all credentials using clean format
 - [x] Column Detection screen missing "Input Column" and "Output Type" headers - Headers already present, cache issue
 - [x] Transformation preview not showing before normalization - Added preview section above normalize button
+
+
+## v3.2.5 Bugs Fixed
+- [x] Full Name column still showing middle initials/credentials - Fixed worker to concatenate only firstName + lastName (no middle name)
+- [x] Dropdown labels showing generic "Name" - Now shows "First Name", "Last Name", or "Full Name" based on column name
