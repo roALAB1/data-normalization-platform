@@ -347,3 +347,221 @@
 - [x] Update UI to show clean format prominently
 - [x] Update CSV export to use clean format
 - [x] Update batch processing to output clean format
+
+### Address Normalization Library (v1.5.0)
+
+#### Core Address Parsing
+- [ ] Install address parsing library (libpostal or addressit)
+- [ ] Create AddressEnhanced class with parsing capabilities
+- [ ] Parse street number, street name, unit/apt, city, state, zip, country
+- [ ] Handle PO Box addresses
+- [ ] Handle military addresses (APO/FPO/DPO)
+- [ ] Support international address formats
+
+#### Address Standardization
+- [ ] USPS address standardization (US addresses)
+- [ ] Street type abbreviations (Street → St, Avenue → Ave)
+- [ ] Directional abbreviations (North → N, Southwest → SW)
+- [ ] Secondary unit designators (Apartment → Apt, Suite → Ste)
+- [ ] State abbreviations (California → CA)
+- [ ] ZIP+4 format support
+- [ ] Case normalization (title case for names, uppercase for state)
+
+#### Address Validation
+- [ ] Format validation (required fields present)
+- [ ] ZIP code validation (format and existence)
+- [ ] State/ZIP code matching
+- [ ] City/State/ZIP consistency check
+- [ ] Street address format validation
+- [ ] International postal code validation
+
+#### Geocoding Integration
+- [ ] Research geocoding APIs (Google Maps, Mapbox, HERE, OpenStreetMap)
+- [ ] Add geocoding to get lat/lng coordinates
+- [ ] Reverse geocoding (coordinates to address)
+- [ ] Address verification via geocoding
+- [ ] Distance calculation between addresses
+- [ ] Timezone detection from address
+
+#### Address Matching & Deduplication
+- [ ] Fuzzy address matching algorithm
+- [ ] Levenshtein distance for street names
+- [ ] Handle common misspellings and variations
+- [ ] Identify duplicate addresses
+- [ ] Address similarity scoring (0-100)
+
+#### UI Components
+- [ ] Create Address Demo page
+- [ ] Single address input with parsing
+- [ ] Display parsed components (street, city, state, zip)
+- [ ] Show standardized vs original address
+- [ ] Add geocoding results (lat/lng, map preview)
+- [ ] CSV batch processing for addresses
+- [ ] Address validation status badges
+
+#### International Support
+- [ ] US address format
+- [ ] UK address format (postcode system)
+- [ ] Canadian address format
+- [ ] Australian address format
+- [ ] European address formats (Germany, France, etc.)
+- [ ] Asian address formats (Japan, China, Korea)
+- [ ] Country-specific validation rules
+
+#### Enterprise Features
+- [ ] Batch address normalization API endpoint
+- [ ] Address verification confidence scoring
+- [ ] CASS (Coding Accuracy Support System) certification info
+- [ ] Delivery point validation (DPV)
+- [ ] Commercial mail receiving agency (CMRA) detection
+- [ ] Vacant address detection
+- [ ] Address type detection (residential, commercial, PO Box)
+
+#### Documentation
+- [ ] Create ADDRESS_NORMALIZATION_IMPLEMENTATION.md
+- [ ] Add usage examples for all features
+- [ ] Document supported countries and formats
+- [ ] Add API endpoint documentation
+
+### Intelligent Multi-Type Normalization Platform (v2.0.0)
+
+#### Smart Data Type Detection
+- [ ] Create DataTypeDetector class
+- [ ] Detect names (first name, last name, full name patterns)
+- [ ] Detect phone numbers (various formats, international)
+- [ ] Detect email addresses (RFC 5322 validation)
+- [ ] Detect physical addresses (street, city, state, zip patterns)
+- [ ] Detect dates (various formats)
+- [ ] Detect URLs
+- [ ] Detect company names
+- [ ] Column header analysis (intelligent field name matching)
+- [ ] Sample data analysis (pattern recognition)
+- [ ] Confidence scoring for each detection (0-100)
+
+#### Unified Normalization Engine
+- [ ] Create NormalizationEngine class
+- [ ] Route names to NameEnhanced
+- [ ] Route phones to PhoneEnhanced
+- [ ] Route emails to EmailEnhanced/EmailVerification
+- [ ] Route addresses to AddressEnhanced
+- [ ] Support multiple normalizations per field
+- [ ] Batch processing with progress tracking
+- [ ] Error handling and fallback strategies
+- [ ] Result caching for performance
+
+#### Smart CSV Analyzer
+- [ ] Automatic column type detection
+- [ ] Header row detection
+- [ ] Delimiter detection (comma, tab, pipe, semicolon)
+- [ ] Encoding detection (UTF-8, Latin-1, etc.)
+- [ ] Data quality assessment
+- [ ] Missing value detection
+- [ ] Duplicate detection
+- [ ] Statistical analysis per column
+- [ ] Suggest normalization strategies
+- [ ] Preview normalization results
+
+#### Multi-Column Normalization
+- [ ] Support normalizing multiple columns simultaneously
+- [ ] Handle related columns (first_name + last_name)
+- [ ] Address component handling (street, city, state, zip)
+- [ ] Preserve original data option
+- [ ] Add normalized columns vs replace
+- [ ] Column mapping interface
+- [ ] Batch apply normalizations
+
+#### Intelligent Normalization UI
+- [ ] Create Smart Normalize page
+- [ ] CSV upload with drag-and-drop
+- [ ] Automatic column analysis display
+- [ ] Column type override options
+- [ ] Normalization preview (first 10 rows)
+- [ ] Select which normalizations to apply
+- [ ] Configure normalization options per column
+- [ ] Real-time progress tracking
+- [ ] Download normalized CSV
+- [ ] Export normalization report
+
+#### Advanced Features
+- [ ] Custom normalization rules
+- [ ] Normalization templates (save/load configurations)
+- [ ] API endpoint for programmatic access
+- [ ] Webhook support for async processing
+- [ ] Multi-file batch processing
+- [ ] Schedule recurring normalizations
+- [ ] Data quality scoring
+- [ ] Normalization history and audit trail
+
+#### Performance Optimization
+- [ ] Parallel processing for large files
+- [ ] Streaming CSV processing (handle 1M+ rows)
+- [ ] Worker threads for CPU-intensive operations
+- [ ] Result caching and memoization
+- [ ] Incremental processing with checkpoints
+- [ ] Memory-efficient processing
+
+#### Documentation
+- [ ] Create INTELLIGENT_NORMALIZATION_GUIDE.md
+- [ ] Document data type detection algorithms
+- [ ] Add usage examples for each data type
+- [ ] Create API documentation
+- [ ] Add troubleshooting guide
+
+### Address Normalization (Simple Format Standardization) (v1.5.0)
+- [ ] Create AddressFormatter class with Title Case conversion
+- [ ] Add street suffix abbreviation (Street → St, Avenue → Ave, etc.)
+- [ ] Add directional abbreviation support (North → N, optional)
+- [ ] Add unit type abbreviation support (Apartment → Apt, optional)
+- [ ] Handle acronyms (PO Box, APO, FPO)
+- [ ] Add edge case handling (multiple suffixes, special characters)
+- [ ] Create Address Demo page with real-time formatting
+- [ ] Add example addresses from different formats
+- [ ] Show original vs normalized address comparison
+- [ ] Add CSV batch processing for addresses
+- [ ] Export AddressFormatter from shared/normalization
+
+### Intelligent Multi-Type Normalization Platform (v2.0.0)
+- [ ] Create DataTypeDetector class for automatic column type detection
+- [ ] Implement pattern matching for names, phones, emails, addresses
+- [ ] Add confidence scoring for detection results
+- [ ] Create UnifiedNormalizationEngine to route to appropriate normalizers
+- [ ] Build SmartCSVProcessor with automatic analysis
+- [ ] Add column mapping UI (user can confirm/override detected types)
+- [ ] Implement multi-column normalization in single pass
+- [ ] Add progress tracking for multi-type batch processing
+- [ ] Create intelligent normalization dashboard page
+- [ ] Add normalization strategy preview before processing
+- [ ] Implement caching for repeated normalizations
+- [ ] Add quality metrics and validation reports
+- [ ] Create comprehensive documentation for intelligent platform
+
+
+### Address Normalization (Simple Format Standardization) v1.5.0
+- [x] Create AddressFormatter class with Title Case conversion
+- [x] Add 27 street suffix abbreviations (Street → St, Avenue → Ave, etc.)
+- [x] Add 8 directional abbreviations (North → N, optional)
+- [x] Add 7 unit type abbreviations (Apartment → Apt, optional)
+- [x] Handle acronyms (PO Box stays "PO Box")
+- [x] Add batch processing support
+- [x] Add change tracking
+- [x] Create Address Demo page with single/batch modes
+- [x] Add CSV upload for batch address normalization
+- [x] Add download CSV functionality
+- [x] Add Address Demo link to navigation
+
+### Intelligent Multi-Type Normalization Platform v2.0.0
+- [x] Create DataTypeDetector for automatic column type detection
+- [x] Implement header analysis (40% weight)
+- [x] Implement pattern matching (60% weight)
+- [x] Support 12 data types (name, email, phone, address, city, state, zip, country, company, etc.)
+- [x] Generate confidence scores (0-100%)
+- [x] Create UnifiedNormalizationEngine to route normalizations
+- [x] Support multi-column processing
+- [x] Add progress tracking callbacks
+- [x] Implement caching for performance
+- [x] Add error handling and quality metrics
+- [x] Create SmartCSVProcessor for CSV analysis
+- [x] Auto-detect CSV delimiter and header
+- [x] Generate normalization strategies
+- [x] Estimate processing time
+- [x] Create comprehensive documentation

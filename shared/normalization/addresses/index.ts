@@ -94,3 +94,6 @@ export function abbreviateDirectional(directional: string): string {
 export function isUnitDesignator(str: string): boolean {
   return UNIT_DESIGNATORS.has(str.replace(/\./g, ''));
 }
+
+// Export AddressFormatter
+export { AddressFormatter, type AddressFormatterOptions, type AddressFormatterResult } from './AddressFormatter';
