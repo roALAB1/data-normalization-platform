@@ -8,6 +8,7 @@ import { NameEnhanced } from '../lib/NameEnhanced';
 import { PhoneEnhanced } from '../../../shared/normalization/phones/PhoneEnhanced';
 import { EmailEnhanced } from '../../../shared/normalization/emails/EmailEnhanced';
 import { AddressFormatter } from '../../../shared/normalization/addresses/AddressFormatter';
+import { LocationNormalizer } from '../../../shared/normalization/locations';
 
 export interface WorkerMessage {
   type: 'process' | 'cancel';
@@ -40,7 +41,15 @@ function normalizeValue(type: string, value: string): string {
     switch (type) {
       case 'name': {
         const name = new NameEnhanced(value);
-        return name.isValid ? name.format('first-last') : value;
+        return name.isValid ? name.full : value;
+      }
+      case 'first-name': {
+        const name = new NameEnhanced(value);
+        return name.isValid && name.firstName ? name.firstName : value;
+      }
+      case 'last-name': {
+        const name = new NameEnhanced(value);
+        return name.isValid && name.lastName ? name.lastName : value;
       }
       case 'email': {
         const email = new EmailEnhanced(value);
@@ -48,11 +57,14 @@ function normalizeValue(type: string, value: string): string {
       }
       case 'phone': {
         const phone = PhoneEnhanced.parse(value);
-        return phone.isValid ? phone.digitsOnly : value;
+        return phone.isValid ? phone.e164 : value;
       }
       case 'address': {
         const result = AddressFormatter.normalize(value);
         return result.normalized;
+      }
+      case 'location': {
+        return LocationNormalizer.normalize(value);
       }
       default:
         return value;

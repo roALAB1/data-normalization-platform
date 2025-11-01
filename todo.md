@@ -729,3 +729,6 @@
 - [x] Test with full name input
 - [x] Test with first+last name input
 - [x] Save checkpoint for v3.1.0
+
+## React Duplicate Key Warnings (v3.6.0)
+- [x] Fix duplicate key warnings in IntelligentNormalization table (headers and cells with duplicate column names)

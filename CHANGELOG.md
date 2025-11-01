@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0] - 2025-11-01
+
+### Added
+- **Location Normalization**: New `LocationNormalizer` module that converts "City, State, Country" format to "City, ST" format
+  - Converts full state names to 2-letter abbreviations (e.g., "California" → "CA")
+  - Removes country names (United States, USA, etc.)
+  - Auto-detection for location columns
+- **Separate Name Column Types**: Added distinct handling for different name column types
+  - `first-name`: Extracts and returns first name only
+  - `last-name`: Extracts and returns last name only
+  - `name`: Returns full normalized name
+- **Development Tools**: Added `dev:clean` script to package.json for easy cache clearing
+- **Troubleshooting Documentation**: Created `DEV_TROUBLESHOOTING.md` guide for common development issues
+
+### Fixed
+- **Phone Number Format**: Changed from digits-only to E.164 format (with + prefix) to match enrichment tool requirements
+  - Example: `14155551234` → `+14155551234`
+- **React Duplicate Key Warnings**: Fixed all duplicate key warnings in IntelligentNormalization component
+  - Column mappings list
+  - Table headers
+  - Table body cells
+- **Worker Caching Issues**: Implemented aggressive cache-busting for worker files
+  - Timestamp-based worker URL loading
+  - Forces fresh code on every page load
+- **Name Column Output**: Fixed worker to properly output formatted names instead of literal "first-last" string
+
+### Changed
+- **Column Type Detection**: Enhanced detection to distinguish between full name, first name, and last name columns
+- **Worker Version**: Updated to v3.6.0-FINAL with all normalization improvements
+
+### Documentation
+- Created `ENRICHMENT_IMPLEMENTATION_STATUS.md` showing compliance with enrichment tool requirements
+- Created `RELEASE_NOTES_v3.6.0.md` with detailed feature descriptions
+- Created `RELEASE_NOTES_v3.5.3.md` documenting cache-busting fix
+- Updated `todo.md` to track all v3.6.0 enhancements
+
 ## [2.1.0] - 2025-10-31
 
 ### Added - Enterprise-Scale CSV Streaming

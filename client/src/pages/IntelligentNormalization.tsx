@@ -37,9 +37,10 @@ function detectColumnType(columnName: string, samples: string[]): { type: string
   if (name.includes('email') || name.includes('e-mail')) return { type: 'email', confidence: 95 };
   if (name.includes('phone') || name.includes('tel') || name.includes('mobile')) return { type: 'phone', confidence: 95 };
   if (name.includes('address') || name.includes('street')) return { type: 'address', confidence: 90 };
-  if (name.includes('first') && name.includes('name')) return { type: 'name', confidence: 90 };
-  if (name.includes('last') && name.includes('name')) return { type: 'name', confidence: 90 };
+  if (name.includes('first') && name.includes('name')) return { type: 'first-name', confidence: 90 };
+  if (name.includes('last') && name.includes('name')) return { type: 'last-name', confidence: 90 };
   if (name.includes('name')) return { type: 'name', confidence: 85 };
+  if (name.includes('location')) return { type: 'location', confidence: 95 };
   if (name.includes('city')) return { type: 'city', confidence: 95 };
   if (name.includes('state')) return { type: 'state', confidence: 95 };
   if (name.includes('zip') || name.includes('postal')) return { type: 'zip', confidence: 95 };
@@ -576,9 +577,9 @@ export default function IntelligentNormalization() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {columnMappings.map((mapping) => (
+                  {columnMappings.map((mapping, idx) => (
                     <div
-                      key={mapping.columnName}
+                      key={`mapping-${mapping.columnName}-${idx}`}
                       className="flex items-center justify-between p-4 border rounded-lg"
                     >
                       <div className="flex items-center gap-3 flex-1">
@@ -774,8 +775,8 @@ export default function IntelligentNormalization() {
                     <thead>
                       <tr className="border-b">
                         <th className="text-left p-2 font-medium">#</th>
-                        {Object.keys(results[0].normalizedRow).map((header) => (
-                          <th key={header} className="text-left p-2 font-medium">
+                        {Object.keys(results[0].normalizedRow).map((header, idx) => (
+                          <th key={`header-${header}-${idx}`} className="text-left p-2 font-medium">
                             {header}
                           </th>
                         ))}
@@ -785,8 +786,8 @@ export default function IntelligentNormalization() {
                       {results.slice(0, 100).map((result) => (
                         <tr key={result.rowIndex} className="border-b hover:bg-gray-50">
                           <td className="p-2 text-gray-500">{result.rowIndex + 1}</td>
-                          {Object.keys(result.normalizedRow).map((header) => (
-                            <td key={header} className="p-2">
+                          {Object.keys(result.normalizedRow).map((header, idx) => (
+                            <td key={`cell-${result.rowIndex}-${header}-${idx}`} className="p-2">
                               {result.normalizedRow[header]}
                             </td>
                           ))}
