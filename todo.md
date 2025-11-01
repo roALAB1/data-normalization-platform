@@ -688,3 +688,12 @@
 - [ ] API documentation
 - [ ] User guide updates
 - [ ] Save checkpoint for v3.0.0
+
+
+## Feature Description Improvements - v3.0.1
+- [x] Update Names feature description to be more specific
+- [x] Update Emails feature description with clearer details
+- [x] Update Phone Numbers feature description
+- [x] Update Addresses feature description
+- [x] Test updated descriptions
+- [x] Save checkpoint for v3.0.1

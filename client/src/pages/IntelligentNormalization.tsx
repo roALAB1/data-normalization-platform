@@ -391,10 +391,10 @@ export default function IntelligentNormalization() {
                   <h3 className="text-lg font-semibold text-gray-900">Names</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• 750+ professional credentials</li>
-                  <li>• Asian name order detection</li>
-                  <li>• Context-aware parsing</li>
-                  <li>• Nickname handling</li>
+                  <li>• Strips 750+ credentials, honorifics, prefixes, suffixes</li>
+                  <li>• Nationality and ethnicity name order nuance detection</li>
+                  <li>• Context-aware parsing for compound names</li>
+                  <li>• Nickname and alias normalization</li>
                 </ul>
               </div>
 
@@ -405,10 +405,10 @@ export default function IntelligentNormalization() {
                   <h3 className="text-lg font-semibold text-gray-900">Emails</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• RFC 5322 validation</li>
-                  <li>• Provider-specific rules</li>
-                  <li>• MX/SMTP verification</li>
-                  <li>• Disposable detection</li>
+                  <li>• RFC 5322 standard validation and formatting</li>
+                  <li>• Provider-specific rules (Gmail, Outlook, etc.)</li>
+                  <li>• MX/SMTP server verification for deliverability</li>
+                  <li>• Disposable and temporary email detection</li>
                 </ul>
               </div>
 
@@ -419,10 +419,10 @@ export default function IntelligentNormalization() {
                   <h3 className="text-lg font-semibold text-gray-900">Phone Numbers</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• 250+ countries supported</li>
-                  <li>• Type detection (mobile/landline)</li>
-                  <li>• Multiple format outputs</li>
-                  <li>• Carrier detection</li>
+                  <li>• 250+ countries with regional formatting rules</li>
+                  <li>• Type detection (mobile, landline, toll-free, VoIP)</li>
+                  <li>• Multiple format outputs (E.164, national, international)</li>
+                  <li>• Carrier and region identification</li>
                 </ul>
               </div>
 
@@ -433,10 +433,10 @@ export default function IntelligentNormalization() {
                   <h3 className="text-lg font-semibold text-gray-900">Addresses</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• Title Case standardization</li>
-                  <li>• 27+ street abbreviations</li>
-                  <li>• Directional normalization</li>
-                  <li>• Unit type handling</li>
+                  <li>• Title Case standardization for consistency</li>
+                  <li>• 27+ street type abbreviations (St, Ave, Blvd, etc.)</li>
+                  <li>• Directional normalization (N, S, E, W, NE, etc.)</li>
+                  <li>• Unit type handling (Apt, Suite, Floor, etc.)</li>
                 </ul>
               </div>
             </div>
