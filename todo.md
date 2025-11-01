@@ -742,3 +742,19 @@
 - [x] Update IntelligentBatchProcessor phone normalization
 - [x] Test with various phone formats
 - [x] Save checkpoint for v3.2.0
+
+
+## Documentation Updates - v3.2.1
+- [x] Update README.md with all features through v3.2.0
+- [x] Update CHANGELOG.md with comprehensive version history
+- [x] Create RELEASE_NOTES.md for GitHub release
+- [x] Save checkpoint for v3.2.1
+
+
+## 3-Column Name Output - v3.2.2
+- [x] Update IntelligentBatchProcessor to output Full Name + First Name + Last Name
+- [x] Remove deduplication logic (simpler approach)
+- [x] Always output 3 clean name columns regardless of input
+- [x] Update ColumnTransformationsSummary to show 3-column output
+- [x] Test with dclark_aids.csv
+- [x] Save checkpoint for v3.2.2

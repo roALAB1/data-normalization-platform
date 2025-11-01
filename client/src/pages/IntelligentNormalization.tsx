@@ -713,9 +713,9 @@ export default function IntelligentNormalization() {
                 };
 
                 if (mapping.detectedType === 'name' || mapping.overrideType === 'name') {
-                  transformation.outputColumns = ['First Name', 'Last Name'];
+                  transformation.outputColumns = ['Full Name', 'First Name', 'Last Name'];
                   transformation.transformationType = 'split';
-                  transformation.description = 'Full name split into first and last name';
+                  transformation.description = 'Split and normalize into Full Name, First Name, and Last Name';
                 } else if (mapping.detectedType === 'email' || mapping.overrideType === 'email') {
                   transformation.outputColumns = [mapping.columnName];
                   transformation.transformationType = 'normalized';
