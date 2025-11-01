@@ -44,7 +44,7 @@ export const OTHER_CREDENTIALS = [
   "CPTD", "APTD", "CPT", "CPLP",
   
   // Fitness & Wellness
-  "ABS", "CSC", "CSCP", "CSCS", "CTSC", "CMCS", "MSCP", "PATP", "FCMC", "NASM",
+  "ABS", "CSC", "CSCP", "CSCS", "CTSC", "CMCS", "MSCP", "PATP", "FCMC", "NASM", "RYT",
   
   // Management & Leadership
   "CMgr", "MCMI", "GAICD", "ChMC", "CMP", "SCMP", "PMP",

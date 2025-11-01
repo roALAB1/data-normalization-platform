@@ -818,3 +818,59 @@
 - [x] NameEnhanced parser now properly strips all credentials from combined names
 - [x] "Alison Theiss, MSc CSC ABS" → now outputs "Alison Theiss"
 - [x] "Dr. Ivette Espinosa-Fernandez, DO, FACOP" → now outputs "Ivette Espinosa-Fernandez"
+
+
+## Future Features & Improvements
+
+### Batch Jobs System
+- [ ] Fix and complete the Batch Jobs functionality
+- [ ] Test batch job processing with large files
+- [ ] Add job status monitoring and progress tracking
+- [ ] Implement job cancellation and retry mechanisms
+- [ ] Add job history and results download
+
+### Documentation
+- [ ] Create comprehensive API documentation
+- [ ] Document all API integrations and endpoints
+- [ ] Explain the purpose and architecture of the batch jobs system
+- [ ] Add developer guide for extending normalization rules
+- [ ] Document the credentials database and how to add new credentials
+- [ ] Create user guide for the batch jobs interface
+- [ ] Add architecture diagrams showing data flow
+
+### API & Integration
+- [ ] Document all external API integrations
+- [ ] Add API authentication and rate limiting documentation
+- [ ] Create examples for programmatic API usage
+- [ ] Document S3 storage integration for file uploads/downloads
+
+
+## v3.3.0 Missing Credentials Added
+- [ ] Row 34: IBCLC - International Board Certified Lactation Consultant
+- [ ] Row 40: MMSc - Master of Medical Science
+- [ ] Row 41: CNS - Clinical Nurse Specialist
+- [ ] Row 61: BCS - Board Certified Specialist (already added but not working?)
+- [ ] Row 67: MScAT - Master of Science in Athletic Training
+- [ ] Row 84: Dip ABLM - Diploma in Breastfeeding and Lactation Medicine
+- [ ] Row 119: CFRM - already should be there, check why not working
+- [ ] Row 119 (2nd): FMACP - Fellow of the American College of Physicians
+- [ ] Row 155: LAc - Licensed Acupuncturist (already added but not working?)
+- [ ] Row 158: AADP - American Association of Drugless Practitioners
+- [ ] Row 178: "Certified Sex Therapist" - job title, not credential
+- [ ] Row 202: CISSN - Certified Sports Nutritionist
+- [ ] Row 215: IT - Information Technology (not a credential, likely part of title)
+- [ ] Row 224: CPO - Certified Prosthetist Orthotist
+- [ ] Row 235: FCP - Fellow of the College of Physicians
+- [ ] Row 236: C&C - needs investigation
+- [ ] Row 242: "D" leftover from "M.D." stripping issue
+- [ ] Row 251: CFMP - Certified Functional Medicine Practitioner
+- [ ] Row 299: PSA - needs investigation (Physician Assistant?)
+- [ ] Row 318: ARNP-FNP - Advanced Registered Nurse Practitioner - Family Nurse Practitioner
+- [ ] Row 321: FAANP - Fellow of the American Association of Nurse Practitioners
+- [ ] Row 323: CLC - Certified Lactation Counselor
+- [ ] Row 358: "M" leftover from credential stripping
+- [ ] Row 386: CDN - Certified Dietitian Nutritionist
+- [ ] Row 398: CSMC - already added but not working?
+- [ ] Row 404: RYT - Registered Yoga Teacher
+- [ ] Row 405: WIMICP - needs investigation
+- [ ] Row 410: CPC - Certified Professional Coder (or Certified Pelvic Coach)

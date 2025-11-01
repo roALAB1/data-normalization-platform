@@ -173,9 +173,9 @@ export class NameEnhanced {
       }
     }
 
-    // 2. Remove pronouns in parentheses (she/her, he/him, they/them, etc.)
+    // 2. Remove pronouns in parentheses or square brackets (she/her, he/him, they/them, etc.)
     // Do this BEFORE multi-person detection to avoid false positives from pronoun slashes
-    const pronounPattern = /\(\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*\)/gi;
+    const pronounPattern = /[\(\[]\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*[\)\]]/gi;
     const pronounMatch = text.match(pronounPattern);
     if (pronounMatch) {
       const before = text;

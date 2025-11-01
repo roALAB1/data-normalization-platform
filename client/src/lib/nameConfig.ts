@@ -75,7 +75,7 @@ export const nameConfig = {
     "Chief", "Officer", "Director", "Manager", "President", "Chair", "Board",
     "Founder", "CEO", "CFO", "COO", "CTO", "VP", "Specialist", "Consultant",
     "Partner", "Operations", "Division", "Department", "Head", "Lead", "Supervisor",
-    "Administrator", "Executive"
+    "Administrator", "Executive", "Therapist"
   ],
   
   LAST_NAME_PREFIXES: [
