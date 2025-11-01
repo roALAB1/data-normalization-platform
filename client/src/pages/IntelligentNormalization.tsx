@@ -576,6 +576,18 @@ export default function IntelligentNormalization() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Column Headers */}
+                <div className="flex items-center justify-between px-4 pb-3 border-b mb-4">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-700">Input Column</p>
+                    <p className="text-xs text-gray-500">From your CSV file</p>
+                  </div>
+                  <div className="w-[280px] text-right">
+                    <p className="text-sm font-semibold text-gray-700">Output Type</p>
+                    <p className="text-xs text-gray-500">Normalized to</p>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   {columnMappings.map((mapping) => (
                     <div
@@ -705,7 +717,12 @@ export default function IntelligentNormalization() {
           <div className="space-y-6">
             {/* Column Transformations Summary */}
             <ColumnTransformationsSummary
-              transformations={columnMappings.map(mapping => {
+              transformations={columnMappings
+                .filter(mapping => {
+                  const type = mapping.overrideType || mapping.detectedType;
+                  return type !== 'unknown' && type !== 'unchanged';
+                })
+                .map(mapping => {
                 const transformation: ColumnTransformation = {
                   inputColumn: mapping.columnName,
                   outputColumns: [],
@@ -728,13 +745,14 @@ export default function IntelligentNormalization() {
                   transformation.outputColumns = [mapping.columnName];
                   transformation.transformationType = 'normalized';
                   transformation.description = 'Address normalized (title case, abbreviations)';
-                } else {
+                } else if (mapping.detectedType !== 'unknown') {
                   transformation.outputColumns = [mapping.columnName];
                   transformation.transformationType = 'unchanged';
                 }
 
                 return transformation;
-              })}
+              })
+              .filter(t => t.transformationType !== 'unchanged')}
             />
 
             {/* Statistics */}

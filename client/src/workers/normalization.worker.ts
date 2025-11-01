@@ -32,15 +32,23 @@ export interface WorkerResponse {
 
 /**
  * Normalize a single value based on type
+ * For names, returns an object with fullName, firstName, lastName
  */
-function normalizeValue(type: string, value: string): string {
-  if (!value) return '';
+function normalizeValue(type: string, value: string): any {
+  if (!value) return type === 'name' ? { fullName: '', firstName: '', lastName: '' } : '';
 
   try {
     switch (type) {
       case 'name': {
         const name = new NameEnhanced(value);
-        return name.isValid ? name.format('first-last') : value;
+        if (name.isValid) {
+          return {
+            fullName: name.full || `${name.firstName || ''} ${name.lastName || ''}`.trim(),
+            firstName: name.firstName || '',
+            lastName: name.lastName || ''
+          };
+        }
+        return { fullName: value, firstName: '', lastName: '' };
       }
       case 'email': {
         const email = new EmailEnhanced(value);
@@ -70,13 +78,26 @@ function processChunk(
   strategy: { columns: Array<{ name: string; type: string }> }
 ): any[] {
   return chunk.map((row) => {
-    const normalizedRow: any = { ...row };
+    const normalizedRow: any = {};
+
+    // Track if we've already processed a name column
+    let nameProcessed = false;
 
     for (const column of strategy.columns) {
       const value = row[column.name];
-      if (value && column.type !== 'unknown') {
-        normalizedRow[column.name] = normalizeValue(column.type, value);
+      
+      if (column.type === 'name' && !nameProcessed) {
+        // Process name column - output 3 columns
+        const nameResult = normalizeValue('name', value || '');
+        normalizedRow['Full Name'] = nameResult.fullName;
+        normalizedRow['First Name'] = nameResult.firstName;
+        normalizedRow['Last Name'] = nameResult.lastName;
+        nameProcessed = true;
+      } else if (column.type !== 'name' && column.type !== 'unknown') {
+        // Process other column types normally
+        normalizedRow[column.name] = normalizeValue(column.type, value || '');
       }
+      // Skip name columns after first one and skip unknown columns completely
     }
 
     return normalizedRow;

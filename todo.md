@@ -758,3 +758,27 @@
 - [x] Update ColumnTransformationsSummary to show 3-column output
 - [x] Test with dclark_aids.csv
 - [x] Save checkpoint for v3.2.2
+
+
+## Column Detection UI Labels - v3.2.3
+- [ ] Add "Input Column (from your CSV)" header/label on left side
+- [ ] Add "Output Type (normalized to)" header/label on right side
+- [ ] Make it clear what left side (input) vs right side (output) represents
+- [ ] Test with dclark_aids.csv to verify clarity
+- [ ] Save checkpoint for v3.2.3
+
+
+## Critical Bug Fixes - v3.2.4
+- [ ] Fix name normalization showing "first-last" instead of clean names
+- [ ] Remove blank rows from Column Transformations Summary
+- [ ] Remove extra blank columns (_1, _2, etc.) from results table
+- [ ] Force browser cache refresh for Input/Output headers
+- [ ] Test with dclark_aids.csv to verify all fixes
+- [ ] Save checkpoint for v3.2.4
+
+
+## v3.2.3 Critical Bug Fixes (Completed)
+- [x] Fixed name normalization showing "first-last" literal string instead of clean names - worker now uses name.full property
+- [x] Fixed blank rows in Column Transformations Summary - filtered out unknown/unchanged columns
+- [x] Fixed extra blank columns (_1, _2, _3) in results table - unknown columns now completely excluded from output
+- [x] Server restarted to clear cache and load new worker code
