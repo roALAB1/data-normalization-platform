@@ -475,8 +475,8 @@ export class NameEnhanced {
 
     return formatString
       .split(' ')
-      .map(c => formatMap[c] || c)
-      .filter(s => s.trim())
+      .map(c => formatMap[c] !== undefined ? formatMap[c] : c)
+      .filter(s => s && s.trim())
       .join(' ')
       .trim();
   }

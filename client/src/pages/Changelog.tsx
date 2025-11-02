@@ -29,6 +29,34 @@ export default function Changelog() {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* v3.6.3 */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  v3.6.3
+                  <Badge>Latest</Badge>
+                </CardTitle>
+                <CardDescription>November 2, 2025</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                <Bug className="h-4 w-4 text-red-500" />
+                Critical Bug Fix
+              </h3>
+              <ul className="text-sm text-gray-600 space-y-1 ml-6">
+                <li className="list-disc">Fixed random letters (p, m, s, q, d) appearing in normalized names</li>
+                <li className="list-disc">Fixed format() method leaking format codes when name parts are empty</li>
+                <li className="list-disc">Names now output cleanly without stray characters</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* v3.6.1 */}
         <Card className="mb-6">
           <CardHeader>
@@ -36,7 +64,6 @@ export default function Changelog() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   v3.6.1
-                  <Badge>Latest</Badge>
                 </CardTitle>
                 <CardDescription>November 2, 2025</CardDescription>
               </div>

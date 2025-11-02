@@ -748,3 +748,23 @@
 
 ## Future Features (Not Immediate Priority)
 - [ ] Manual filter parameter suggestions - Allow users to suggest/add custom normalization rules for system learning
+
+
+## Performance Optimization Audit (v3.7.0)
+- [ ] Analyze backend API routes for bottlenecks
+- [ ] Audit database queries for N+1 problems and missing indexes
+- [ ] Review job processing pipeline for efficiency
+- [ ] Analyze frontend bundle size and code splitting opportunities
+- [ ] Review React component rendering performance
+- [ ] Audit normalization library performance
+- [ ] Check for memory leaks and resource cleanup
+- [ ] Review file upload/download handling
+- [ ] Analyze WebSocket connection management
+- [ ] Create comprehensive optimization report
+- [ ] Implement high-priority optimizations
+
+
+## CRITICAL BUG - v3.6.3 (URGENT)
+- [x] Fix random letters (p, m, s, q, d) being added to beginning and end of normalized names
+- [x] Investigate normalization worker code for stray character insertion
+- [x] Test with user's CSV file to verify fix
