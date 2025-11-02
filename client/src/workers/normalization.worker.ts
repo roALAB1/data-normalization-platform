@@ -8,7 +8,6 @@ import { NameEnhanced } from '../lib/NameEnhanced';
 import { PhoneEnhanced } from '../../../shared/normalization/phones/PhoneEnhanced';
 import { EmailEnhanced } from '../../../shared/normalization/emails/EmailEnhanced';
 import { AddressFormatter } from '../../../shared/normalization/addresses/AddressFormatter';
-import { LocationNormalizer } from '../../../shared/normalization/locations';
 
 export interface WorkerMessage {
   type: 'process' | 'cancel';
@@ -64,7 +63,9 @@ function normalizeValue(type: string, value: string): string {
         return result.normalized;
       }
       case 'location': {
-        return LocationNormalizer.normalize(value);
+        // Location normalization removed - LocationNormalizer module doesn't exist
+        // TODO: Implement location normalization if needed
+        return value;
       }
       default:
         return value;
@@ -124,6 +125,14 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 
       self.postMessage(response);
     } catch (error) {
+      // Log detailed error for debugging
+      console.error('[Worker] Error processing chunk:', {
+        chunkIndex,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        chunk: chunk.slice(0, 2), // Log first 2 rows for context
+      });
+
       // Send error back to main thread
       const response: WorkerResponse = {
         type: 'error',
