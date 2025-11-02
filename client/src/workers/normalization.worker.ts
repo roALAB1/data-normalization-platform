@@ -33,9 +33,8 @@ export interface WorkerResponse {
 
 /**
  * Normalize a single value based on type
- * For names, returns an object with fullName, firstName, lastName
  */
-function normalizeValue(type: string, value: string): any {
+function normalizeValue(type: string, value: string): string {
   if (!value) return '';
 
   try {
@@ -83,28 +82,11 @@ function processChunk(
   strategy: { columns: Array<{ name: string; type: string }> }
 ): any[] {
   return chunk.map((row) => {
-    const normalizedRow: any = {};
+    const normalizedRow: any = { ...row };
 
-    // Process each column based on its type
     for (const column of strategy.columns) {
-      const value = row[column.name] || '';
-      
-      if (column.type === 'name') {
-        // Full name column - output as-is
-        normalizedRow[column.name] = normalizeValue('name', value);
-      } else if (column.type === 'first-name') {
-        // First name column - output as-is
-        normalizedRow[column.name] = normalizeValue('first-name', value);
-      } else if (column.type === 'last-name') {
-        // Last name column - output as-is
-        normalizedRow[column.name] = normalizeValue('last-name', value);
-      } else if (column.type === 'location') {
-        // Location - split into City and State columns
-        const locationResult = LocationNormalizer.parse(value);
-        normalizedRow['City'] = locationResult.city;
-        normalizedRow['State'] = locationResult.state;
-      } else if (column.type !== 'unknown') {
-        // Other types (email, phone, address, etc.)
+      const value = row[column.name];
+      if (value && column.type !== 'unknown') {
         normalizedRow[column.name] = normalizeValue(column.type, value);
       }
     }

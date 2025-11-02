@@ -1,4 +1,4 @@
-# Enhanced Name Normalization Demo
+# Data Normalization Platform
 
 A production-ready web application for normalizing and cleaning messy data at scale. Built to handle tens to hundreds of thousands of rows with intelligent parsing, validation, and formatting.
 
@@ -7,252 +7,115 @@ A production-ready web application for normalizing and cleaning messy data at sc
 A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow:
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
-- **Flexible Name Processing**: Accepts full name OR first+last name columns, always outputs separate First Name & Last Name (v3.1.0)
-- **Column Transformation Visibility**: Clear input→output mappings with transformation types (split, normalized) (v3.2.0)
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
 - **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v2.1.0)
 - **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
-- **Server-Side Batch System**: Robust job queue with BullMQ + Redis for large-scale processing (v3.0.0)
 - **Specialized Normalizers**:
-  - **Names**: 770+ credentials, nationality/ethnicity name order nuances, flexible input formats
-  - **Phones**: 250+ countries, type detection, digits-only output format
+  - **Names**: 750+ credentials, Asian name detection, context-aware parsing
+  - **Phones**: 250+ countries, type detection, multiple formats
   - **Emails**: RFC 5322 validation, provider-specific rules, MX/SMTP verification
   - **Addresses**: Title Case, 27+ abbreviations, standardization
 
 ### Key Features
 
-✅ **Column Transformations Summary** 📋: Expandable accordion showing input→output mappings with badges and descriptions (v3.2.0)  
-✅ **Digits-Only Phone Format** 📱: Clean numeric output (no parentheses/spaces/hyphens) for database storage (v3.2.0)  
-✅ **Flexible Name Input** 🔄: Accepts full name OR first+last columns, always outputs First Name + Last Name (v3.1.0)  
-✅ **Responsive Feature Cards** 📱: Visual examples adapt to screen width, proper text wrapping on mobile (v3.0.3)  
-✅ **Visual Examples** 👁️: Before/after transformation examples in feature cards (v3.0.2)  
-✅ **Improved Descriptions** 📝: Specific, detailed feature descriptions (v3.0.1)  
-✅ **Server-Side Batch Processing** ⚙️: BullMQ + Redis job queue, background workers, enhanced dashboard (v3.0.0)  
-✅ **Hero Section Showcase** 🎨: Feature grid with detailed capabilities before upload (v2.3.0)  
-✅ **Simplified Single-Page Platform** 🎯: Unified interface, removed redundant demo pages (v2.2.0)  
-✅ **Enterprise-Scale CSV Streaming** ⚡: 100k+ rows, 1,000-5,000 rows/sec, constant memory (v2.1.0)  
-✅ **Intelligent Multi-Type Platform** 🤖: Auto-detect data types with 95%+ accuracy (v2.0.0)  
-✅ **Address Normalization** 🏠: Title Case, 27+ abbreviations, 10,000+ addresses/second (v1.5.0)  
-✅ **Enterprise Email Verification** 📧: MX/SMTP validation, disposable detection, reputation scoring (v1.4.0)  
-✅ **770+ Professional Credentials**: Healthcare, finance, IT, engineering, legal, education coverage  
-✅ **Asian Name Detection** 🌏: 400+ Chinese/Korean/Japanese/Vietnamese surnames  
-✅ **Context-Aware Parsing** 🧠: Email/phone/company context for accuracy  
-✅ **Batch Processing**: Server-side job queue for unlimited datasets  
-✅ **Real-time Processing**: Interactive demo for individual records  
-✅ **Hybrid Monorepo**: Publishable `@normalization/core` package  
+✅ **Intelligent Multi-Type Platform** 🤖: Auto-detect data types (name, email, phone, address) with 95%+ accuracy and normalize multiple columns (v2.0.0)  
+✅ **Address Normalization** 🏠: Title Case conversion, 27+ street suffix abbreviations, 10,000+ addresses/second (v1.5.0)  
+✅ **750+ Professional Credentials**: Comprehensive coverage across healthcare, finance, IT, engineering, supply chain, legal, education, and more  
+✅ **Enterprise Email Verification** 📧: MX record validation, SMTP testing, disposable detection, reputation scoring (v1.4.0)  
+✅ **Email CSV Batch Processing** 📊: Upload CSV files with up to 10,000 emails for bulk normalization (v1.3.1)  
+✅ **Phone Normalization Enhanced** 📱: Google libphonenumber integration with 250+ countries, type detection, multiple formats (v1.2.0)  
+✅ **WebSocket Progress Tracking** ⚡: Real-time batch job updates with <100ms latency (v1.1.0)  
+✅ **Asian Name Detection** 🌏: Intelligent detection of family-name-first patterns for 400+ Chinese/Korean/Japanese/Vietnamese surnames (v1.1.0)  
+✅ **Context-Aware Parsing** 🧠: Uses email/phone/company context to boost parsing accuracy (v1.1.0)  
+✅ **Cross-Page Navigation** 🧭: Seamless navigation between all demo pages (v1.4.1)  
+✅ **Intelligent CSV Parsing**: Auto-detects column structure (single full name, first/last split, multi-column)  
+✅ **Batch Processing**: Server-side job queue handles unlimited dataset sizes  
+✅ **Real-time Processing**: Interactive demo for testing individual records  
+✅ **Hybrid Monorepo**: Publishable `@normalization/core` package for reuse across projects  
 ✅ **Optimized Performance**: O(1) credential lookups using Sets and Maps  
-✅ **Accent Handling**: Configurable preservation or ASCII conversion  
-✅ **Multiple Export Formats**: CSV, JSON with detailed logs  
-✅ **Statistics Dashboard**: Valid/invalid ratios, processing time, quality metrics  
+✅ **Accent Handling**: Configurable accent preservation or ASCII conversion  
+✅ **Comprehensive Cleaning**: Removes credentials, job titles, pronouns, fixes encoding issues  
+✅ **Multiple Export Formats**: CSV, JSON with detailed repair logs  
+✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
-## 📦 What's New
+### What's New in v2.2.0 🚀
 
-### v3.3.0 - Expanded Credential Database 📚
+**Simplified Single-Page Platform** 🎯  
+Streamlined user experience with unified Data Normalization Platform page. Removed redundant individual demo pages - all normalization happens in one powerful interface.
 
-**Additional Credentials**
-- Added 15+ missing healthcare credentials: IBCLC, CLC, DipABLM (Lactation), MMSc (Medical Science), CNS (Clinical Nurse Specialist), ARNP-FNP, FAANP (Advanced Nursing), MScAT/MSEAT (Athletic Training), FMACP, FCP (Physician Fellowships), CDN, CISSN, CSSD (Nutrition/Sports Dietetics), AADP, CFMP (Alternative Medicine), CPO (Prosthetist Orthotist), CPC (Professional Coder)
-- Added RYT (Registered Yoga Teacher) to fitness/wellness credentials
-- Enhanced pronoun removal to support square brackets: [She/Her], [He/Him], etc.
-- Added "Therapist" to job title filters to prevent false positives
-- Total credential database now covers 770+ professional designations
+### What's New in v2.1.0 🚀
 
-### v3.2.0 - Column Transformations Summary & Digits-Only Phone Format 🔍
+**Enterprise-Scale CSV Streaming** ⚡  
+Process 100k+ row CSV files with streaming architecture. StreamingCSVProcessor with PapaParse, ChunkedNormalizer with Web Worker pool (4-8 workers), ProgressiveDownloader for memory-efficient downloads, real-time progress tracking (rows/sec, ETA, memory), pause/resume/cancel controls. Performance: 1,000-5,000 rows/second with constant memory footprint.
 
-**Column Transformations Visibility**
-- Expandable "Column Transformations Applied" accordion in results section
-- Shows input column → output column(s) mappings
-- Color-coded badges (split, normalized, unchanged)
-- Detailed descriptions for each transformation
-- Example: "Name → First Name + Last Name (split)"
+### What's New in v2.0.0 🚀
 
-**Phone Number Format Update**
-- Changed from formatted (+1 415-555-1234) to digits-only (14155551234)
-- No parentheses, spaces, or hyphens in output
-- Clean numeric format for database storage and API integration
-- Updated IntelligentBatchProcessor to use `format('digitsOnly')`
+**Intelligent Multi-Type Normalization Platform** 🤖  
+Automatic data type detection with 95%+ accuracy using DataTypeDetector. Supports 12 data types (name, email, phone, address, city, state, zip, country, company, etc.) with confidence scoring. UnifiedNormalizationEngine routes data to appropriate normalizers with multi-column processing, progress tracking, and caching. SmartCSVProcessor auto-detects CSV structure and generates normalization strategies.
 
-### v3.1.0 - Enhanced Name Processing with Flexible Input/Output 🔄
+### What's New in v1.5.0 🚀
 
-**Flexible Name Input Formats**
-- Accepts **full name** column (e.g., "Dr. John Smith PhD") → automatically splits
-- Accepts **first name + last name** columns → processes separately
-- Always outputs **"First Name"** and **"Last Name"** columns for consistency
+**Address Normalization** 🏠  
+Simple format standardization with AddressFormatter class. Title Case conversion ("143 WEST SIDLEE STREET" → "143 West Sidlee St"), 27 street suffix abbreviations (Street → St, Avenue → Ave, Boulevard → Blvd), 8 directional abbreviations (North → N), 7 unit type abbreviations (Apartment → Apt). Performance: 10,000+ addresses/second, zero dependencies, zero cost. Includes Address Demo page with single/batch modes and CSV upload.
 
-**Implementation**
-- Created NameSplitter utility for intelligent full name splitting
-- Updated IntelligentBatchProcessor to detect and handle both formats
-- Enhanced DataTypeDetector to recognize first_name/last_name columns
-- Updated UI to communicate flexible input capabilities
+### What's New in v1.4.0 🚀
 
-### v3.0.3 - Responsive Layout Fix 📱
+**Enterprise Email Verification** 📧  
+Comprehensive email verification using @devmehq/email-validator-js with MX record validation, SMTP connection testing, mailbox verification, disposable email detection, free provider detection, role-based email detection, catch-all domain detection, and email reputation scoring (0-100).
 
-**Mobile-Friendly Feature Cards**
-- Examples stack vertically on small screens
-- Text truncation with ellipsis to prevent overflow
-- Proper wrapping at all breakpoints (mobile, tablet, desktop)
-- Clean display when browser is snapped to half-screen
+**Email Normalization** 📊  
+RFC 5322 compliant validation using validator.js (23.7k stars, 8-10M weekly downloads). Provider-specific normalization rules for Gmail, Outlook, Yahoo, iCloud, ProtonMail, AOL, Fastmail, Zoho. Plus tag extraction, dot removal (Gmail-specific), case normalization, and batch CSV processing (up to 10,000 emails).
 
-### v3.0.2 - Visual Examples in Feature Cards 👁️
+**Navigation Improvements** 🧭  
+Consistent cross-navigation between all pages (Home, Phone Demo, Email Demo, Batch Jobs). Users can navigate directly from any page to any other page without returning home first.
 
-**Before/After Transformation Examples**
-- Names: "Dr. John Smith, PhD → John Smith" | "WANG, Wei → Wei Wang"
-- Emails: "John.Smith@GMAIL.COM → johnsmith@gmail.com"
-- Phone Numbers: "(415) 555-1234 → +1 415-555-1234"
-- Addresses: "123 MAIN STREET → 123 Main St"
+### What's New in v1.2.0 🚀
 
-### v3.0.1 - Improved Feature Descriptions 📝
+**Phone Normalization Enhanced** 📱  
+Powered by Google's libphonenumber library with 250+ country support, type detection (Mobile, Landline, Toll-free, VoIP), multiple format outputs (International, National, E.164, RFC3966), as-you-type formatting, and carrier detection.
 
-**Specific, Detailed Descriptions**
-- Names: "Strips 750+ credentials, honorifics, prefixes, suffixes" + "Nationality and ethnicity name order nuance detection"
-- Emails: "RFC 5322 standard validation" + "Provider-specific rules (Gmail, Outlook, etc.)"
-- Phone Numbers: "250+ countries with regional formatting rules" + "Type detection (mobile, landline, toll-free, VoIP)"
-- Addresses: "Title Case standardization" + "27+ street type abbreviations (St, Ave, Blvd, etc.)"
+### What's New in v1.1.0 🚀
 
-### v3.0.0 - Robust Server-Side Batch Processing System ⚙️
+**WebSocket Progress Tracking** ⚡  
+Real-time batch job updates with instant feedback (<100ms latency vs 5-second polling). Includes connection status indicator and automatic reconnection.
 
-**Core Infrastructure**
-- JobQueue service with BullMQ for reliable job management
-- BatchWorker for background processing with progress tracking
-- IntelligentBatchProcessor with auto-detection & multi-column normalization
-- Database schema: scheduledJobs and apiKeys tables
-- Enhanced API endpoints: submitBatch, getStats, retry, onJobUpdate (WebSocket)
+**Asian Name Order Detection** 🌏  
+400+ surname library for Chinese, Korean, Japanese, and Vietnamese names. Intelligently detects family-name-first patterns with >95% accuracy and <3ms overhead.
 
-**Enhanced Job Dashboard UI**
-- Job submission form with file upload
-- Job list with filtering and search
-- Real-time status updates via WebSocket
-- Job statistics cards (total, processing, completed, failed)
-- Download results button
-- Retry failed jobs functionality
+**Context-Aware Parsing** 🧠  
+Analyzes email domains, phone country codes, and company names to boost parsing accuracy. Uses weighted voting to detect cultural patterns and improve confidence scores.
 
-**Performance**
-- 1,000-5,000 rows/second processing speed
-- Constant memory footprint regardless of file size
-- Production-ready for power users with automated workflows
+### Recent Improvements (v1.0.0)
 
-### v2.3.0 - Hero Section Feature Showcase 🎨
+- **750+ Credentials**: Expanded from ~100 to 750+ professional credentials across all industries
+- **Hybrid Monorepo**: Refactored into publishable `@normalization/core` package
+- **Bug Fixes**: Fixed hyphenated names, generational suffixes, pronouns, multiple parentheses
+- **Performance**: Optimized with Sets/Maps for O(1) credential lookups
+- **Architecture**: Modular library organization by domain (names, phones, emails, companies, addresses)
 
-**Feature Grid Display**
-- Large hero headline: "Enterprise-Scale Data Normalization"
-- Descriptive subheading explaining workflow
-- 4 feature cards: Names, Emails, Phone Numbers, Addresses
-- Detailed bullet points for each capability
-- "Coming Soon" banner for Company Names
-- Upload section moved below for better user education
-
-### v2.2.0 - Simplified Single-Page Platform 🎯
-
-**Streamlined User Experience**
-- Removed individual Phone/Email/Address demo pages
-- Home route (/) goes directly to Intelligent Normalization
-- Simplified navigation to just "Batch Jobs"
-- Cleaner, more focused interface
-- All normalization capabilities in one powerful page
-
-### v2.1.0 - Enterprise-Scale CSV Streaming ⚡
-
-**Streaming Architecture**
-- **StreamingCSVProcessor**: PapaParse-based streaming (no row limits)
-- **ChunkedNormalizer**: Parallel processing with Web Worker pool (4-8 workers)
-- **ProgressiveDownloader**: Memory-efficient downloads
-- **Real-time tracking**: Rows/sec, ETA, memory usage
-- **Full controls**: Pause/Resume/Cancel support
-
-**Performance**
-- 1,000-5,000 rows/second processing speed
-- Constant memory footprint regardless of file size
-- Handles 100k+ row CSV files efficiently
-
-### v2.0.0 - Intelligent Multi-Type Normalization Platform 🤖
-
-**Automatic Data Type Detection**
-- DataTypeDetector with 95%+ accuracy
-- Supports 12 data types: name, email, phone, address, city, state, zip, country, company, etc.
-- Confidence scoring (0-100%) for each detection
-- Header analysis (40% weight) + pattern matching (60% weight)
-
-**Unified Processing Engine**
-- UnifiedNormalizationEngine routes data to appropriate normalizers
-- Multi-column processing with progress tracking
-- Result caching for performance
-- SmartCSVProcessor auto-detects CSV structure
-
-### v1.5.0 - Address Normalization 🏠
-
-**Address Formatter**
-- Title Case conversion ("143 WEST SIDLEE STREET" → "143 West Sidlee St")
-- 27 street suffix abbreviations (Street → St, Avenue → Ave, Boulevard → Blvd)
-- 8 directional abbreviations (North → N, South → S, East → E, West → W)
-- 7 unit type abbreviations (Apartment → Apt, Suite → Ste, Floor → Fl)
-- Performance: 10,000+ addresses/second
-- Zero dependencies, zero cost
-
-### v1.4.0 - Enterprise Email Verification 📧
-
-**Comprehensive Verification**
-- MX record validation
-- SMTP connection testing
-- Mailbox verification
-- Disposable email detection
-- Free provider detection
-- Role-based email detection
-- Catch-all domain detection
-- Email reputation scoring (0-100)
-
-**Email Normalization**
-- RFC 5322 compliant validation
-- Provider-specific rules (Gmail, Outlook, Yahoo, iCloud, ProtonMail, AOL, Fastmail, Zoho)
-- Tag extraction, dot removal (Gmail), case normalization
-- Batch CSV processing (up to 10,000 emails)
-
-### v1.2.0 - Phone Normalization Enhanced 📱
-
-**Google libphonenumber Integration**
-- 250+ country support
-- Type detection (Mobile, Landline, Toll-free, VoIP)
-- Multiple format outputs (International, National, E.164, RFC3966)
-- As-you-type formatting
-- Carrier detection
-
-## 🏗️ Architecture
-
-### Client-Side Streaming (v2.1.0+)
-- **StreamingCSVProcessor**: Handles large CSV files with PapaParse streaming
-- **ChunkedNormalizer**: Distributes work across Web Worker pool
-- **WorkerPoolManager**: Manages 4-8 workers for parallel processing
-- **ProgressiveDownloader**: Streams results to CSV without memory bloat
-
-### Server-Side Batch Processing (v3.0.0+)
-- **JobQueue**: BullMQ-based job queue with Redis backend
-- **BatchWorker**: Background worker for processing jobs
-- **IntelligentBatchProcessor**: Auto-detection and multi-column normalization
-- **JobDashboardEnhanced**: Real-time status updates via WebSocket
-
-### Core Normalizers
-- **NameEnhanced**: 770+ credentials, Asian name detection, context-aware parsing
-- **NameSplitter**: Intelligent full name splitting (v3.1.0)
-- **PhoneEnhanced**: Google libphonenumber with 250+ countries
-- **EmailEnhanced**: RFC 5322 validation, provider rules, MX/SMTP verification
-- **AddressFormatter**: Title Case, 27+ abbreviations
-
-### Data Type Detection
-- **DataTypeDetector**: 95%+ accuracy with confidence scoring
-- Supports: name, first_name, last_name, email, phone, address, city, state, zip, country, company
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 22.13.0+
-- pnpm
-- Redis (for server-side batch processing)
+
+- Node.js 22.x
+- pnpm 9.x
+- MySQL/PostgreSQL (for production)
 
 ### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/roALAB1/data-normalization-platform.git
+cd data-normalization-platform
+
 # Install dependencies
 pnpm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
 
 # Push database schema
 pnpm db:push
@@ -261,51 +124,397 @@ pnpm db:push
 pnpm dev
 ```
 
+The application will be available at `http://localhost:3000`
+
+## 📖 Usage
+
+### Interactive Demo
+
+**Name Normalization:**
+1. Navigate to the home page
+2. Choose **Single** mode to test individual names
+3. Enter a name and click "Parse Name"
+4. View parsed components, formatted outputs, and repair log
+
+**Phone Normalization:**
+1. Click "Phone Demo" in the header
+2. Select default country
+3. Enter a phone number and click "Parse Phone Number"
+4. View international, national, E.164, and RFC3966 formats
+5. Try as-you-type formatting
+
+**Email Normalization:**
+1. Click "Email Demo" in the header
+2. Choose **Single** mode for individual emails
+3. Enter an email and click "Normalize Email"
+4. View original vs normalized email, provider detection, plus tag extraction
+5. Switch to **Batch** mode to upload CSV files (up to 10,000 emails)
+
+**Address Normalization:**
+1. Click "Address Demo" in the header
+2. Choose **Single** mode for individual addresses
+3. Enter an address and click "Format Address"
+4. View original vs formatted address with Title Case and abbreviations
+5. Switch to **Batch** mode to upload CSV files (up to 10,000 addresses)
+
+### Batch Processing (Browser-based, up to 10K rows)
+
+1. Switch to **Batch** mode on any demo page
+2. Paste data (one per line) or upload a CSV file
+3. Click "Process Batch"
+4. Download results as CSV with statistics
+
+### Large-Scale Processing (Server-side, unlimited rows)
+
+1. Click "Batch Jobs" in the header
+2. Upload your CSV file (supports millions of rows)
+3. Select normalization type (Name, Phone, Email, etc.)
+4. Monitor progress in real-time with WebSocket updates
+5. Download results when complete
+
+## 🏗️ Architecture
+
+### Tech Stack
+
+**Frontend**:
+- React 19 with TypeScript
+- Tailwind CSS 4 + shadcn/ui
+- Wouter (routing)
+- tRPC (type-safe API)
+
+**Backend**:
+- Node.js with Express
+- tRPC for API layer
+- Drizzle ORM
+- MySQL database
+- Background job queue
+- WebSocket for real-time updates
+
+**Infrastructure**:
+- S3-compatible storage
+- OAuth authentication
+- Real-time progress tracking
+- Hybrid monorepo with pnpm workspaces + Turborepo
+
+### Project Structure
+
+```
+├── client/                 # Frontend React application
+│   ├── src/
+│   │   ├── pages/         # Page components
+│   │   │   ├── HomeEnhanced.tsx       # Name normalization demo
+│   │   │   ├── PhoneDemoEnhanced.tsx  # Phone normalization demo
+│   │   │   ├── EmailDemo.tsx          # Email normalization demo
+│   │   │   ├── AddressDemo.tsx        # Address normalization demo
+│   │   │   └── JobDashboard.tsx       # Batch job dashboard
+│   │   ├── components/    # Reusable UI components
+│   │   └── hooks/         # Custom React hooks
+├── server/                # Backend Node.js application
+│   ├── routes/
+│   │   └── emails.ts      # Email verification API endpoints
+│   ├── routers.ts         # tRPC route definitions
+│   ├── jobRouter.ts       # Batch job API
+│   ├── jobProcessor.ts    # Background worker
+│   └── jobDb.ts           # Database operations
+├── drizzle/               # Database schema
+│   └── schema.ts
+├── shared/                # Shared types and platform-wide normalization library
+│   └── normalization/     # Organized by domain
+│       ├── names/         # Name normalization (750+ credentials, titles, prefixes, suffixes)
+│       │   ├── NameEnhanced.ts        # Enhanced name parser
+│       │   ├── credentials.ts         # 750+ professional credentials
+│       │   ├── titles.ts              # Name titles and prefixes
+│       │   └── suffixes.ts            # Generational suffixes
+│       ├── phones/        # Phone normalization (250+ countries)
+│       │   ├── PhoneEnhanced.ts       # Google libphonenumber integration
+│       │   └── config.ts              # Country codes and formats
+│       ├── emails/        # Email normalization
+│       │   ├── EmailEnhanced.ts       # validator.js integration
+│       │   └── EmailVerification.ts   # Enterprise verification
+│       ├── addresses/     # Address normalization
+│       │   └── AddressFormatter.ts    # Simple format standardization
+│       ├── intelligent/   # Intelligent platform
+│       │   ├── DataTypeDetector.ts    # Auto column type detection
+│       │   ├── UnifiedNormalizationEngine.ts  # Multi-type routing
+│       │   └── SmartCSVProcessor.ts   # CSV analysis
+│       └── companies/     # Company normalization (coming soon)
+├── packages/              # Publishable packages
+│   └── normalization-core/ # @normalization/core npm package
+└── docs/                  # Additional documentation
+    ├── NAME_NORMALIZATION_IMPLEMENTATION.md
+    ├── PHONE_NORMALIZATION_IMPLEMENTATION.md
+    └── EMAIL_NORMALIZATION_IMPLEMENTATION.md
+```
+
+## 📦 Publishable Package
+
+The normalization library is available as a standalone package:
+
+```bash
+# Install from the monorepo
+pnpm add @normalization/core
+
+# Use in your project
+import { NameEnhanced } from '@normalization/core/names';
+import { PhoneEnhanced } from '@normalization/core/phones';
+import { EmailEnhanced } from '@normalization/core/emails';
+import { AddressFormatter } from '@normalization/core/addresses';
+import { DataTypeDetector, UnifiedNormalizationEngine } from '@normalization/core/intelligent';
+```
+
+**Package Features**:
+- 750+ professional credentials
+- 250+ country phone support
+- RFC 5322 email validation
+- CJS + ESM + TypeScript declarations
+- O(1) lookup performance
+- Modular imports by domain
+- Zero dependencies (core functionality)
+
+## 🔧 Configuration
+
 ### Environment Variables
 
-Required environment variables are automatically injected:
-- `JWT_SECRET`: Authentication secret
-- `OAUTH_SERVER_URL`: OAuth server URL
-- `VITE_APP_TITLE`: Application title
-- `VITE_APP_LOGO`: Application logo URL
+Required environment variables (see `.env.example`):
 
-## 📊 Performance
+```env
+# Database
+DATABASE_URL=mysql://user:password@localhost:3306/normalization
 
-- **Client-Side Streaming**: 1,000-5,000 rows/second, constant memory
-- **Server-Side Batch**: 1,000-5,000 rows/second, handles unlimited file sizes
-- **Address Normalization**: 10,000+ addresses/second
-- **Name Parsing**: O(1) credential lookups using Sets and Maps
+# S3 Storage
+S3_ENDPOINT=https://s3.amazonaws.com
+S3_BUCKET=your-bucket
+S3_ACCESS_KEY=your-access-key
+S3_SECRET_KEY=your-secret-key
 
-## 🔧 Technology Stack
+# OAuth (if using authentication)
+OAUTH_SERVER_URL=https://auth.example.com
+JWT_SECRET=your-jwt-secret
 
-**Frontend**
-- React 19 + TypeScript
-- Tailwind CSS 4
-- shadcn/ui components
-- Wouter (routing)
-- PapaParse (CSV streaming)
-- Web Workers (parallel processing)
+# Application
+VITE_APP_TITLE=Data Normalization Platform
+VITE_APP_LOGO=/logo.png
+```
 
-**Backend**
-- Node.js + Express
-- tRPC for type-safe APIs
-- BullMQ + Redis (job queue)
-- Drizzle ORM (database)
-- S3 (file storage)
+### Customizing Normalizers
 
-**Libraries**
-- libphonenumber-js (phone normalization)
-- validator.js (email validation)
-- @devmehq/email-validator-js (email verification)
+Edit configuration files in `shared/normalization/`:
 
-## 📝 License
+- `names/credentials.ts`: Professional credentials by industry
+- `names/titles.ts`: Name titles and prefixes
+- `names/suffixes.ts`: Generational suffixes
+- `phones/config.ts`: Country codes, formats, carrier patterns
+- `emails/EmailEnhanced.ts`: Email provider rules
 
-MIT
+## 📊 Normalizer Details
 
-## 🤝 Contributing
+### Name Normalizer
 
-Contributions welcome! Please open an issue or submit a pull request.
+**Handles**:
+- **Credentials**: 750+ professional credentials across all industries
+  - Healthcare: MD, DO, RN, NP, PA, DDS, PharmD, etc. (150+)
+  - Finance: CPA, CFA, CFP, ChFC, CLU, etc. (80+)
+  - IT/Tech: CISSP, CEH, CCNA, AWS, Azure, CompTIA, etc. (200+)
+  - Engineering: PE, EIT, PMP, Six Sigma, etc. (100+)
+  - Supply Chain: CSCP, CPIM, CTSC, CLTD, etc. (50+)
+  - Legal: JD, LLM, Esq, etc. (40+)
+  - Education: PhD, EdD, MA, MS, BA, BS, etc. (60+)
+- **Pronouns**: Automatically removes (she/her), (he/him), (they/them), etc.
+- **Generational Suffixes**: Jr., Sr., II, III, IV, V, etc.
+- **Job Titles**: CEO, Director, Manager, etc.
+- **Nicknames**: In quotes or parentheses
+- **Last Name Prefixes**: van, de, von, etc. (80+ prefixes)
+- **Multi-person Detection**: "John and Jane"
+- **Hyphenated Names**: Preserves "Meng-Ling", "Jean-Paul", etc.
+- **Encoding Issues**: Fran?ois → François
+- **Accent Normalization**: Configurable
+- **Asian Name Order Detection**: 400+ surname library
 
-## 📧 Support
+**Output Formats**:
+- Full: "Dr. John Paul Smith Jr."
+- Short: "John Smith"
+- Initials: "J.P.S."
+- Custom: "SMITH, John Paul"
 
-For questions or support, please open an issue on GitHub.
+### Phone Normalizer
+
+**Powered by Google libphonenumber**
+
+**Handles**:
+- 250+ countries with validation
+- Type detection (Mobile, Landline, Toll-free, VoIP, Premium Rate, Shared Cost, Personal Number, Pager, UAN, Voicemail)
+- Multiple format outputs (E.164, national, international, RFC3966)
+- Extension detection
+- As-you-type formatting
+- Invalid pattern filtering
+- Carrier detection
+
+**Output Formats**:
+- E.164: "+14155552671"
+- National: "(415) 555-2671"
+- International: "+1 415-555-2671"
+- RFC3966: "tel:+1-415-555-2671"
+
+### Email Normalizer
+
+**Powered by validator.js (23.7k stars, 8-10M weekly downloads)**
+
+**Validation Features**:
+- RFC 5322 compliant validation
+- UTF-8 local part support
+- Domain-specific validation
+- TLD requirement enforcement
+
+**Normalization Features**:
+- Provider detection (Gmail, Outlook, Yahoo, iCloud, ProtonMail, AOL, Fastmail, Zoho)
+- Plus tag extraction and removal (+spam, +newsletter)
+- Dot removal (Gmail-specific: john.doe@gmail.com → johndoe@gmail.com)
+- Case normalization
+- Batch CSV processing (up to 10,000 emails)
+
+**Enterprise Verification** (v1.4.0):
+- MX record validation (DNS lookup for mail exchange servers)
+- SMTP connection testing (verify server reachability)
+- Mailbox verification (RCPT TO command)
+- Disposable email detection (temporary/throwaway services)
+- Free provider detection (Gmail, Yahoo vs corporate)
+- Role-based email detection (admin@, info@, support@)
+- Catch-all domain detection (domains accepting all emails)
+- Email reputation scoring (0-100 based on all checks)
+
+**Output**:
+- Original email
+- Normalized email
+- Provider (Gmail, Outlook, etc.)
+- Plus tag extracted
+- Validation status
+- Verification score (if enterprise verification enabled)
+
+## 🧪 Testing
+
+```bash
+# Run tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Check TypeScript types
+pnpm type-check
+
+# Lint code
+pnpm lint
+
+# Build packages
+pnpm build
+```
+
+## 🚢 Deployment
+
+### Using Manus Platform (Recommended)
+
+The project is optimized for deployment on Manus:
+
+1. Create a checkpoint in the Manus UI
+2. Click "Publish" in the dashboard
+3. Your app is live with automatic SSL and domain
+
+### Manual Deployment
+
+```bash
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start
+```
+
+Ensure environment variables are set in your production environment.
+
+## 📝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/email-normalizer`)
+3. Make your changes
+4. Add tests for new functionality
+5. Commit with clear messages (`git commit -m "Add email normalizer with disposable detection"`)
+6. Push to your fork (`git push origin feature/email-normalizer`)
+7. Create a Pull Request
+
+### Code Style
+
+- TypeScript for all new code
+- Follow existing patterns in normalizer files
+- Add JSDoc comments for public APIs
+- Use meaningful variable names
+- Keep functions focused and testable
+
+## 🐛 Bug Fixes
+
+All critical bugs have been fixed:
+
+- ✅ Hyphenated names ("Meng-Ling Erik Kuo" now parses correctly)
+- ✅ Generational suffixes (III, Jr., Sr. detected as suffixes, not last names)
+- ✅ Pronouns removal ((she/her), (he/him), (they/them) automatically stripped)
+- ✅ Supply chain credentials (CSCP, CPIM, CTSC now recognized)
+- ✅ Multiple parentheses handling ("John Doe (he/him) (Ph.D.)" works correctly)
+- ✅ Vite HMR WebSocket configuration (no console errors)
+- ✅ Deployment path mappings (all imports resolved correctly)
+- ✅ Phone Demo old version button removed (v1.4.1)
+- ✅ Cross-page navigation implemented (v1.4.1)
+
+## 📚 Documentation
+
+- [Name Normalizer Implementation](docs/NAME_NORMALIZATION_IMPLEMENTATION.md)
+- [Phone Normalizer Implementation](docs/PHONE_NORMALIZATION_IMPLEMENTATION.md)
+- [Email Normalization Implementation](docs/EMAIL_NORMALIZATION_IMPLEMENTATION.md)
+- [CSV Format Guide](docs/csv-formats.md)
+- [Batch Processing Guide](docs/batch-processing.md)
+- [Deployment Guide](docs/deployment.md)
+- [Monorepo Architecture](MONOREPO.md)
+
+## 🔐 Security
+
+- User authentication via OAuth
+- Job-level access control (users only see their own jobs)
+- S3 presigned URLs for secure file access
+- Input validation and sanitization
+- SQL injection protection via Drizzle ORM
+- SMTP verification with timeout protection
+- Rate limiting for email verification APIs
+
+## 📈 Performance
+
+- **Browser-based**: Handles up to 10,000 rows in ~5-10 seconds
+- **Server-side**: Processes 100K rows in ~30-60 seconds
+- **Chunked processing**: 1000 rows per chunk to prevent memory issues
+- **Real-time updates**: WebSocket-based progress tracking (<100ms latency)
+- **Optimized lookups**: O(1) credential matching using Sets and Maps
+- **Email verification**: <1ms per email (format + normalization), <100ms with MX/SMTP checks
+
+## 🙏 Acknowledgments
+
+- Original Python script inspired by hours of iteration with Gemini and ChatGPT
+- [Namefully](https://namefully.netlify.app/) JavaScript library for name formatting patterns
+- [Google libphonenumber](https://github.com/google/libphonenumber) for phone normalization
+- [validator.js](https://github.com/validatorjs/validator.js) for email validation
+- [@devmehq/email-validator-js](https://github.com/devmehq/email-validator-js) for enterprise email verification
+- shadcn/ui for beautiful component library
+- Credential data sourced from Wikipedia, FDA, CompTIA, Cisco, Microsoft, AWS, (ISC)², ISACA, APICS, ASQ, and other professional organizations
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+## 🤝 Support
+
+- Create an [Issue](https://github.com/roALAB1/data-normalization-platform/issues)
+- Documentation: [Wiki](https://github.com/roALAB1/data-normalization-platform/wiki)
+
+---
+
+**Built with ❤️ for data professionals who deal with messy real-world data**

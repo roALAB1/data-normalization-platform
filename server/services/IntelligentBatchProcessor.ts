@@ -140,9 +140,9 @@ export class IntelligentBatchProcessor {
         }
 
         case 'phone': {
-          const phone = new PhoneEnhanced(value, { defaultCountry: 'US' });
+          const phone = new PhoneEnhanced(value, 'US');
           return {
-            normalized: phone.format('digitsOnly'),
+            normalized: phone.format('international'),
             isValid: phone.isValid(),
           };
         }
@@ -218,10 +218,10 @@ export class IntelligentBatchProcessor {
           totalRows++;
         },
         complete: () => {
-          // Check if we have any name columns
-          const hasNameColumns = detections.some(d => 
-            d.detectedType === 'name' || d.detectedType === 'first_name' || d.detectedType === 'last_name'
-          );
+          // Check if we need to handle name splitting
+          const hasFullName = detections.some(d => d.detectedType === 'name');
+          const hasFirstName = detections.some(d => d.detectedType === 'first_name');
+          const hasLastName = detections.some(d => d.detectedType === 'last_name');
           const nameSplitter = new NameSplitter();
 
           // Second pass: normalize data
@@ -238,21 +238,20 @@ export class IntelligentBatchProcessor {
                 const detection = detections[index];
 
                 if (detection.detectedType === 'name') {
-                  // Full name - we'll process this for the 3-column output
+                  // Full name - split into first and last
                   const split = nameSplitter.split(value);
-                  if (!splitName) splitName = { firstName: '', lastName: '' };
-                  splitName.firstName = split.firstName;
-                  splitName.lastName = split.lastName;
+                  splitName = { firstName: split.firstName, lastName: split.lastName };
+                  // Don't add to normalizedRow yet - we'll add First Name and Last Name columns later
                 } else if (detection.detectedType === 'first_name') {
-                  // First name column - normalize and store
+                  // First name - normalize and store
                   const name = new NameEnhanced(value);
                   if (!splitName) splitName = { firstName: '', lastName: '' };
-                  if (!splitName.firstName) splitName.firstName = name.format('f');
+                  splitName.firstName = name.format('f');
                 } else if (detection.detectedType === 'last_name') {
-                  // Last name column - normalize and store
+                  // Last name - normalize and store
                   const name = new NameEnhanced(value);
                   if (!splitName) splitName = { firstName: '', lastName: '' };
-                  if (!splitName.lastName) splitName.lastName = name.format('l');
+                  splitName.lastName = name.format('l');
                 } else if (detection.detectedType !== 'unknown' && detection.confidence >= 0.5) {
                   const { normalized, isValid } = this.normalizeValue(value, detection.detectedType);
                   normalizedRow[header] = normalized;
@@ -263,10 +262,8 @@ export class IntelligentBatchProcessor {
                 }
               });
 
-              // Add 3 clean name columns if we processed names
+              // Add First Name and Last Name columns if we processed names
               if (splitName) {
-                const fullName = `${splitName.firstName} ${splitName.lastName}`.trim();
-                normalizedRow['Full Name'] = fullName;
                 normalizedRow['First Name'] = splitName.firstName;
                 normalizedRow['Last Name'] = splitName.lastName;
               }

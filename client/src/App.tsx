@@ -6,7 +6,6 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import JobDashboardEnhanced from "./pages/JobDashboardEnhanced";
 import IntelligentNormalization from "./pages/IntelligentNormalization";
-import Changelog from "./pages/Changelog";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -14,7 +13,6 @@ function Router() {
     <Switch>
       <Route path={"/"} component={IntelligentNormalization} />
       <Route path={"/jobs"} component={JobDashboardEnhanced} />
-      <Route path={"/changelog"} component={Changelog} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

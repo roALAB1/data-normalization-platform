@@ -173,9 +173,9 @@ export class NameEnhanced {
       }
     }
 
-    // 2. Remove pronouns in parentheses or square brackets (she/her, he/him, they/them, etc.)
+    // 2. Remove pronouns in parentheses (she/her, he/him, they/them, etc.)
     // Do this BEFORE multi-person detection to avoid false positives from pronoun slashes
-    const pronounPattern = /[\(\[]\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*[\)\]]/gi;
+    const pronounPattern = /\(\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*\)/gi;
     const pronounMatch = text.match(pronounPattern);
     if (pronounMatch) {
       const before = text;
@@ -225,7 +225,7 @@ export class NameEnhanced {
       }
     }
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
-    textNoNicknames = text.replace(/['"(),\.]/g, ' ').replace(/\s+/g, ' ').trim();
+    textNoNicknames = text.replace(/['"(),]/g, ' ');
 
     // 7. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
@@ -241,31 +241,26 @@ export class NameEnhanced {
     }
 
     // 8. Remove suffixes/credentials (MD, PhD, CFP, etc.) from anywhere in the name
-    // HARDCODED: Module loading is broken, using direct array
-    const ALL_CREDENTIALS_HARDCODED = ["MD", "M.D.", "DO", "D.O.", "PhD", "Ph.D.", "DPM", "DMD", "D.M.D.", "DDS", "D.D.S.", "OD", "ND", "NMD", "RN", "NP", "APRN", "BSN", "MSN", "DNP", "FNP", "CRNP", "CNM", "CNS", "APN", "LPN", "LVN", "PA", "PA-C", "PT", "PTA", "OT", "COTA", "OTD", "DPT", "SLP", "MS-SLP", "SLPD", "LCSW", "LMFT", "LMHC", "LPC", "LPCC", "LMSW", "LSW", "LISW", "LICSW", "MSW", "LCPC", "LPHA", "MFCC", "RPh", "PharmD", "DC", "D.C.", "LAc", "L.Ac.", "LicAc", "DAc", "OMD", "MSOM", "DAOM", "DVM", "D.V.M.", "VMD", "FAAEM", "FAAFP", "FAAN", "FAANS", "FAAOS", "FAAP", "FACC", "FACD", "FACE", "FACEP", "FACOG", "FACOP", "FACP", "FACS", "FPMRS", "APMA", "RD", "RDN", "LDN", "CDN", "LN", "MPH", "BA", "B.A.", "BS", "B.S.", "BSc", "B.Sc.", "BEng", "B.E.", "MA", "M.A.", "MS", "M.S.", "MSc", "M.Sc.", "MEng", "M.E.", "MFA", "M.F.A.", "MBA", "M.B.A.", "MEd", "M.Ed.", "MPhil", "M.Phil.", "LLM", "LL.M.", "MPA", "M.P.A.", "EdD", "D.Ed.", "DrPH", "D.PH.", "PsyD", "Psy.D.", "LLD", "LL.D.", "DBA", "JD", "J.D.", "ABD", "CPA", "CFA", "CFP", "CFP®", "CFC", "CDFA", "RFP", "CMA", "CGMA", "CIA", "CFE", "CLU", "CPCU", "ChFC", "EMBA", "CISSP", "CISM", "CISA", "CEH", "OSCP", "PMP", "CAPM", "CSM", "PSM", "AWS", "CCNA", "CCNP", "CCIE", "PE", "SE", "RA", "AIA", "LEED", "AP", "CSC", "ABS", "CSCP", "CSCS", "CTSC", "CMCS"];
-    
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
     
-    // Build regex pattern for all credentials (case insensitive, word boundaries)
-    // Escape special regex characters and handle periods
+    // Build pattern for credentials as standalone words
+    // Use lookahead/lookbehind to ensure not part of hyphenated names
     const credentialPattern = new RegExp(
-      `\\b(${ALL_CREDENTIALS_HARDCODED.map(c => {
-        // Escape special regex chars and make periods optional
-        return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\./g, '\\.?');
-      }).join('|')})\\b`,
+      `(?<![-])\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b(?![-])`,
       'gi'
     );
     
-    // Find and remove all credentials
+    // Find all credentials
     const matches = textNoNicknames.match(credentialPattern);
     if (matches) {
       credentialsRemoved.push(...matches);
+      // Remove all credentials
       textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
     }
     
-    // Remove trailing hyphens/dashes/commas that were before credentials
-    textNoNicknames = textNoNicknames.replace(/\s*[,\-\u2013\u2014]\s*$/, '').trim();
+    // Remove trailing hyphens/dashes that were before credentials
+    textNoNicknames = textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim();
     
     // Clean up multiple spaces
     textNoNicknames = textNoNicknames.replace(/\s+/g, ' ').trim();
@@ -480,8 +475,8 @@ export class NameEnhanced {
 
     return formatString
       .split(' ')
-      .map(c => formatMap[c] !== undefined ? formatMap[c] : c)
-      .filter(s => s && s.trim())
+      .map(c => formatMap[c] || c)
+      .filter(s => s.trim())
       .join(' ')
       .trim();
   }
