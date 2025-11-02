@@ -3,6 +3,7 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import emailRoutes from "./routes/emails.js";
+import credentialsRoutes from "./routes/credentials.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,7 @@ async function startServer() {
 
   // API routes
   app.use('/api/emails', emailRoutes);
+  app.use('/api/credentials', credentialsRoutes);
 
   // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {

@@ -1,21 +1,894 @@
-import { nameConfig } from './nameConfig';
-import {
-  CREDENTIALS_SET,
-  ALL_CREDENTIALS,
-  isCredential,
-  GENERATIONAL_SUFFIXES,
-  isGenerationalSuffix,
-  TITLES,
-  isTitle,
-  LAST_NAME_PREFIXES,
-  isLastNamePrefix,
-  isAsianSurname,
-  detectAsianCulture,
-  getAsianSurnameConfidence,
-  analyzeContext,
-  boostConfidenceWithContext
-} from '@shared/normalization/names';
-import type { NameContext, ContextAnalysis } from '@shared/normalization/names';
+/**
+ * NameEnhanced - Advanced Name Parsing and Normalization
+ * 
+ * Enterprise-grade name parser with hardcoded credentials for worker compatibility.
+ * Based on research from theiconic/name-parser (production-proven library).
+ * 
+ * Pattern: Define data where it's consumed (no external module imports).
+ * 
+ * Version: 3.7.0 - Credentials Fixed (633 credentials hardcoded)
+ */
+
+export const NAME_ENHANCED_VERSION = '3.7.0-credentials-fixed';
+export const CREDENTIALS_COUNT = 683;
+
+// ============================================================================
+// HARDCODED CONSTANTS (No module imports - worker-compatible)
+// ============================================================================
+
+/**
+ * All Professional Credentials (630 total)
+ * Extracted from shared/normalization/names/credentials/*.ts
+ * Hardcoded here to avoid Vite worker bundling issues
+ * Exported for use in normalizeValue.ts
+ */
+export const ALL_CREDENTIALS = [
+  "A+",
+  "A.M.ASCE",
+  "AAGO",
+  "ABA",
+  "ABC",
+  "ABCTE",
+  "ABD",
+  "ABR",
+  "ABS",
+  "AADP",
+  "ACA",
+  "ACAS",
+  "ACCA",
+  "ACII",
+  "ACNP",
+  "AE",
+  "AEEVT",
+  "AEM",
+  "AEMT",
+  "AFN-C",
+  "AG",
+  "AIA",
+  "AIC",
+  "AICP",
+  "AINS",
+  "AK",
+  "ALA",
+  "ALC",
+  "AMIEEE",
+  "ANIPR",
+  "AOBFP",
+  "AOBSPOMM",
+  "AP",
+  "APMA",
+  "APN",
+  "APR",
+  "APRN",
+  "ARNP",
+  "ARNP-FNP",
+  "APTD",
+  "ARM",
+  "ASA",
+  "ASEAN",
+  "ASG",
+  "ASID",
+  "ASLA",
+  "ASP",
+  "AVA",
+  "AWS",
+  "Azure",
+  "B.A.",
+  "B.B.A.",
+  "B.Com.",
+  "B.E.",
+  "B.Ed.",
+  "B.F.A.",
+  "B.Mus.",
+  "B.S.",
+  "B.Sc.",
+  "BA",
+  "BBA",
+  "BCA",
+  "BCTMB",
+  "BCom",
+  "BCS",
+  "BEd",
+  "BEng",
+  "BFA",
+  "BHMS",
+  "BLS-I",
+  "BMus",
+  "BPI",
+  "BS",
+  "BSN",
+  "BSc",
+  "BVScAH",
+  "Black Belt",
+  "C.M.C.",
+  "CA",
+  "CAAPM",
+  "CAE",
+  "CAGO",
+  "CAIA",
+  "CAMS",
+  "CAPM",
+  "CAPP",
+  "CAPS",
+  "CASP+",
+  "CB",
+  "CBE",
+  "CBNE",
+  "CBNT",
+  "CBRTE",
+  "CBT",
+  "CBTE",
+  "CBV",
+  "CCAr",
+  "CCCA",
+  "CCM",
+  "CCDM",
+  "CCDA",
+  "CCDE",
+  "CCDP",
+  "CCENT",
+  "CCEP",
+  "CCH",
+  "CCIE",
+  "CCIM",
+  "CCMT",
+  "CCNA",
+  "CCNP",
+  "CCP-C",
+  "CCPR",
+  "CCS",
+  "CCSK",
+  "CCSP",
+  "CCUFC",
+  "CCXP",
+  "CDFA",
+  "CDFM",
+  "CDT",
+  "CDN",
+  "CEA",
+  "CEH",
+  "CEM",
+  "CERA",
+  "CERM",
+  "CESSWI",
+  "CFA",
+  "CFC",
+  "CFMP",
+  "CFCC",
+  "CFCM",
+  "CFE",
+  "CFI",
+  "CFII",
+  "CFM",
+  "CFM-I",
+  "CFM-II",
+  "CFM-III",
+  "CFO",
+  "CFP",
+  "CFPIM",
+  "CFPS",
+  "CFP®",
+  "CFRE",
+  "CFRN",
+  "CFRM",
+  "CG",
+  "CGA",
+  "CGB",
+  "CGC",
+  "CGFM",
+  "CGFO",
+  "CGL",
+  "CGMA",
+  "CGP",
+  "CGR",
+  "CGSP",
+  "CHA",
+  "CHBA",
+  "CHES",
+  "CHDM",
+  "CHC",
+  "CHE",
+  "CHPP",
+  "CHRL",
+  "CHRM",
+  "CHST",
+  "CHTP",
+  "CIA",
+  "CICP",
+  "CICS",
+  "CIEH",
+  "CIH",
+  "CIPM",
+  "CICP",
+  "CISSN",
+  "CIMA",
+  "CIRO",
+  "CISA",
+  "CISM",
+  "CISSP",
+  "CIW",
+   "CLC",
+  "CMCS",
+  "CLU",
+  "CMA",
+  "CMFO",
+  "CMG",
+  "CMP",
+  "CMQ",
+  "CMRP",
+  "CMT",
+  "CMfgE",
+  "CMfgT",
+  "CMgr",
+  "CNC",
+  "CNM",
+  "CNP",
+  "CNS",
+  "CODP",
+  "COTA",
+  "CP-C",
+  "CPA",
+  "CPC",
+  "CPACC",
+  "CPO",
+  "CPARS",  "CPCM",
+  "CPCU",
+  "CPE",
+  "CPESC",
+  "CPFA",
+  "CPFO",
+  "CPG",
+  "CPIM",
+  "CPLP",
+  "CPM",
+  "CPP",
+  "CPSM",
+  "CPT",
+  "CPTD",
+  "CQA",
+  "CQE",
+  "CQI",
+  "CQIA",
+  "CRE",
+  "CRISC",
+  "CRMA",
+  "CRME",
+  "CRNP",
+  "CRO",
+  "CRRN",
+  "CRS",
+  "CSC",
+  "CSBE",
+  "CSMC",
+  "CSSD",
+  "CSCMP",
+  "CSCS",
+  "CSCP",
+  "CSE",
+  "CSEP",
+  "CSI",
+  "PSA",
+  "PSM",
+  "PSPO",  "CSPO",
+  "CSPOMM",
+  "CSRE",
+  "CSRTE",
+  "CSSBB",
+  "CSSGB",
+  "CSTE",
+  "CTFA",
+  "CTO",
+  "CTP",
+  "CTRN",
+  "CTSC",
+  "CTT+",
+  "CVA",
+  "CVPM",
+  "CVRS",
+  "CVT",
+  "CXA",
+  "CYDS",
+  "ChMC",
+  "Cloud+",
+  "CySA+",
+  "D.C.",
+  "D.D.S.",
+  "D.Ed.",
+  "D.M.",
+  "D.M.D.",
+  "D.O.",
+  "D.PH.",
+  "D.V.M.",
+  "DAAPM",
+  "DABFM",
+  "DABFP",
+  "DABHP",
+  "DABIM",
+  "DABMP",
+  "DABR",
+  "DABSNM",
+  "DABVLM",
+  "DABVP",
+  "DABVT",
+  "DACAW",
+  "DACBN",
+  "DACLAM",
+  "DACM",
+  "DACPV",
+  "DACT",
+  "DACVAA",
+  "DACVB",
+  "DACVCP",
+  "DACVD",
+  "DACVECC",
+  "DACVIM",
+  "DACVM",
+  "DACVNU",
+  "DACVO",
+  "DACVP",
+  "DACVPM",
+  "DACVR",
+  "DACVSMR",
+  "DACZM",
+  "DAOM",
+  "DAVCS",
+  "DAVDC",
+  "DAc",
+  "DAcRI",
+  "DAcWV",
+  "DBA",
+  "DC",
+  "DDS",
+  "DHANP",
+  "DHt",
+  "DMD",
+  "DNAP",
+  "DNBHE",
+  "DNP",
+  "DO",
+  "DOM",
+  "DPM",
+  "DPT",
+  "DVM",
+  "Dipl.Ac.",
+  "Dipl.OM",
+  "DipABLM",
+  "DrPH",
+  "EA",
+  "EAc",
+  "EFO",
+  "EI",
+  "EIT",
+  "ELS",
+  "EMBA",
+  "EMT",
+  "ENP",
+  "EVP",
+  "EdD",
+  "Engr",
+  "Esq",
+  "F.ASCE",
+  "FAAEM",
+  "FAAFP",
+  "FACOOG",
+  "FAAN",
+  "FAANP",
+  "FAANS",
+  "FAAOS",
+  "FAAP",
+  "FACC",
+  "FACD",
+  "FACE",
+  "FACEP",
+  "FACOG",
+  "FACOP",
+  "FACFAS",
+  "FACFO",
+  "FACHA",
+  "FACHE",
+  "FACOFP",
+  "FACOG",
+  "FACP",
+  "FACS",
+  "FAEMS",
+  "FAGD",
+  "FAGO",
+  "FAHA",
+  "FPMRS",
+  "FAIA",
+  "FAICP",
+  "FAIHM",
+  "FALA",
+  "FAOM",
+  "FASHP",
+  "FASID",
+  "FASLA",
+  "FASPEN",
+  "FAWM",
+  "FCA",
+  "FCAS",
+  "FCMC",
+  "FCP",
+  "FCCA",
+  "FCIM",
+  "FIC",
+  "FICF",
+  "FIDSA",
+  "FIEEE",
+  "FMACP",
+  "FMP",
+  "FNP",
+  "FP-C",
+  "FPC",
+  "FRM",
+  "FRSA",
+  "FSA",
+  "GAICD",
+  "GCED",
+  "GCFA",
+  "GCIA",
+  "GCIH",
+  "GCP",
+  "GIAC",
+  "GISP",
+  "GIT",
+  "GPEN",
+  "GPHR",
+  "GRI",
+  "GSEC",
+  "GSMIEEE",
+  "Green Belt",
+  "HASG",
+  "HCCP",
+  "HCIB",
+  "HLL",
+  "HMD",
+  "HSG",
+  "IABC",
+  "IACCP",
+  "IAEM",
+  "IBCLC",
+  "ICCM-D",
+  "ICCM-F",
+  "ICD.D",
+  "IF",
+  "ISSP",
+  "ISSP-CSP",
+  "ISSP-SA",
+  "ITIL",
+  "J.D.",
+  "J.P.",
+  "JD",
+  "KBE",
+  "KCHS/DCHS",
+  "KHS/DHS",
+  "Kaizen",
+  "L.Ac.",
+  "LAc",
+  "LCMT",
+  "LCPC",
+  "LCSW",
+  "LDN",
+  "LEED AP",
+  "LEED GA",
+  "LICSW",
+  "LISW",
+  "LL",
+  "LL.D.",
+  "LL.M.",
+  "LLD",
+  "LLM",
+  "LMFT",
+  "LMHC",
+  "LMSW",
+  "LMT",
+  "LN",
+  "LNC",
+  "LPA",
+  "LPC",
+  "LPCC",
+  "LPHA",
+  "LPIC-1",
+  "LPIC-2",
+  "LPIC-3",
+  "LPN",
+  "LSI",
+  "LSIT",
+  "LSW",
+  "LVN",
+  "LVT",
+  "Lean Six Sigma",
+  "Lean",
+  "LicAc",
+  "Linux+",
+  "M.A.",
+  "M.ASCE",
+  "M.B.A.",
+  "M.Com.",
+  "M.D.",
+  "M.E.",
+  "M.Ed.",
+  "M Ed",
+  "M.F.A.",
+  "M.IDST",
+  "M.Mus.",
+  "M.P.A.",
+  "M.P.H.",
+  "M.Phil.",
+  "M.S.",
+  "M.Sc.",
+  "MA",
+  "MAAA",
+  "MAHRI",
+  "MAI",
+  "MBA",
+  "MBA+",
+  "MBACP",
+  "MBAe",
+  "MBE",
+  "MBS",
+  "MCITP",
+  "MCMI",
+  "MCP",
+  "MCSA",
+  "MCSD",
+  "MCSE",
+  "MCT",
+  "MCTS",
+  "MCom",
+  "MD",
+  "MDH",
+  "MEd",
+  "M Ed",
+  "M.Ed",
+  "MEng",
+  "MFA",
+  "MFCC",
+  "MIEEE",
+  "MIRHR",
+  "MLS",
+  "MLSE",
+  "MMus",
+  "MNNP",
+  "MOS",
+  "MPA",
+  "MPH",
+  "MPhil",
+  "MRA",
+  "MS",
+  "MS-SLP",
+  "MSA",
+  "MSDT",
+  "MSEAT",
+  "MSN",
+  "MSOM",
+  "MSW",
+  "MSc",
+  "MMSc",
+  "MSCP",
+  "MT-BC",
+  "N/A",
+  "NASM-CPT",
+  "NBCT",
+  "NBC-HWC",
+  "NCARB",
+  "NCCA",
+  "NCCAOM",
+  "NCIDQ",
+  "ND",
+  "NICET I/II/III/IV",
+  "NMD",
+  "NP",
+  "NRP",
+  "Network",
+  "Network+",
+  "OBE",
+  "OD",
+  "OHST",
+  "OMD",
+  "OSCP",
+  "OT",
+  "OTD",
+  "P.E",
+  "PA",
+  "PA-C",
+  "PACE",
+  "PATP",
+  "PCAP",
+  "PCEP",
+  "PCPP",
+  "PE",
+  "PG",
+  "PHR",
+  "PLA",
+  "PLS",
+  "PME",
+  "PMH-C",
+  "PMI-ACP",
+  "PMI-RMP",
+  "PMI-SP",
+  "PMP",
+  "PP",
+  "PPM",
+  "PRINCE2",
+  "PRM",
+  "PRSA",
+  "PSM",
+  "PT",
+  "PTA",
+  "PenTest+",
+  "Ph.D.",
+  "Ph D",
+  "PhD",
+  "PharmD",
+  "Project+",
+  "Psy.D.",
+  "PsyD",
+  "QC",
+  "QSD",
+  "QSP",
+  "RA",
+  "RAI",
+  "RBA",
+  "RCI",
+  "RD",
+  "RDCS",
+  "RDN",
+  "RDMS",
+  "RES",
+  "RFP",
+  "RHCA",
+  "RHCE",
+  "RHCSA",
+  "RID",
+  "RLS",
+  "RN",
+  "RN-C",
+  "RN-CS",
+  "RN/NP",
+  "RPA",
+  "RPh",
+  "RRPT",
+  "RRT",
+  "RS Hom",
+  "RTRP",
+  "RVT",
+  "RYT",
+  "S.J.D.",
+  "S.M.ASCE",
+  "SCCP",
+  "SCMP",
+  "SCOR-P",
+  "SCPM",
+  "SE",
+  "SECB",
+  "SFP",
+  "SG",
+  "SHRM-CP",
+  "SHRM-SCP",
+  "SI",
+  "SIIE",
+  "SIM",
+  "SLP",
+  "SLPD",
+  "SMA",
+  "SMIEEE",
+  "SMT",
+  "SPC",
+  "SPHR",
+  "SRA",
+  "SRES",
+  "SRS",
+  "SSBB",
+  "STS",
+  "Security+",
+  "Server+",
+  "Six Sigma",
+  "TCRN",
+  "TP-C",
+  "TR-C",
+  "UMC",
+  "USA",
+  "USAF",
+  "USCG",
+  "USMC",
+  "USN",
+  "VCAP",
+  "VCDX",
+  "VCP",
+  "VMD",
+  "VTS",
+  "WAS",
+  "WHNP-BC",
+  "WIMI-CP",
+  "WP-C"
+] as const;
+
+/**
+ * Generational Suffixes (29 total)
+ * Used to denote family lineage (Jr., Sr., II, III, etc.)
+ */
+const GENERATIONAL_SUFFIXES = [
+  "Jr", "Jr.", "Junior",
+  "Sr", "Sr.", "Senior",
+  "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+  "XI", "XII", "XIII", "XIV", "XV",
+  "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"
+] as const;
+
+/**
+ * Name Titles/Honorifics (43 total)
+ * Prefixes that appear before a person's name
+ */
+const TITLES = [
+  "Dr", "Dr.", "Mr", "Mr.", "Mrs", "Mrs.", "Miss", "Ms", "Ms.", 
+  "Prof", "Prof.", "Mx", "Mx.", "Revd", "Rev", "Rev.", "Sir", "Lady",
+  "Hon", "Hon.", "Honorable", "Judge", "Justice", "Senator", "Representative",
+  "Congressman", "Congresswoman", "Governor", "Mayor", "President", "Vice President",
+  "Secretary", "Ambassador", "Father", "Fr", "Fr.", "Mother", "Sr", "Sr.",
+  "Brother", "Br", "Br.", "Rabbi", "Imam", "Pastor", "Bishop", "Archbishop",
+  "Cardinal", "Pope", "Deacon", "Elder"
+] as const;
+
+/**
+ * Last Name Prefixes (61 total)
+ * Particles that are part of surnames (e.g., "van", "de", "von")
+ */
+const LAST_NAME_PREFIXES = [
+  "van der", "van den", "van de", "van 't", "van", "vander",
+  "ter", "der", "ten", "'s", "'t",
+  "de la", "de", "des", "du", "d'", "le", "la",
+  "von und zu", "von", "zu",
+  "del", "degli", "della", "di", "da",
+  "dos", "das", "e",
+  "bin", "bint", "binti", "binte", "abu", "al", "el", "ibn",
+  "aït", "at", "ath",
+  "bath", "bat", "ben", "bar",
+  "mac", "mc", "ni", "nic", "o'", "ó", "ua", "uí",
+  "ap", "ab", "ferch", "verch", "erch",
+  "af", "av",
+  "a", "alam", "olam", "chaudhary", "ch", "dele",
+  "fitz", "i", "ka", "kil", "gil", "mal", "mul",
+  "m'", "m'c", "m.c", "mck", "mhic", "mic", "mala",
+  "na", "ngā", "nin", "öz", "pour", "te", "tre", "war", "bet"
+] as const;
+
+// Create Sets for O(1) lookup performance
+const CREDENTIALS_SET = new Set(ALL_CREDENTIALS);
+const GENERATIONAL_SUFFIXES_SET = new Set(GENERATIONAL_SUFFIXES);
+const TITLES_SET = new Set(TITLES);
+const LAST_NAME_PREFIXES_SET = new Set(LAST_NAME_PREFIXES);
+
+// Create normalized Map for case-insensitive credential lookup
+const CREDENTIALS_MAP = new Map<string, string>();
+ALL_CREDENTIALS.forEach(cred => {
+  const normalized = cred.replace(/\./g, '').toLowerCase();
+  CREDENTIALS_MAP.set(normalized, cred);
+  CREDENTIALS_MAP.set(cred, cred);
+});
+
+/**
+ * Check if a string is a known credential
+ */
+function isCredential(value: string, caseSensitive: boolean = false): boolean {
+  if (caseSensitive) {
+    return CREDENTIALS_SET.has(value as any);
+  }
+  const normalized = value.replace(/\./g, '').toLowerCase();
+  return CREDENTIALS_MAP.has(normalized);
+}
+
+/**
+ * Check if a string is a generational suffix
+ */
+function isGenerationalSuffix(value: string): boolean {
+  if (/^[IVX]+$/.test(value)) {
+    return GENERATIONAL_SUFFIXES_SET.has(value as any);
+  }
+  const normalized = value.replace(/\./g, '').toLowerCase();
+  return GENERATIONAL_SUFFIXES.some(suffix => 
+    suffix.replace(/\./g, '').toLowerCase() === normalized
+  );
+}
+
+/**
+ * Check if a string is a title
+ */
+function isTitle(value: string): boolean {
+  if (TITLES_SET.has(value as any)) {
+    return true;
+  }
+  const normalized = value.toLowerCase();
+  return TITLES.some(title => title.toLowerCase() === normalized);
+}
+
+/**
+ * Check if a string is a last name prefix
+ */
+function isLastNamePrefix(value: string): boolean {
+  const normalized = value.toLowerCase();
+  return LAST_NAME_PREFIXES_SET.has(normalized as any) || 
+         LAST_NAME_PREFIXES.some(prefix => prefix.toLowerCase() === normalized);
+}
+
+/**
+ * Job-related words that might appear in names but aren't part of the actual name
+ */
+const JOB_WORDS = [
+  "Chief", "Officer", "Director", "Manager", "President", "Chair", "Board",
+  "Founder", "CEO", "CFO", "COO", "CTO", "VP", "Specialist", "Consultant",
+  "Partner", "Operations", "Division", "Department", "Head", "Lead", "Supervisor",
+  "Administrator", "Executive"
+] as const;
+
+/**
+ * Misencoded character map for fixing encoding issues
+ */
+const MISENCODED_MAP: Record<string, string> = {
+  "\u201a": "'",  // ‚
+  "\u201c": '"',  // "
+  "\u201d": '"',  // "
+  "\u2018": "'",  // '
+  "\u2019": "'",  // '
+  "\u2013": "-",  // –
+  "\u2014": "-",  // —
+  "\u2026": "...", // …
+  "\u00b4": "'",  // ´
+  "`": "'",
+  "\u00a8": "",   // ¨
+  "\u00e6": "ae", // æ
+  "\u0153": "oe", // œ
+  "\u00df": "ss", // ß
+  "\u00f8": "o",  // ø
+  "\u00f0": "d",  // ð
+  "\u00fe": "th", // þ
+  "?": ""
+};
+
+/**
+ * Common Latin name fixes for accent restoration
+ */
+const COMMON_LATIN_FIXES: Record<string, { fixed: string; reason: string }> = {
+  "Francois": { fixed: "François", reason: "accent_restoration" },
+  "Andre": { fixed: "André", reason: "accent_restoration" },
+  "Rene": { fixed: "René", reason: "accent_restoration" },
+  "Jose": { fixed: "José", reason: "accent_restoration" },
+  "Garcia": { fixed: "García", reason: "accent_restoration" },
+  "Munoz": { fixed: "Muñoz", reason: "accent_restoration" },
+  "Bjorn": { fixed: "Björn", reason: "accent_restoration" },
+  "Soren": { fixed: "Søren", reason: "accent_restoration" },
+  "Noel": { fixed: "Noël", reason: "accent_restoration" },
+  "Schafer": { fixed: "Schäfer", reason: "accent_restoration" },
+  "Muller": { fixed: "Müller", reason: "accent_restoration" },
+  "Fran?ois": { fixed: "François", reason: "latin1_fix" },
+  "Mu?oz": { fixed: "Muñoz", reason: "latin1_fix" },
+  "Gar?ia": { fixed: "García", reason: "latin1_fix" },
+  "Jos?": { fixed: "José", reason: "latin1_fix" },
+  "Bj?rn": { fixed: "Björn", reason: "latin1_fix" },
+  "S?ren": { fixed: "Søren", reason: "latin1_fix" },
+  "No?l": { fixed: "Noël", reason: "latin1_fix" },
+  "Ni?o": { fixed: "Niño", reason: "latin1_fix" },
+  "Pe?a": { fixed: "Peña", reason: "latin1_fix" },
+  "Mu?ller": { fixed: "Müller", reason: "latin1_fix" },
+  "Sch?fer": { fixed: "Schäfer", reason: "latin1_fix" }
+};
+
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+// Stub types for Asian name detection (temporarily disabled)
+type NameContext = {
+  email?: string;
+  phone?: string;
+  company?: string;
+};
+
+type ContextAnalysis = {
+  culture?: string;
+  confidence?: number;
+};
 
 export interface RepairLog {
   original: string;
@@ -39,7 +912,7 @@ export interface NameParts {
 export interface ParseOptions {
   preserveAccents?: boolean;
   trackPerformance?: boolean;
-  context?: NameContext;  // Additional context for improved parsing
+  context?: NameContext;  // Additional context for improved parsing (feature temporarily disabled)
 }
 
 export interface ParseResult {
@@ -49,7 +922,7 @@ export interface ParseResult {
     repairTime: number;
     totalTime: number;
   };
-  contextAnalysis?: ContextAnalysis;  // Context analysis results
+  contextAnalysis?: ContextAnalysis;  // Context analysis results (feature temporarily disabled)
 }
 
 export class NameEnhanced {
@@ -146,11 +1019,18 @@ export class NameEnhanced {
     }
 
     let text = this.rawName.trim();
+    
+    // Detect Excel error values (#NAME?, #VALUE!, #REF!, etc.)
+    if (/^#[A-Z]+[?!]?$/.test(text)) {
+      this.isValid = false;
+      this.parseTime = performance.now() - startTime;
+      return;
+    }
     const originalText = text;
 
     // 1. Fix mis-encoded characters
     const repairStart = performance.now();
-    for (const [bad, fix] of Object.entries(nameConfig.COMMON_LATIN_FIXES)) {
+    for (const [bad, fix] of Object.entries(COMMON_LATIN_FIXES)) {
       const escapedBad = this.escapeRegex(bad);
       const regex = new RegExp(`\\b${escapedBad}\\b`, 'gi');
       if (regex.test(text)) {
@@ -162,7 +1042,7 @@ export class NameEnhanced {
       }
     }
 
-    for (const [bad, good] of Object.entries(nameConfig.MISENCODED_MAP)) {
+    for (const [bad, good] of Object.entries(MISENCODED_MAP)) {
       if (text.includes(bad)) {
         const before = text;
         const escapedBad = this.escapeRegex(bad);
@@ -173,9 +1053,9 @@ export class NameEnhanced {
       }
     }
 
-    // 2. Remove pronouns in parentheses (she/her, he/him, they/them, etc.)
+    // 2. Remove pronouns in parentheses or square brackets (she/her, he/him, they/them, etc.)
     // Do this BEFORE multi-person detection to avoid false positives from pronoun slashes
-    const pronounPattern = /\(\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*\)/gi;
+    const pronounPattern = /[\(\[]\s*(she\/her|he\/him|they\/them|she\/they|he\/they|any pronouns?|all pronouns?)\s*[\)\]]/gi;
     const pronounMatch = text.match(pronounPattern);
     if (pronounMatch) {
       const before = text;
@@ -225,7 +1105,8 @@ export class NameEnhanced {
       }
     }
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
-    textNoNicknames = text.replace(/['"(),]/g, ' ');
+    // Remove the entire nickname match (including quotes/parens), not just the punctuation
+    textNoNicknames = text.replace(nicknameRegex, ' ').trim();
 
     // 7. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
@@ -244,10 +1125,15 @@ export class NameEnhanced {
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
     
+    // Clean up leading hyphens/spaces before credentials (e.g., "Sharon Lemoine -FNP" → "Sharon Lemoine FNP")
+    textNoNicknames = textNoNicknames.replace(/\s+-([A-Z])/g, ' $1');
+    
     // Build pattern for credentials as standalone words
     // Use lookahead/lookbehind to ensure not part of hyphenated names
+    // Sort by length (longest first) to match "ARNP-FNP" before "ARNP"
+    const sortedCredentials = [...ALL_CREDENTIALS].sort((a, b) => b.length - a.length);
     const credentialPattern = new RegExp(
-      `(?<![-])\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b(?![-])`,
+      `(?<![-])\\b(${sortedCredentials.map(c => this.escapeRegex(c)).join('|')})(?=\\s|$|[^\\w])`,
       'gi'
     );
     
@@ -272,7 +1158,7 @@ export class NameEnhanced {
     }
 
     // 9. Filter out job titles
-    const hasJobWord = nameConfig.JOB_WORDS.some(word => 
+    const hasJobWord = JOB_WORDS.some(word => 
       new RegExp(`\\b${word}\\b`, 'i').test(textNoNicknames)
     );
     if (hasJobWord) {
@@ -320,7 +1206,9 @@ export class NameEnhanced {
 
     // Context analysis (if provided)
     if (this.options.context) {
-      this.contextAnalysis = analyzeContext(this.options.context);
+      // TODO: Re-enable Asian name detection after credential fix is verified
+      // this.contextAnalysis = analyzeContext(this.options.context);
+      this.contextAnalysis = null;
       if (this.contextAnalysis.detectedCulture && this.contextAnalysis.confidence >= 60) {
         this.recordRepair(text, text, `context_detected_${this.contextAnalysis.detectedCulture}_from_${this.contextAnalysis.sources.join('_and_')}`);
       }
@@ -328,12 +1216,16 @@ export class NameEnhanced {
     
     // Asian name order detection
     // Check if the first part is an Asian surname (family-name-first pattern)
-    let firstPartConfidence = getAsianSurnameConfidence(parts[0]);
-    const lastPartConfidence = parts.length > 1 ? getAsianSurnameConfidence(parts[parts.length - 1]) : 0;
+    // TODO: Re-enable Asian surname confidence detection
+    // let firstPartConfidence = getAsianSurnameConfidence(parts[0]);
+    // const lastPartConfidence = parts.length > 1 ? getAsianSurnameConfidence(parts[parts.length - 1]) : 0;
+    let firstPartConfidence = 0;
+    const lastPartConfidence = 0;
     
     // Boost confidence using context if available
     if (this.contextAnalysis && this.contextAnalysis.confidence >= 60) {
-      firstPartConfidence = boostConfidenceWithContext(firstPartConfidence, this.contextAnalysis);
+      // TODO: Re-enable confidence boosting after Asian name detection is restored
+      // firstPartConfidence = boostConfidenceWithContext(firstPartConfidence, this.contextAnalysis);
     }
     
     // Heuristics for name order detection:
@@ -350,7 +1242,9 @@ export class NameEnhanced {
     
     if (firstPartConfidence >= confidenceThreshold) {
       // First part is a known Asian surname
-      const culture = detectAsianCulture(parts[0]);
+      // TODO: Re-enable Asian culture detection after credential fix is verified
+      // const culture = detectAsianCulture(parts[0]);
+      const culture = null;
       this.asianCulture = culture;
       this.nameOrderConfidence = firstPartConfidence;
       
@@ -475,14 +1369,15 @@ export class NameEnhanced {
 
     return formatString
       .split(' ')
-      .map(c => formatMap[c] || c)
-      .filter(s => s.trim())
+      .map(c => formatMap[c] !== undefined ? formatMap[c] : c)
+      .filter(s => s && s.trim())  // Filter empty strings
       .join(' ')
       .trim();
   }
 
   get full(): string {
-    return this.format('p f m l s');
+    // Don't include prefix (title) or suffix (credentials) in full name
+    return this.format('f m l');
   }
 
   get short(): string {

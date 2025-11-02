@@ -5,9 +5,10 @@
 
 // Import normalizers directly (will be bundled by Vite)
 import { NameEnhanced } from '../lib/NameEnhanced';
-import { PhoneEnhanced } from '../../../shared/normalization/phones/PhoneEnhanced';
-import { EmailEnhanced } from '../../../shared/normalization/emails/EmailEnhanced';
-import { AddressFormatter } from '../../../shared/normalization/addresses/AddressFormatter';
+import { normalizeValue } from '../lib/normalizeValue';
+import { analyzeSchema } from '../lib/schemaAnalyzer';
+import { buildPlan } from '../lib/normalizationPlan';
+import { processRowWithContext } from '../lib/contextAwareExecutor';
 
 export interface WorkerMessage {
   type: 'process' | 'cancel';
@@ -30,69 +31,23 @@ export interface WorkerResponse {
   };
 }
 
-/**
- * Normalize a single value based on type
- */
-function normalizeValue(type: string, value: string): string {
-  if (!value) return '';
-
-  try {
-    switch (type) {
-      case 'name': {
-        const name = new NameEnhanced(value);
-        return name.isValid ? name.full : value;
-      }
-      case 'first-name': {
-        const name = new NameEnhanced(value);
-        return name.isValid && name.firstName ? name.firstName : value;
-      }
-      case 'last-name': {
-        const name = new NameEnhanced(value);
-        return name.isValid && name.lastName ? name.lastName : value;
-      }
-      case 'email': {
-        const email = new EmailEnhanced(value);
-        return email.isValid ? email.normalized : value;
-      }
-      case 'phone': {
-        const phone = PhoneEnhanced.parse(value);
-        return phone.isValid ? phone.e164 : value;
-      }
-      case 'address': {
-        const result = AddressFormatter.normalize(value);
-        return result.normalized;
-      }
-      case 'location': {
-        // Location normalization removed - LocationNormalizer module doesn't exist
-        // TODO: Implement location normalization if needed
-        return value;
-      }
-      default:
-        return value;
-    }
-  } catch {
-    return value;
-  }
-}
+// normalizeValue is now imported from ../lib/normalizeValue.ts
 
 /**
- * Process a chunk of rows
+ * Process a chunk of rows with context awareness
  */
 function processChunk(
   chunk: any[],
   strategy: { columns: Array<{ name: string; type: string }> }
 ): any[] {
+  // Build schema and plan once for the entire chunk
+  const headers = strategy.columns.map(c => c.name);
+  const schema = analyzeSchema(headers);
+  const plan = buildPlan(schema);
+  
   return chunk.map((row) => {
-    const normalizedRow: any = { ...row };
-
-    for (const column of strategy.columns) {
-      const value = row[column.name];
-      if (value && column.type !== 'unknown') {
-        normalizedRow[column.name] = normalizeValue(column.type, value);
-      }
-    }
-
-    return normalizedRow;
+    // Use context-aware processing
+    return processRowWithContext(row, schema, plan);
   });
 }
 

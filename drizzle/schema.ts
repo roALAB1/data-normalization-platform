@@ -112,3 +112,44 @@ export const apiKeys = mysqlTable("apiKeys", {
 
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type InsertApiKey = typeof apiKeys.$inferInsert;
+
+/**
+ * Credential issues table
+ * Tracks user-reported issues with credential stripping
+ */
+export const credentialIssues = mysqlTable("credentialIssues", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // Reference to users table (nullable for anonymous reports)
+  issueType: mysqlEnum("issueType", ["not_stripped", "incorrectly_stripped", "missing_credential", "other"]).notNull(),
+  originalText: text("originalText").notNull(), // The full name/text that had the issue
+  expectedOutput: text("expectedOutput"), // What the user expected
+  actualOutput: text("actualOutput"), // What the system produced
+  credentialText: varchar("credentialText", { length: 255 }), // The specific credential in question
+  description: text("description"), // User's description of the issue
+  status: mysqlEnum("status", ["pending", "reviewed", "resolved", "wont_fix"]).default("pending").notNull(),
+  reviewedBy: int("reviewedBy"), // Admin user who reviewed
+  reviewNotes: text("reviewNotes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CredentialIssue = typeof credentialIssues.$inferSelect;
+export type InsertCredentialIssue = typeof credentialIssues.$inferInsert;
+
+/**
+ * Credential usage tracking table
+ * Tracks which credentials appear in real data to prioritize additions
+ */
+export const credentialUsage = mysqlTable("credentialUsage", {
+  id: int("id").autoincrement().primaryKey(),
+  credential: varchar("credential", { length: 255 }).notNull().unique(), // The credential text (e.g., "MMSc", "CPO")
+  occurrenceCount: int("occurrenceCount").default(1).notNull(), // How many times this credential has been seen
+  lastSeen: timestamp("lastSeen").defaultNow().notNull(),
+  isInList: boolean("isInList").default(false).notNull(), // Whether it's already in ALL_CREDENTIALS
+  addedToListAt: timestamp("addedToListAt"), // When it was added to the list
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CredentialUsage = typeof credentialUsage.$inferSelect;
+export type InsertCredentialUsage = typeof credentialUsage.$inferInsert;

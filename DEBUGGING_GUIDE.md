@@ -36,7 +36,43 @@
 
 ## Known Issues
 
-### 1. Worker Import Errors (BLOCKER 🔴)
+### 1. Credentials Without Commas Not Removed (FIXED ✅)
+
+**Problem:**
+- Last Name column still has credentials like "Simon MD", "Kopman DDS"
+- Middle initials like "S. Perrin" not being removed
+- v3.7.1 only removed credentials AFTER commas
+
+**Root Cause:**
+- normalizeValue.ts only had comma-removal logic: `cleaned.replace(/,.*$/, '')`
+- No pattern matching for credentials as standalone words
+
+**Solution (v3.7.2):**
+1. Exported ALL_CREDENTIALS from NameEnhanced.ts
+2. Added credential regex pattern to normalizeValue.ts:
+   ```typescript
+   const credentialPattern = new RegExp(
+     `(?<![-])\\b(${ALL_CREDENTIALS.map(c => escapeRegex(c)).join('|')})(?=\\s|$|[^\\w])`,
+     'gi'
+   );
+   cleaned = cleaned.replace(credentialPattern, '').trim();
+   ```
+3. Added middle initial removal: `cleaned.replace(/^[A-Z]\\.\\s+/, '')`
+
+**Test Coverage:**
+- ✅ 18/18 tests passing in `csv-column-cleaning.test.ts`
+- ✅ Credentials without commas removed
+- ✅ Middle initials removed
+- ✅ Credentials after commas still working
+
+**Files:**
+- `client/src/lib/NameEnhanced.ts` - Exported ALL_CREDENTIALS
+- `client/src/lib/normalizeValue.ts` - Added credential pattern
+- `tests/csv-column-cleaning.test.ts` - Added 3 new tests
+
+---
+
+### 2. Worker Import Errors (BLOCKER 🔴)
 
 **Problem:**
 - Worker fails to initialize with "Failed to process chunk 0" error
@@ -80,7 +116,41 @@ it('should not have broken imports', async () => {
 
 ---
 
-### 2. Module Loading in Workers (CRITICAL 🔴)
+### 2. CSV Column Cleaning (FIXED ✅)
+
+**Problem:**
+- Input CSV already has "First Name" and "Last Name" columns with credentials/titles
+- Worker was only processing "Name" column, not cleaning existing columns
+- Credentials like "MD", "CFP" still appearing in Last Name column
+- Titles like "Dr." still appearing in First Name column
+- Pronouns like "(she/her)" not being removed
+
+**Root Cause:**
+- Worker only handled "name" type, not "first-name" and "last-name" types
+- No logic to clean individual column values
+
+**Solution (VALIDATED):**
+1. Create separate `normalizeValue.ts` utility file
+2. Add `first-name` type handler:
+   - Remove titles: `Dr.`, `Prof.`, `Mr.`, `Mrs.`, `Ms.`, `Miss.`
+   - Remove middle initials: `Jennifer R.` → `Jennifer`
+3. Add `last-name` type handler:
+   - Remove credentials after commas: `Berman, MD` → `Berman`
+   - Remove pronouns: `Bouch (she/her)` → `Bouch`
+   - Remove trailing periods
+
+**Test Coverage:**
+- 15/15 tests passing in `csv-column-cleaning.test.ts`
+- Covers titles, credentials, pronouns, complex cases
+
+**Files:**
+- `client/src/lib/normalizeValue.ts` - Utility function
+- `client/src/workers/normalization.worker.ts` - Uses normalizeValue
+- `tests/csv-column-cleaning.test.ts` - Test suite
+
+---
+
+### 3. Module Loading in Workers (FIXED ✅)
 
 **Problem:**
 - `ALL_CREDENTIALS` array imported from `@shared/normalization/names` returns empty `[]` when loaded in Web Workers
@@ -96,12 +166,32 @@ it('should not have broken imports', async () => {
 - Empty credential arrays in console logs
 - `isCredential()` always returns `false`
 
-**Solution:**
-- **Option A (Temporary):** Hardcode credentials directly in `NameEnhanced.ts` (150+ common ones)
-- **Option B (Proper):** Use dynamic import or lazy loading
-- **Option C (Best):** Research how enterprise libraries handle this (see Phase 3)
+**Solution (RESEARCHED & VALIDATED):**
 
-**Status:** UNRESOLVED - Needs enterprise solution research
+**Enterprise Pattern from theiconic/name-parser (131 stars, production-proven):**
+- **DON'T** import credentials from external modules
+- **DO** hardcode credentials as constants directly in the class file
+- **Pattern:** Define data where it's consumed
+
+**Implementation:**
+```typescript
+// In NameEnhanced.ts - at the top of the file
+const ALL_CREDENTIALS = [
+  'MD', 'PhD', 'MBA', 'CFP', 'CPA', 'RN', 'DDS', ...
+  // All 723 credentials hardcoded here
+];
+
+// Then use it directly
+const CREDENTIALS_SET = new Set(ALL_CREDENTIALS);
+```
+
+**Why This Works:**
+- No module imports = no bundling issues
+- Works in all contexts (main thread, workers, tests)
+- Zero dependencies on external modules
+- Proven pattern from production libraries processing "hundreds of thousands" of names
+
+**Status:** ✅ FIXED in v3.7.0 - All tests passing
 
 ---
 

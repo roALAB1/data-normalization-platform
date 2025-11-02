@@ -30,9 +30,10 @@ describe('Worker Initialization', () => {
     
     // Verify required imports ARE present
     expect(workerContent).toContain('NameEnhanced');
-    expect(workerContent).toContain('PhoneEnhanced');
-    expect(workerContent).toContain('EmailEnhanced');
-    expect(workerContent).toContain('AddressFormatter');
+    expect(workerContent).toContain('normalizeValue');
+    expect(workerContent).toContain('analyzeSchema');
+    expect(workerContent).toContain('buildPlan');
+    expect(workerContent).toContain('processRowWithContext');
   });
 
   it('should export required worker interfaces', async () => {

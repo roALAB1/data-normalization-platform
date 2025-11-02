@@ -29,6 +29,13 @@
       "when": 1761966842165,
       "tag": "0003_jittery_the_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1762120946584,
+      "tag": "0004_classy_plazm",
+      "breakpoints": true
     }
   ]
 }
