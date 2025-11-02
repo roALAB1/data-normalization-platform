@@ -36,7 +36,34 @@
 
 ## Known Issues
 
-### 1. Credentials Without Commas Not Removed (FIXED ✅)
+### 1. v3.8.1 Remaining Issues (IN PROGRESS 🚧)
+
+**Problem:**
+- Row 81: `Nancy Kurts -` → Last Name = "-" (trailing hyphen not cleaned)
+- Row 170: `-Ling Erik Kuo` → First Name = "-Ling" (leading hyphen issue)
+
+**Root Cause:**
+1. **Row 81:** Trailing hyphen cleanup exists (line 1149) but runs before final name parsing
+   - Code: `textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim()`
+   - Hyphen gets into lastName during parsing after cleanup runs
+   
+2. **Row 170:** Leading hyphen in first name
+   - Original: `-Ling Erik Kuo` (should be `Meng-Ling Erik Kuo`)
+   - Excel formula prevention was removed from hyphen check
+   - Need to handle leading hyphens in name parts
+
+**Solution (v3.8.2):**
+- TBD - See todo.md for planned approach
+- Will require test-first development per FIX_PROCESS.md
+
+**Status:**
+- v3.8.1 marked STABLE despite these 2 issues (93% clean overall)
+- 26 other "issues" are incomplete source data (acceptable)
+- Production ready for real-world use
+
+---
+
+### 2. Credentials Without Commas Not Removed (FIXED ✅)
 
 **Problem:**
 - Last Name column still has credentials like "Simon MD", "Kopman DDS"
