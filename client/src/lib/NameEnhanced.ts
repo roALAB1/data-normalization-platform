@@ -200,42 +200,7 @@ export class NameEnhanced {
       this.recordRepair(before, text, 'credential_modifiers_removed');
     }
 
-    // 5. SMART COMMA HANDLING: Detect "Last, First" vs "Name, Credentials"
-    const commaIndex = text.indexOf(',');
-    if (commaIndex !== -1) {
-      const beforeComma = text.substring(0, commaIndex).trim();
-      const afterComma = text.substring(commaIndex + 1).trim();
-      
-      // Heuristic: Detect if it's "Last, First" or "Name, Credentials"
-      // "Last, First" indicators:
-      // - afterComma is 1-2 words (first name, or first + middle)
-      // - afterComma doesn't contain multiple credentials/abbreviations
-      // "Name, Credentials" indicators:
-      // - afterComma has multiple abbreviations (MD, PhD, etc.)
-      // - afterComma has 3+ words with dots/abbreviations
-      
-      const afterWords = afterComma.split(/\s+/);
-      const hasMultipleAbbrevs = afterWords.filter(w => 
-        /^[A-Z]{2,}[.]?$/.test(w) || // All caps abbreviations
-        /[A-Z][.]/.test(w) || // Dotted abbreviations
-        ALL_CREDENTIALS.some(c => c.toLowerCase() === w.toLowerCase())
-      ).length >= 2;
-      
-      const isLastFirst = afterWords.length <= 2 && !hasMultipleAbbrevs;
-      
-      if (isLastFirst) {
-        // "Last, First" format - swap and continue
-        text = `${afterComma} ${beforeComma}`.trim();
-        this.recordRepair(`${beforeComma}, ${afterComma}`, text, 'last_first_swapped');
-      } else {
-        // "Name, Credentials" format - strip credentials
-        this.suffix = afterComma;
-        text = beforeComma;
-        this.recordRepair(`${beforeComma}, ${afterComma}`, text, 'comma_split_credentials');
-      }
-    }
-
-    // 6. Remove credentials in parentheses (Ph.D.), (MD), etc.
+    // 5. Remove credentials in parentheses (Ph.D.), (MD), etc.
     const credInParensPattern = new RegExp(
       `\\(\\s*(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\s*\\)`,
       'gi'
@@ -260,7 +225,7 @@ export class NameEnhanced {
       }
     }
     this.nickname = nicknames.length > 0 ? nicknames.join(' ') : null;
-    textNoNicknames = text.replace(/['"(),\.]/g, ' ').replace(/\s+/g, ' ').trim();
+    textNoNicknames = text.replace(/['"(),]/g, ' ');
 
     // 7. Remove titles/prefixes (Dr, Mr, Mrs, etc.)
     const titlePattern = new RegExp(
@@ -279,25 +244,23 @@ export class NameEnhanced {
     let credentialsRemoved: string[] = [];
     let previousText = textNoNicknames;
     
-    // Build regex pattern for all credentials (case insensitive, word boundaries)
-    // Escape special regex characters and handle periods
+    // Build pattern for credentials as standalone words
+    // Use lookahead/lookbehind to ensure not part of hyphenated names
     const credentialPattern = new RegExp(
-      `\\b(${ALL_CREDENTIALS.map(c => {
-        // Escape special regex chars and make periods optional
-        return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\./g, '\\.?');
-      }).join('|')})\\b`,
+      `(?<![-])\\b(${ALL_CREDENTIALS.map(c => this.escapeRegex(c)).join('|')})\\b(?![-])`,
       'gi'
     );
     
-    // Find and remove all credentials
+    // Find all credentials
     const matches = textNoNicknames.match(credentialPattern);
     if (matches) {
       credentialsRemoved.push(...matches);
+      // Remove all credentials
       textNoNicknames = textNoNicknames.replace(credentialPattern, '').trim();
     }
     
-    // Remove trailing hyphens/dashes/commas that were before credentials
-    textNoNicknames = textNoNicknames.replace(/\s*[,\-\u2013\u2014]\s*$/, '').trim();
+    // Remove trailing hyphens/dashes that were before credentials
+    textNoNicknames = textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim();
     
     // Clean up multiple spaces
     textNoNicknames = textNoNicknames.replace(/\s+/g, ' ').trim();
@@ -460,9 +423,8 @@ export class NameEnhanced {
     let middleParts = parts.slice(1, lastPartIndex);
 
     // Detect last name prefixes (start from the position before the last name)
-    // Only check for prefixes if we have 3+ parts (to avoid false positives like "Ben Brausen")
     let i = lastPartIndex - 1;
-    while (i >= 1 && parts.length >= 3) {
+    while (i >= 1) {
       const candidate = parts[i].toLowerCase();
       const candidate2 = i > 0 ? `${parts[i - 1]} ${parts[i]}`.toLowerCase() : candidate;
 

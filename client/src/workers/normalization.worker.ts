@@ -1,16 +1,14 @@
 /**
  * Web Worker for parallel normalization processing
  * Handles chunks of data in background thread
- * Version: 3.5.2 - Ben Brausen + Meng-Ling fixes
  */
-
-console.log('[Worker v3.5.2] Loaded - Ben prefix fix + hyphen formula fix applied');
 
 // Import normalizers directly (will be bundled by Vite)
 import { NameEnhanced } from '../lib/NameEnhanced';
 import { PhoneEnhanced } from '../../../shared/normalization/phones/PhoneEnhanced';
 import { EmailEnhanced } from '../../../shared/normalization/emails/EmailEnhanced';
 import { AddressFormatter } from '../../../shared/normalization/addresses/AddressFormatter';
+import { LocationNormalizer } from '../../../shared/normalization/locations';
 
 export interface WorkerMessage {
   type: 'process' | 'cancel';
@@ -38,22 +36,21 @@ export interface WorkerResponse {
  * For names, returns an object with fullName, firstName, lastName
  */
 function normalizeValue(type: string, value: string): any {
-  if (!value) return type === 'name' ? { fullName: '', firstName: '', lastName: '' } : '';
+  if (!value) return '';
 
   try {
     switch (type) {
       case 'name': {
         const name = new NameEnhanced(value);
-        if (name.isValid) {
-          // Use only firstName + lastName for Full Name (no middle name, prefix, suffix, or credentials)
-          const cleanFullName = `${name.firstName || ''} ${name.lastName || ''}`.trim();
-          return {
-            fullName: cleanFullName,
-            firstName: name.firstName || '',
-            lastName: name.lastName || ''
-          };
-        }
-        return { fullName: value, firstName: '', lastName: '' };
+        return name.isValid ? name.full : value;
+      }
+      case 'first-name': {
+        const name = new NameEnhanced(value);
+        return name.isValid && name.firstName ? name.firstName : value;
+      }
+      case 'last-name': {
+        const name = new NameEnhanced(value);
+        return name.isValid && name.lastName ? name.lastName : value;
       }
       case 'email': {
         const email = new EmailEnhanced(value);
@@ -61,11 +58,14 @@ function normalizeValue(type: string, value: string): any {
       }
       case 'phone': {
         const phone = PhoneEnhanced.parse(value);
-        return phone.isValid ? phone.digitsOnly : value;
+        return phone.isValid ? phone.e164 : value;
       }
       case 'address': {
         const result = AddressFormatter.normalize(value);
         return result.normalized;
+      }
+      case 'location': {
+        return LocationNormalizer.normalize(value);
       }
       default:
         return value;
@@ -85,46 +85,27 @@ function processChunk(
   return chunk.map((row) => {
     const normalizedRow: any = {};
 
-    // Collect all name column values first
-    const nameColumns = strategy.columns.filter(col => col.type === 'name');
-    
-    if (nameColumns.length > 0) {
-      // Combine all name column values into a single full name for parsing
-      const combinedName = nameColumns
-        .map(col => row[col.name] || '')
-        .filter(val => val.trim())
-        .join(' ')
-        .trim();
-      
-      // Parse the combined name once
-      const nameResult = normalizeValue('name', combinedName);
-      
-      // Apply title case capitalization (capitalize first letter of each name part)
-      const titleCase = (str: string) => {
-        if (!str) return str;
-        // Handle hyphenated names: capitalize after hyphens too
-        return str.split('-').map(part => 
-          part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-        ).join('-');
-      };
-      
-      // Prevent Excel formula interpretation by prefixing with ' if starts with =, +, @
-      // NOTE: Don't prevent hyphens here as they're common in names like "Meng-Ling"
-      const preventFormula = (str: string) => {
-        if (!str) return str;
-        if (/^[=+@]/.test(str)) return `'${str}`;
-        return str;
-      };
-      
-      normalizedRow['Full Name'] = preventFormula(nameResult.fullName.split(' ').map(titleCase).join(' '));
-      normalizedRow['First Name'] = preventFormula(titleCase(nameResult.firstName));
-      normalizedRow['Last Name'] = preventFormula(titleCase(nameResult.lastName));
-    }
-
-    // Process non-name columns
+    // Process each column based on its type
     for (const column of strategy.columns) {
-      if (column.type !== 'name' && column.type !== 'unknown') {
-        normalizedRow[column.name] = normalizeValue(column.type, row[column.name] || '');
+      const value = row[column.name] || '';
+      
+      if (column.type === 'name') {
+        // Full name column - output as-is
+        normalizedRow[column.name] = normalizeValue('name', value);
+      } else if (column.type === 'first-name') {
+        // First name column - output as-is
+        normalizedRow[column.name] = normalizeValue('first-name', value);
+      } else if (column.type === 'last-name') {
+        // Last name column - output as-is
+        normalizedRow[column.name] = normalizeValue('last-name', value);
+      } else if (column.type === 'location') {
+        // Location - split into City and State columns
+        const locationResult = LocationNormalizer.parse(value);
+        normalizedRow['City'] = locationResult.city;
+        normalizedRow['State'] = locationResult.state;
+      } else if (column.type !== 'unknown') {
+        // Other types (email, phone, address, etc.)
+        normalizedRow[column.name] = normalizeValue(column.type, value);
       }
     }
 

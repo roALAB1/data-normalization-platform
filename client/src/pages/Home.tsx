@@ -200,8 +200,8 @@ export default function Home() {
                             { label: 'Middle Name', value: parsedName.middleName },
                             { label: 'Last Name', value: parsedName.lastName },
                             { label: 'Nickname', value: parsedName.nickname },
-                          ].map(({ label, value }) => (
-                            <div key={label} className="grid grid-cols-3 gap-2 text-sm border-t pt-2">
+                          ].map(({ label, value }, idx) => (
+                            <div key={`part-${label}-${idx}`} className="grid grid-cols-3 gap-2 text-sm border-t pt-2">
                               <div className="text-muted-foreground">{label}</div>
                               <div className="col-span-2 font-mono">
                                 {value ? (
@@ -230,8 +230,8 @@ export default function Home() {
                             { label: 'Initials', value: parsedName.initials.join('. ') + '.' },
                             { label: 'Last, First', value: parsedName.format('l, f') },
                             { label: 'LAST, First Middle', value: parsedName.format('L, f m') },
-                          ].map(({ label, value }) => (
-                            <div key={label} className="flex justify-between items-center text-sm border-b pb-2 last:border-0">
+                          ].map(({ label, value }, idx) => (
+                            <div key={`format-${label}-${idx}`} className="flex justify-between items-center text-sm border-b pb-2 last:border-0">
                               <span className="text-muted-foreground">{label}:</span>
                               <span className="font-mono font-semibold">{value}</span>
                             </div>
