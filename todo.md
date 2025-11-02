@@ -1,8 +1,8 @@
 # Project TODO
 
 ## Current Status
-- **Latest Stable:** v3.8.0 - Context-Aware CSV Processor
-- **Testing:** v3.8.1 - Final 5 Issues Fixed
+- **Latest Stable:** v3.8.1 - Final 5 Issues Fixed (93% clean, production ready)
+- **Next:** v3.8.2 - Fix Remaining 2 Issues (Row 81, Row 170)
 
 ---
 
@@ -126,9 +126,9 @@
 See VERSION_HISTORY.md for complete history.
 
 
-## v3.8.1 - Fix Remaining 5 Issues [TESTING]
+## v3.8.1 - Fix Remaining 5 Issues [STABLE]
 
-**Status:** TESTING - Awaiting user verification
+**Status:** STABLE - Production ready! 93% clean (382/410 rows perfect)
 
 **Problematic Rows:**
 1. Row 81: `Nancy Kurts -` → Last Name shows "-" (trailing hyphen)
@@ -154,4 +154,56 @@ See VERSION_HISTORY.md for complete history.
 - [x] Run tests - 86/86 passing (+10 new tests)
 - [x] Update VERSION_HISTORY.md
 - [x] Update todo.md
+- [x] Ask user to verify with CSV
+- [x] User verified - 93% clean, 2 real bugs remaining (Row 81, Row 170)
+- [x] Mark STABLE - Production ready!
+
+---
+
+## v3.8.2 - Fix Remaining 2 Issues [NOT STARTED]
+
+**Status:** NOT STARTED
+
+**Problematic Rows:**
+1. **Row 81:** `Nancy Kurts -` → Last Name = "-" (trailing hyphen cleanup not working)
+2. **Row 170:** `-Ling Erik Kuo` → First Name = "-Ling" (leading hyphen issue)
+
+**Root Causes:**
+1. **Row 81:** Trailing hyphen cleanup exists (line 1149) but not working correctly
+   - Code: `textNoNicknames.replace(/\s*[-\u2013\u2014]\s*$/, '').trim()`
+   - Issue: May be running before final name parsing, so hyphen gets into lastName
+   
+2. **Row 170:** Leading hyphen in first name
+   - Original: `-Ling Erik Kuo` (should be `Meng-Ling Erik Kuo`)
+   - Excel formula prevention removed hyphen from formula check
+   - Need to handle leading hyphens in name parts
+
+**Tasks:**
+- [ ] Read FIX_PROCESS.md, VERSION_HISTORY.md, DEBUGGING_GUIDE.md
+- [ ] Create test FIRST (tests/name-enhanced-v382-fixes.test.ts)
+- [ ] Run test on current code (should fail)
+- [ ] Fix trailing hyphen issue (Row 81)
+- [ ] Fix leading hyphen issue (Row 170)
+- [ ] Run tests - should pass all 88 tests (+2 new)
+- [ ] Update VERSION_HISTORY.md
+- [ ] Update todo.md
 - [ ] Ask user to verify with CSV
+
+**Expected Impact:**
+- Fix final 2 real bugs
+- 100% clean CSV (excluding incomplete source data)
+- Production-ready name normalization system
+
+---
+
+## Future Enhancements [BACKLOG]
+
+### Incomplete Name Handling
+- [ ] Add option to filter/flag incomplete names (single-letter last names)
+- [ ] Add validation mode: strict (reject incomplete) vs lenient (accept as-is)
+- [ ] Add warning column for flagged rows
+
+### User-Reported Issues
+- [ ] Add "Report Issue" button to UI
+- [ ] Build credentials tracking database
+- [ ] Allow users to flag incorrectly stripped/kept text

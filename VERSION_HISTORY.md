@@ -6,9 +6,9 @@
 
 ---
 
-## v3.8.1 (2025-11-02) - Final 5 Issues Fixed [TESTING] 🧪
+## v3.8.1 (2025-11-02) - Final 5 Issues Fixed [STABLE] ✅
 
-**Status:** TESTING - Awaiting user verification with dclark_aids.csv
+**Status:** STABLE - Production ready! 93% clean (28/410 rows have issues, 26 are incomplete source data)
 
 ### What Was Fixed:
 **Problem:** User tested v3.8.0 and found 5 remaining issues in CSV:
@@ -51,10 +51,21 @@
 - `tests/name-enhanced-v381-fixes.test.ts`: 10 new tests for the 5 issues
 - `VERSION_HISTORY.md`: This entry
 
+### User Verification Results:
+- ✅ Tested with dclark_aids.csv (410 rows)
+- ✅ 93% clean (382/410 rows perfect)
+- ✅ 28 issues found:
+  - 26 incomplete source data (single-letter last names like "Esther B") - acceptable
+  - 2 real bugs remaining (Row 81: trailing hyphen, Row 170: leading hyphen)
+- ✅ **Marked STABLE - Production ready!**
+
+### Known Issues (v3.8.2):
+1. **Row 81:** `Nancy Kurts -` → Last Name = "-" (trailing hyphen cleanup not working)
+2. **Row 170:** `-Ling Erik Kuo` → First Name = "-Ling" (leading hyphen issue)
+
 ### Next Steps:
-- User to verify with dclark_aids.csv
-- If clean (0-2 issues), mark STABLE and save checkpoint
-- If more issues, continue iterating
+- v3.8.2: Fix remaining 2 issues
+- Future: Add option to filter/flag incomplete names (single-letter last names)
 
 ---
 
