@@ -85,28 +85,27 @@ function processChunk(
   return chunk.map((row) => {
     const normalizedRow: any = {};
 
-    // Collect all name column values first
-    const nameColumns = strategy.columns.filter(col => col.type === 'name');
-    
-    if (nameColumns.length > 0) {
-      // Combine all name column values into a single full name for parsing
-      const combinedName = nameColumns
-        .map(col => row[col.name] || '')
-        .filter(val => val.trim())
-        .join(' ')
-        .trim();
-      
-      // Parse the combined name once
-      const nameResult = normalizeValue('name', combinedName);
-      normalizedRow['Full Name'] = nameResult.fullName;
-      normalizedRow['First Name'] = nameResult.firstName;
-      normalizedRow['Last Name'] = nameResult.lastName;
-    }
-
-    // Process non-name columns
+    // Process each column based on its type
     for (const column of strategy.columns) {
-      if (column.type !== 'name' && column.type !== 'unknown') {
-        normalizedRow[column.name] = normalizeValue(column.type, row[column.name] || '');
+      const value = row[column.name] || '';
+      
+      if (column.type === 'name') {
+        // Full name column - output as-is
+        normalizedRow[column.name] = normalizeValue('name', value);
+      } else if (column.type === 'first-name') {
+        // First name column - output as-is
+        normalizedRow[column.name] = normalizeValue('first-name', value);
+      } else if (column.type === 'last-name') {
+        // Last name column - output as-is
+        normalizedRow[column.name] = normalizeValue('last-name', value);
+      } else if (column.type === 'location') {
+        // Location - split into City and State columns
+        const locationResult = LocationNormalizer.parse(value);
+        normalizedRow['City'] = locationResult.city;
+        normalizedRow['State'] = locationResult.state;
+      } else if (column.type !== 'unknown') {
+        // Other types (email, phone, address, etc.)
+        normalizedRow[column.name] = normalizeValue(column.type, value);
       }
     }
 

@@ -616,15 +616,14 @@ export default function IntelligentNormalization() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="name">
-                              {mapping.columnName.toLowerCase().includes('first') ? 'First Name' : 
-                               mapping.columnName.toLowerCase().includes('last') ? 'Last Name' : 
-                               'Name (Full Name + First + Last)'}
-                            </SelectItem>
+                            <SelectItem value="name">Full Name</SelectItem>
+                            <SelectItem value="first-name">First Name</SelectItem>
+                            <SelectItem value="last-name">Last Name</SelectItem>
                             <SelectItem value="email">Email</SelectItem>
                             <SelectItem value="phone">Phone</SelectItem>
                             <SelectItem value="address">Address</SelectItem>
                             <SelectItem value="company">Company</SelectItem>
+                            <SelectItem value="location">Location (City, State)</SelectItem>
                             <SelectItem value="city">City</SelectItem>
                             <SelectItem value="state">State</SelectItem>
                             <SelectItem value="zip">ZIP Code</SelectItem>
@@ -926,10 +925,16 @@ export default function IntelligentNormalization() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.3.0</span>
+          <span>v3.6.1</span>
+          <span>•</span>
+          <Link href="/changelog">
+            <a className="hover:text-foreground transition-colors cursor-pointer">
+              Changelog
+            </a>
+          </Link>
           <span>•</span>
           <a
-            href="https://github.com/roALAB1/data-normalization-platform"
+            href="https://github.com/roALAB1/data-normalization-platform#readme"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 hover:text-foreground transition-colors"

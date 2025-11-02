@@ -24,25 +24,70 @@ const COUNTRY_PATTERNS = [
   /,?\s*us$/i
 ];
 
+export interface LocationResult {
+  city: string;
+  state: string;
+  original: string;
+}
+
 export class LocationNormalizer {
-  static normalize(location: string): string {
-    if (!location) return '';
+  /**
+   * Parse location string and return separate city and state
+   * Input: "Los Angeles, California, United States"
+   * Output: { city: "Los Angeles", state: "CA", original: "..." }
+   */
+  static parse(location: string): LocationResult {
+    if (!location) return { city: '', state: '', original: location };
+    
+    // Remove country
     let normalized = location.trim();
     for (const pattern of COUNTRY_PATTERNS) {
       normalized = normalized.replace(pattern, '');
     }
+    
+    // Split by comma
     const parts = normalized.split(',').map(p => p.trim()).filter(p => p);
-    if (parts.length === 0) return '';
-    if (parts.length === 1) return parts[0];
+    
+    if (parts.length === 0) {
+      return { city: '', state: '', original: location };
+    }
+    
+    if (parts.length === 1) {
+      // Only one part - could be city or state
+      return { city: parts[0], state: '', original: location };
+    }
+    
+    // Last part is likely the state
     const lastPart = parts[parts.length - 1];
     const stateLower = lastPart.toLowerCase();
+    
+    // Check if it's already a 2-letter abbreviation
+    let stateAbbr = '';
     if (lastPart.length === 2 && lastPart === lastPart.toUpperCase()) {
-      return parts.join(', ');
+      stateAbbr = lastPart;
+    } else {
+      // Try to find abbreviation
+      stateAbbr = STATE_ABBREVIATIONS[stateLower] || lastPart;
     }
-    const stateAbbr = STATE_ABBREVIATIONS[stateLower];
-    if (stateAbbr) {
-      parts[parts.length - 1] = stateAbbr;
-    }
-    return parts.join(', ');
+    
+    // Everything before the last part is the city
+    const city = parts.slice(0, -1).join(', ');
+    
+    return {
+      city,
+      state: stateAbbr,
+      original: location
+    };
+  }
+  
+  /**
+   * Legacy method for backward compatibility
+   * Returns "City, ST" format
+   */
+  static normalize(location: string): string {
+    const result = this.parse(location);
+    if (!result.city && !result.state) return '';
+    if (!result.state) return result.city;
+    return `${result.city}, ${result.state}`;
   }
 }

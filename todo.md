@@ -732,3 +732,18 @@
 
 ## React Duplicate Key Warnings (v3.6.0)
 - [x] Fix duplicate key warnings in IntelligentNormalization table (headers and cells with duplicate column names)
+
+
+## Critical Fixes (v3.6.1)
+- [x] Fix dropdown labels - now shows "Full Name", "First Name", "Last Name" clearly
+- [x] Fix name column output - worker now processes first-name and last-name types correctly
+- [x] Split location into TWO separate columns: City and State (LocationNormalizer.parse() returns separate fields)
+
+
+## v3.6.1 Updates (In Progress)
+- [x] Update GitHub link in app footer to point to proper README/documentation section
+- [x] Update version number to v3.6.1 in package.json and app footer
+- [ ] Add Changelog tab to app to display version history
+
+## Future Features (Not Immediate Priority)
+- [ ] Manual filter parameter suggestions - Allow users to suggest/add custom normalization rules for system learning
