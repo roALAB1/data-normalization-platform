@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.13.4 🚀
+
+**Critical Normalization Fixes** ✅  
+Fixed three critical issues: (1) Middle initials now properly removed from First/Last names ("Jennifer R." → "Jennifer"), (2) Location columns split into Personal City + Personal State with state abbreviations ("Durham, North Carolina" → City: "Durham", State: "NC"), (3) Full Name column removal verified working. All 139 tests passing. Production ready!
+
 ### What's New in v3.9.1 🚀
 
 **Bug Report System** 🐛  

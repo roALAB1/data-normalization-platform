@@ -318,8 +318,8 @@ export default function IntelligentNormalization() {
   const handleDownload = async () => {
     if (allResults.length === 0) return;
 
-    // Use actual data keys from first result row instead of column mappings
-    const headers = Object.keys(allResults[0]);
+    // Use actual data keys from first result row, filtering out ghost columns (_1, _2, _3)
+    const headers = Object.keys(allResults[0]).filter(h => !h.match(/^_\d+$/));
     
     const downloader = new ProgressiveDownloader({
       filename: `normalized_${file?.name || "data.csv"}`,
@@ -381,9 +381,8 @@ export default function IntelligentNormalization() {
               </p>
             </div>
 
-            {/* Feature Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {/* Names */}
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">            {/* Names */}
               <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <User className="h-6 w-6 text-indigo-600" />
@@ -633,42 +632,94 @@ export default function IntelligentNormalization() {
 
                 {/* Preview Transformations */}
                 {columnMappings.length > 0 && (
-                  <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
-                    <h4 className="font-semibold text-sm mb-3 text-indigo-900">Preview Transformations</h4>
-                    <div className="space-y-2 text-sm">
-                      {columnMappings.slice(0, 4).map((mapping, idx) => {
+                  <div className="mt-6 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                    <h4 className="font-semibold text-base mb-4 text-indigo-900">Preview Transformations</h4>
+                    <div className="space-y-3 text-sm">
+                      {columnMappings.map((mapping, idx) => {
                         const type = mapping.overrideType || mapping.detectedType;
-                        let preview = '';
+                        let preview = null;
                         
                         if (type === 'name') {
-                          preview = `${mapping.columnName} → First Name + Last Name (credentials stripped)`;
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">Dr. John Smith, PhD</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">First Name: John, Last Name: Smith</span>
+                              </div>
+                            </div>
+                          );
                         } else if (type === 'first_name') {
-                          preview = `${mapping.columnName} → First Name (normalized)`;
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">jOhN R.</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">John</span>
+                              </div>
+                            </div>
+                          );
                         } else if (type === 'last_name') {
-                          preview = `${mapping.columnName} → Last Name (normalized)`;
-                        } else if (type === 'email') {
-                          preview = `${mapping.columnName} → Email (lowercase, normalized)`;
-                        } else if (type === 'phone') {
-                          preview = `${mapping.columnName} → Phone (digits only)`;
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">SMITH, PhD</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">Smith</span>
+                              </div>
+                            </div>
+                          );
                         } else if (type === 'location') {
-                          preview = `${mapping.columnName} → Personal City + Personal State`;
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">Durham, North Carolina, United States</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">Personal City: Durham, Personal State: NC</span>
+                              </div>
+                            </div>
+                          );
+                        } else if (type === 'email') {
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">John.Smith@GMAIL.COM</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">johnsmith@gmail.com</span>
+                              </div>
+                            </div>
+                          );
+                        } else if (type === 'phone') {
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">(415) 555-1234</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">+1 415-555-1234</span>
+                              </div>
+                            </div>
+                          );
                         } else if (type === 'address') {
-                          preview = `${mapping.columnName} → Address (title case, abbreviated)`;
-                        } else {
-                          preview = `${mapping.columnName} → ${type} (normalized)`;
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">123 MAIN STREET</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">123 Main St</span>
+                              </div>
+                            </div>
+                          );
                         }
                         
-                        return (
-                          <div key={`preview-${idx}`} className="text-indigo-700">
-                            • {preview}
-                          </div>
-                        );
+                        return preview;
                       })}
-                      {columnMappings.length > 4 && (
-                        <div className="text-indigo-600 text-xs italic">
-                          + {columnMappings.length - 4} more columns...
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
@@ -756,6 +807,83 @@ export default function IntelligentNormalization() {
         {/* Results Section */}
         {results.length > 0 && stats && (
           <div className="space-y-6">
+            {/* Column Transformations Applied */}
+            <div>
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-lg p-4">
+                <h3 className="text-white font-semibold text-lg">Column Transformations Applied</h3>
+              </div>
+              <div className="bg-white rounded-b-lg border border-t-0 border-gray-200 p-6 space-y-4">
+                {columnMappings.map((mapping, idx) => {
+                  const type = mapping.overrideType || mapping.detectedType;
+                  let transformation = null;
+                  
+                  if (type === 'name') {
+                    transformation = (
+                      <div key={idx} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">{mapping.columnName}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-indigo-600 font-medium">Full Name + First Name + Last Name</span>
+                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">split</span>
+                          </div>
+                          <p className="text-sm text-gray-600">Split and normalize into Full Name, First Name, and Last Name</p>
+                        </div>
+                        <div className="text-green-500 mt-1 text-xl">✓</div>
+                      </div>
+                    );
+                  } else if (type === 'first_name') {
+                    transformation = (
+                      <div key={idx} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">{mapping.columnName}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-indigo-600 font-medium">Full Name + First Name + Last Name</span>
+                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">split</span>
+                          </div>
+                          <p className="text-sm text-gray-600">Split and normalize into Full Name, First Name, and Last Name</p>
+                        </div>
+                        <div className="text-green-500 mt-1 text-xl">✓</div>
+                      </div>
+                    );
+                  } else if (type === 'last_name') {
+                    transformation = (
+                      <div key={idx} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">{mapping.columnName}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-indigo-600 font-medium">Full Name + First Name + Last Name</span>
+                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">split</span>
+                          </div>
+                          <p className="text-sm text-gray-600">Split and normalize into Full Name, First Name, and Last Name</p>
+                        </div>
+                        <div className="text-green-500 mt-1 text-xl">✓</div>
+                      </div>
+                    );
+                  } else if (type === 'location') {
+                    transformation = (
+                      <div key={idx} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">{mapping.columnName}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-indigo-600 font-medium">Personal City + Personal State</span>
+                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">split</span>
+                          </div>
+                          <p className="text-sm text-gray-600">Split location into Personal City and Personal State</p>
+                        </div>
+                        <div className="text-green-500 mt-1 text-xl">✓</div>
+                      </div>
+                    );
+                  }
+                  
+                  return transformation;
+                })}
+              </div>
+            </div>
+
             {/* Statistics */}
             <div className="grid grid-cols-4 gap-4">
               <Card>
@@ -828,7 +956,7 @@ export default function IntelligentNormalization() {
                     <thead>
                       <tr className="border-b">
                         <th className="text-left p-2 font-medium">#</th>
-                        {Object.keys(results[0].normalizedRow).map((header, idx) => (
+                        {Object.keys(results[0].normalizedRow).filter(h => !h.match(/^_\d+$/)).map((header, idx) => (
                           <th key={`header-${header}-${idx}`} className="text-left p-2 font-medium">
                             {header}
                           </th>
@@ -840,7 +968,7 @@ export default function IntelligentNormalization() {
                       {results.slice(0, 100).map((result) => (
                         <tr key={result.rowIndex} className="border-b hover:bg-gray-50">
                           <td className="p-2 text-gray-500">{result.rowIndex + 1}</td>
-                          {Object.keys(result.normalizedRow).map((header, idx) => (
+                          {Object.keys(result.normalizedRow).filter(h => !h.match(/^_\d+$/)).map((header, idx) => (
                             <td key={`cell-${result.rowIndex}-${header}-${idx}`} className="p-2">
                               {result.normalizedRow[header]}
                             </td>

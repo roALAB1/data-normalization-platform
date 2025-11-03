@@ -164,5 +164,35 @@
 - Update all docs (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS, todo.md)
 - Ask user to verify before saving checkpoint
 - Push to GitHub after checkpoint is verified
-- Use GitHub token: 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
-- Username: roALAB1
+- GitHub credentials configured via git config
+
+
+## v3.13.5 - Hero Section + Ghost Numbers Fix (COMPLETED ✅)
+
+**Status:** COMPLETED - Ready for checkpoint
+
+**Issues Fixed:**
+- [x] Hero section missing (was removed during rollback)
+- [x] Ghost numbers (_1, _2, _3) appearing in output columns
+
+**Solutions Applied:**
+1. ✅ Added hero section with enrichment features (Names, Emails, Phones, Addresses)
+2. ✅ Enhanced Preview Transformations section with actual sample data
+3. ✅ Added Column Transformations Applied section (post-normalization)
+4. ✅ Filtered ghost columns (_1, _2, _3) from CSV download using regex `/^_\d+$/`
+5. ✅ Filtered ghost columns from results table headers and cells
+
+**Tasks:**
+- [x] Add hero section explaining enrichment transformations
+- [x] Enhance Preview Transformations with sample data
+- [x] Add Column Transformations Applied section
+- [x] Fix ghost numbers in CSV download
+- [x] Fix ghost numbers in results table
+- [x] Update todo.md
+- [ ] Update VERSION_HISTORY.md, DEBUGGING_GUIDE.md
+- [ ] Create checkpoint v3.13.5
+- [ ] Push to GitHub
+
+**Files Modified:**
+- `client/src/pages/IntelligentNormalization.tsx` - Hero section, transformations display, ghost column filtering
+
