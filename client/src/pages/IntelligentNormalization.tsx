@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2 } from "lucide-react";
+import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2, Trash2 } from "lucide-react";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
 import { useState, useRef } from "react";
 import { Link } from "wouter";
@@ -38,8 +38,8 @@ function detectColumnType(columnName: string, samples: string[]): { type: string
   if (name.includes('email') || name.includes('e-mail')) return { type: 'email', confidence: 95 };
   if (name.includes('phone') || name.includes('tel') || name.includes('mobile')) return { type: 'phone', confidence: 95 };
   if (name.includes('address') || name.includes('street')) return { type: 'address', confidence: 90 };
-  if (name.includes('first') && name.includes('name')) return { type: 'first-name', confidence: 90 };
-  if (name.includes('last') && name.includes('name')) return { type: 'last-name', confidence: 90 };
+  if (name.includes('first') && name.includes('name')) return { type: 'first_name', confidence: 90 };
+  if (name.includes('last') && name.includes('name')) return { type: 'last_name', confidence: 90 };
   if (name.includes('name')) return { type: 'name', confidence: 85 };
   if (name.includes('location')) return { type: 'location', confidence: 95 };
   if (name.includes('city')) return { type: 'city', confidence: 95 };
@@ -118,7 +118,7 @@ export default function IntelligentNormalization() {
         throw new Error("CSV file must have at least a header and one data row");
       }
 
-      const headers = lines[0].split(",").map((h) => h.trim());
+      const headers = lines[0].split(",").map((h) => h.trim()).filter(h => h.length > 0);
       const sampleRows = lines.slice(1, Math.min(6, lines.length));
       const samples: Record<string, string[]> = {};
       
@@ -318,7 +318,8 @@ export default function IntelligentNormalization() {
   const handleDownload = async () => {
     if (allResults.length === 0) return;
 
-    const headers = columnMappings.map(m => m.columnName);
+    // Use actual data keys from first result row instead of column mappings
+    const headers = Object.keys(allResults[0]);
     
     const downloader = new ProgressiveDownloader({
       filename: `normalized_${file?.name || "data.csv"}`,
@@ -590,6 +591,16 @@ export default function IntelligentNormalization() {
                       </div>
                       <div className="flex items-center gap-3">
                         {getConfidenceBadge(mapping.confidence)}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            setColumnMappings(prev => prev.filter((_, i) => i !== idx));
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                         <Select
                           value={mapping.overrideType || mapping.detectedType}
                           onValueChange={(value) =>
@@ -601,6 +612,8 @@ export default function IntelligentNormalization() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="name">Name</SelectItem>
+                            <SelectItem value="first_name">First Name</SelectItem>
+                            <SelectItem value="last_name">Last Name</SelectItem>
                             <SelectItem value="email">Email</SelectItem>
                             <SelectItem value="phone">Phone</SelectItem>
                             <SelectItem value="address">Address</SelectItem>
@@ -608,6 +621,7 @@ export default function IntelligentNormalization() {
                             <SelectItem value="city">City</SelectItem>
                             <SelectItem value="state">State</SelectItem>
                             <SelectItem value="zip">ZIP Code</SelectItem>
+                            <SelectItem value="location">Location</SelectItem>
                             <SelectItem value="country">Country</SelectItem>
                             <SelectItem value="unknown">Unknown</SelectItem>
                           </SelectContent>
@@ -616,6 +630,48 @@ export default function IntelligentNormalization() {
                     </div>
                   ))}
                 </div>
+
+                {/* Preview Transformations */}
+                {columnMappings.length > 0 && (
+                  <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                    <h4 className="font-semibold text-sm mb-3 text-indigo-900">Preview Transformations</h4>
+                    <div className="space-y-2 text-sm">
+                      {columnMappings.slice(0, 4).map((mapping, idx) => {
+                        const type = mapping.overrideType || mapping.detectedType;
+                        let preview = '';
+                        
+                        if (type === 'name') {
+                          preview = `${mapping.columnName} → First Name + Last Name (credentials stripped)`;
+                        } else if (type === 'first_name') {
+                          preview = `${mapping.columnName} → First Name (normalized)`;
+                        } else if (type === 'last_name') {
+                          preview = `${mapping.columnName} → Last Name (normalized)`;
+                        } else if (type === 'email') {
+                          preview = `${mapping.columnName} → Email (lowercase, normalized)`;
+                        } else if (type === 'phone') {
+                          preview = `${mapping.columnName} → Phone (digits only)`;
+                        } else if (type === 'location') {
+                          preview = `${mapping.columnName} → Personal City + Personal State`;
+                        } else if (type === 'address') {
+                          preview = `${mapping.columnName} → Address (title case, abbreviated)`;
+                        } else {
+                          preview = `${mapping.columnName} → ${type} (normalized)`;
+                        }
+                        
+                        return (
+                          <div key={`preview-${idx}`} className="text-indigo-700">
+                            • {preview}
+                          </div>
+                        );
+                      })}
+                      {columnMappings.length > 4 && (
+                        <div className="text-indigo-600 text-xs italic">
+                          + {columnMappings.length - 4} more columns...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex gap-3 mt-6">
                   <Button onClick={handleProcess} className="flex-1">
@@ -843,7 +899,7 @@ export default function IntelligentNormalization() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.10.0</span>
+          <span>v3.13.3</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"
