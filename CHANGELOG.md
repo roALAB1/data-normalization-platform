@@ -1,5 +1,41 @@
 # Changelog
 
+## [3.13.5] - 2025-01-XX - STABLE
+
+### Added - Hero Section + UI Enhancements
+- **Hero Section**: Enterprise-scale data normalization feature showcase
+  - 4 feature cards: Names, Emails, Phone Numbers, Addresses
+  - Key capabilities listed for each data type
+  - Before/after transformation examples
+- **Enhanced Preview Transformations**: Shows actual sample data before normalization
+  - Name: "Dr. John Smith, PhD" → "First Name: John, Last Name: Smith"
+  - First Name: "jOhN R." → "John"
+  - Last Name: "SMITH, PhD" → "Smith"
+  - Location: "Durham, North Carolina, United States" → "Personal City: Durham, Personal State: NC"
+  - Purple gradient background with indigo accents
+- **Column Transformations Applied**: Post-normalization summary section
+  - Collapsible section with purple gradient header
+  - Shows which columns were transformed and how
+  - Split badges for columns generating multiple outputs
+  - Green checkmarks for completed transformations
+
+### Fixed - Ghost Columns
+- **CSV Download**: Filtered ghost columns (_1, _2, _3) from CSV headers using regex `/^_\d+$/`
+- **Results Table**: Filtered ghost columns from table headers and cells
+- **Cleaner Output**: No more empty column artifacts in exported data
+
+### Changed
+- Professional UI with purple/indigo color scheme for transformations
+- Better user guidance with feature cards and examples
+- Improved visualization of data transformations
+
+### Technical Details
+- All 139 tests passing
+- Ghost column regex filter: `/^_\d+$/`
+- Applied to 3 locations: CSV download (line 322), table headers (line 959), table cells (line 971)
+
+---
+
 ## [3.13.4] - 2025-01-XX - STABLE
 
 ### Fixed - Critical Normalization Issues

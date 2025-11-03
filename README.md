@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.13.5 🚀
+
+**Hero Section + Ghost Numbers Fix** ✨  
+Enhanced UI with enrichment features display and cleaner CSV output. Added hero section showing enrichment capabilities (Names, Emails, Phones, Addresses), enhanced transformation previews with sample data, post-normalization "Column Transformations Applied" section. Fixed ghost columns (_1, _2, _3) filtered from CSV output and results table. All 139 tests passing. Production ready!
+
 ### What's New in v3.13.4 🚀
 
 **Critical Normalization Fixes** ✅  
