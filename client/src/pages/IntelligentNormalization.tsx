@@ -546,7 +546,7 @@ export default function IntelligentNormalization() {
               {/* Bottom CTA */}
               <div className="mt-8 text-center">
                 <p className="text-white text-sm">
-                  ✨ Ready for Apollo.io, ZoomInfo, Clearbit, and other enrichment tools
+                  ✨ Ready for enrichment in AudienceLab
                 </p>
               </div>
             </div>
