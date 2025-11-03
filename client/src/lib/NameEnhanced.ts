@@ -1360,12 +1360,16 @@ export interface ParseResult {
     while (i >= 1) {
       const candidate = parts[i].toLowerCase();
       const candidate2 = i > 0 ? `${parts[i - 1]} ${parts[i]}`.toLowerCase() : candidate;
+      
+      // v3.13.4: Skip single-letter initials (A, B, etc.) - they're middle initials, not last name prefixes
+      // Only treat as last name prefix if it's 2+ letters (e.g., "de", "van", "al")
+      const isSingleLetterInitial = parts[i].length === 1;
 
       if (LAST_NAME_PREFIXES.includes(candidate2 as any)) {
         lastNameParts = [...parts.slice(i - 1, i + 1), ...lastNameParts];
         middleParts = parts.slice(1, i - 1);
         i -= 1;
-      } else if (LAST_NAME_PREFIXES.includes(candidate as any)) {
+      } else if (!isSingleLetterInitial && LAST_NAME_PREFIXES.includes(candidate as any)) {
         lastNameParts = [parts[i], ...lastNameParts];
         middleParts = parts.slice(1, i);
       } else {
@@ -1375,7 +1379,17 @@ export interface ParseResult {
     }
 
     this.lastName = this.toTitleCase(lastNameParts.join(' '));
-    this.middleName = middleParts.length > 0 ? middleParts.join(' ') : null;
+    
+    // v3.13.4: Filter out single-letter middle initials (A., B., etc.)
+    // Only keep middle names that are full words (2+ letters without trailing period)
+    const filteredMiddleParts = middleParts.filter(part => {
+      // Remove trailing period for checking
+      const withoutPeriod = part.replace(/\.$/, '');
+      // Keep only if it's 2+ letters (full middle name, not initial)
+      return withoutPeriod.length >= 2;
+    });
+    
+    this.middleName = filteredMiddleParts.length > 0 ? filteredMiddleParts.join(' ') : null;
     
     // Assign generational suffix if detected (combine with credential suffix if both exist)
     if (suffixPart) {
