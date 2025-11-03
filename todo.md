@@ -340,3 +340,27 @@ See VERSION_HISTORY.md for complete history.
 - Shows input → output examples
 - Highlights key requirements (title case, credential stripping, etc.)
 - Positioned prominently on homepage
+
+
+## v3.12.0 - Bug Fixes: Dropdown, Preview, Location Splitting
+
+**Status:** COMPLETE
+
+**Reported Issues:**
+1. [x] Dropdown missing "First Name", "Last Name", "Location" options
+2. [x] Preview transformation display missing above "Normalize All Columns" button
+3. [x] Location column not split into "Personal City" and "Personal State"
+
+**Requirements:**
+- Dropdown should show: Name, Email, Phone, Address, Company, City, State, ZIP Code, Country, First Name, Last Name, Location, Unknown
+- Preview should show sample transformations for each detected column before normalization
+- Location input (e.g., "Durham, North Carolina, United States") should split into:
+  - Personal City: "Durham"
+  - Personal State: "North Carolina" (or "NC" if abbreviation detected)
+  - Country: Dropped (not needed for enrichment)
+
+**Files to Fix:**
+- client/src/pages/IntelligentNormalization.tsx - Add missing dropdown options
+- client/src/pages/IntelligentNormalization.tsx - Restore preview transformation display
+- client/src/lib/contextAwareExecutor.ts - Add location splitting logic
+- shared/normalization/intelligent/DataTypeDetector.ts - Ensure location detection works

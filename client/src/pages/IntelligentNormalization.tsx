@@ -772,6 +772,8 @@ export default function IntelligentNormalization() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="name">Name</SelectItem>
+                            <SelectItem value="first_name">First Name</SelectItem>
+                            <SelectItem value="last_name">Last Name</SelectItem>
                             <SelectItem value="email">Email</SelectItem>
                             <SelectItem value="phone">Phone</SelectItem>
                             <SelectItem value="address">Address</SelectItem>
@@ -779,6 +781,7 @@ export default function IntelligentNormalization() {
                             <SelectItem value="city">City</SelectItem>
                             <SelectItem value="state">State</SelectItem>
                             <SelectItem value="zip">ZIP Code</SelectItem>
+                            <SelectItem value="location">Location</SelectItem>
                             <SelectItem value="country">Country</SelectItem>
                             <SelectItem value="unknown">Unknown</SelectItem>
                           </SelectContent>
@@ -787,6 +790,53 @@ export default function IntelligentNormalization() {
                     </div>
                   ))}
                 </div>
+
+                {/* Preview Transformation Examples */}
+                {columnMappings.length > 0 && (
+                  <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3">Preview Transformations</h4>
+                    <div className="space-y-2">
+                      {columnMappings.slice(0, 3).map((mapping, idx) => {
+                        const type = mapping.overrideType || mapping.detectedType;
+                        let example = { input: '', output: '' };
+                        
+                        // Generate example based on type
+                        if (type === 'name') {
+                          example = { input: 'Dr. John Smith, PhD', output: 'First Name: John, Last Name: Smith' };
+                        } else if (type === 'first_name') {
+                          example = { input: 'jOhN R.', output: 'John' };
+                        } else if (type === 'last_name') {
+                          example = { input: 'SMITH, PhD', output: 'Smith' };
+                        } else if (type === 'email') {
+                          example = { input: 'John.Smith@GMAIL.COM', output: 'johnsmith@gmail.com' };
+                        } else if (type === 'phone') {
+                          example = { input: '(718) 496-9400', output: '+17184969400' };
+                        } else if (type === 'address') {
+                          example = { input: '123 main street', output: '123 Main St' };
+                        } else if (type === 'city') {
+                          example = { input: 'los angeles', output: 'Los Angeles' };
+                        } else if (type === 'state') {
+                          example = { input: 'California', output: 'CA' };
+                        } else if (type === 'location') {
+                          example = { input: 'Durham, North Carolina, United States', output: 'Personal City: Durham, Personal State: NC' };
+                        } else if (type === 'company') {
+                          example = { input: 'ACME CORP', output: 'Acme Corp' };
+                        }
+                        
+                        if (!example.input) return null;
+                        
+                        return (
+                          <div key={`preview-${idx}`} className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-gray-700 min-w-[120px]">{mapping.columnName}:</span>
+                            <span className="text-gray-500">{example.input}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-indigo-600 font-medium">{example.output}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex gap-3 mt-6">
                   <Button onClick={handleProcess} className="flex-1">
@@ -1014,7 +1064,7 @@ export default function IntelligentNormalization() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.10.0</span>
+          <span>v3.11.0</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"

@@ -247,6 +247,39 @@ export class IntelligentBatchProcessor {
                   const split = nameSplitter.split(value);
                   splitName = { firstName: split.firstName, lastName: split.lastName };
                   // v3.10.0: Don't add "Name" column to output (only output First Name + Last Name)
+                } else if (detection.detectedType === 'location') {
+                  // v3.12.0: Split location into Personal City and Personal State
+                  const parts = value.split(',').map((p: string) => p.trim());
+                  
+                  if (parts.length >= 2) {
+                    // First part is city
+                    const city = parts[0];
+                    normalizedRow['Personal City'] = city.split(' ').map((w: string) => 
+                      w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+                    ).join(' ');
+                    
+                    // Second part is state
+                    const state = parts[1];
+                    if (state.length === 2) {
+                      normalizedRow['Personal State'] = state.toUpperCase();
+                    } else {
+                      const stateAbbreviations: Record<string, string> = {
+                        'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
+                        'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE', 'florida': 'FL', 'georgia': 'GA',
+                        'hawaii': 'HI', 'idaho': 'ID', 'illinois': 'IL', 'indiana': 'IN', 'iowa': 'IA',
+                        'kansas': 'KS', 'kentucky': 'KY', 'louisiana': 'LA', 'maine': 'ME', 'maryland': 'MD',
+                        'massachusetts': 'MA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS', 'missouri': 'MO',
+                        'montana': 'MT', 'nebraska': 'NE', 'nevada': 'NV', 'new hampshire': 'NH', 'new jersey': 'NJ',
+                        'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC', 'north dakota': 'ND', 'ohio': 'OH',
+                        'oklahoma': 'OK', 'oregon': 'OR', 'pennsylvania': 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
+                        'south dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT', 'vermont': 'VT',
+                        'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV', 'wisconsin': 'WI', 'wyoming': 'WY'
+                      };
+                      const stateLower = state.toLowerCase();
+                      normalizedRow['Personal State'] = stateAbbreviations[stateLower] || state.toUpperCase();
+                    }
+                  }
+                  // Don't add original location column to output
                 } else if (detection.detectedType === 'first_name') {
                   // First name - normalize and store
                   const name = new NameEnhanced(value);
