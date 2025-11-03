@@ -317,3 +317,26 @@ See VERSION_HISTORY.md for complete history.
 
 **Design Reference:** See `ENRICHMENT_REQUIREMENTS.md` for full requirements
 
+
+
+## v3.11.0 - Enrichment Requirements Hero Section [COMPLETE]
+
+**Status:** COMPLETE - Production ready
+
+**Goal:** Add hero section to homepage displaying enrichment normalization requirements in aesthetically pleasing format
+
+**Features:**
+- [x] Read enrichment requirements PDF document
+- [x] Extract normalization rules and requirements
+- [x] Design hero section with requirements table/cards
+- [x] Implement aesthetically pleasing layout above upload section
+- [x] Show users what normalization will do before they upload
+- [x] Test on homepage
+- [x] Update documentation
+
+**Design Principles:**
+- Clean, modern design matching existing UI
+- Easy to scan and understand
+- Shows input → output examples
+- Highlights key requirements (title case, credential stripping, etc.)
+- Positioned prominently on homepage

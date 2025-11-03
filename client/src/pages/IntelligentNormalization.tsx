@@ -380,6 +380,177 @@ export default function IntelligentNormalization() {
               </p>
             </div>
 
+            {/* Enrichment Requirements Section */}
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 mb-12 shadow-xl">
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-white mb-3">
+                  Enrichment-Ready Output Format
+                </h3>
+                <p className="text-indigo-100 text-lg">
+                  Our normalization engine automatically formats your data to match enrichment tool requirements
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* First Name */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <User className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">First Name</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-indigo-100 mb-4">
+                    <li>• Title case (John, not JOHN)</li>
+                    <li>• No middle initials</li>
+                    <li>• No punctuation</li>
+                  </ul>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">jOhN R.</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">John</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">mARY</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">Mary</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Last Name */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <User className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">Last Name</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-indigo-100 mb-4">
+                    <li>• Title case (Smith, not SMITH)</li>
+                    <li>• No suffixes (Jr, Sr, III)</li>
+                    <li>• No credentials (PhD, MD)</li>
+                  </ul>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">o'connor</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">O'Connor</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">SMITH, PhD</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">Smith</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">Address</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-indigo-100 mb-4">
+                    <li>• USPS abbreviations (St, Ave)</li>
+                    <li>• Title case each word</li>
+                    <li>• No extra spaces/commas</li>
+                  </ul>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">123 main street</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">123 Main St</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">45 elm boulevard</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">45 Elm Blvd</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* City */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">City</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-indigo-100 mb-4">
+                    <li>• Title case</li>
+                    <li>• Multi-word capitalization</li>
+                    <li>• Consistent formatting</li>
+                  </ul>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">los angeles</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">Los Angeles</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">new york</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">New York</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* State & ZIP */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">State & ZIP</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-indigo-100 mb-4">
+                    <li>• 2-letter USPS codes (CA, TX)</li>
+                    <li>• 5-digit ZIP only</li>
+                    <li>• Strip ZIP+4 extensions</li>
+                  </ul>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">California</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">CA</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">90210-1234</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">90210</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Phone className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">Phone</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-indigo-100 mb-4">
+                    <li>• E.164 format (+1...)</li>
+                    <li>• No spaces/punctuation</li>
+                    <li>• Multiple with comma-space</li>
+                  </ul>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">(718) 496-9400</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">+17184969400</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-red-300">646-555-0199</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">+16465550199</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom CTA */}
+              <div className="mt-8 text-center">
+                <p className="text-white text-sm">
+                  ✨ Ready for Apollo.io, ZoomInfo, Clearbit, and other enrichment tools
+                </p>
+              </div>
+            </div>
+
             {/* Feature Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               {/* Names */}
