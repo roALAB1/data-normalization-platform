@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.10.0 🚀
+
+**Simplified Output Schema (Enrichment-Ready Format)** 🎯  
+Output now simplified to only **First Name** and **Last Name** columns (no Full Name, Middle Name, or Suffix) to match enrichment tool requirements (Apollo.io, ZoomInfo, Clearbit, etc.). System automatically derives First/Last from any name input, maintains title case conversion, and strips all 770+ credentials. All 124 tests passing.
+
 ### What's New in v3.9.1 🚀
 
 **Bug Report System** 🐛  
