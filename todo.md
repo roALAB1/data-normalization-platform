@@ -280,3 +280,40 @@ See VERSION_HISTORY.md for complete history.
 6. User clicks "Submit Report"
 7. Success toast appears, dialog closes
 8. Report saved to database via tRPC API
+
+
+## v3.10.0 - Simplified Output Schema (Enrichment-Ready) [IN PROGRESS]
+
+**Status:** IN PROGRESS - Following FIX_PROCESS.md
+
+**Goal:** Output ONLY First Name + Last Name (matching enrichment tool requirements)
+
+**Problem:** Current output includes Full Name, Middle Name, Suffix which enrichment tool doesn't need
+
+**Solution:**
+- Remove Full Name, Middle Name, Suffix from output columns
+- Output only: `First Name`, `Last Name`
+- Use Full Name internally for parsing context
+- Strip all credentials, titles, suffixes automatically
+- Match ENRICHMENT_REQUIREMENTS.md schema exactly
+
+**Tasks:**
+- [x] Read all required docs (FIX_PROCESS, VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS)
+- [ ] Create tests for simplified schema (First Name + Last Name only)
+- [ ] Run tests on current code (should fail)
+- [ ] Update normalization engine to output only First Name + Last Name
+- [ ] Run tests again (should pass)
+- [ ] Update UI to show only First Name + Last Name columns
+- [ ] Test with user's CSV file (dclark_aids.csv)
+- [ ] Update documentation (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS, todo.md)
+- [ ] Ask user to verify before checkpoint
+
+**Enrichment Tool Compliance:**
+- ✅ First Name: Title case, no middle initials, no punctuation
+- ✅ Last Name: Title case, no middle initials, no punctuation
+- ✅ Remove Full Name from output (use internally only)
+- ✅ Remove Middle Name from output
+- ✅ Remove Suffix from output
+
+**Design Reference:** See `ENRICHMENT_REQUIREMENTS.md` for full requirements
+

@@ -791,13 +791,13 @@ export default function IntelligentNormalization() {
                           ))}
                           <td className="p-2">
                             <ReportIssueButton
-                              originalInput={result.originalRow['Full Name'] || Object.values(result.originalRow).join(' ')}
+                              originalInput={Object.values(result.originalRow).join(' ')}
                               actualOutput={{
-                                full: result.normalizedRow['Full Name'] || null,
+                                full: null, // v3.10.0: Full name no longer in output
                                 first: result.normalizedRow['First Name'] || null,
-                                middle: result.normalizedRow['Middle Name'] || null,
+                                middle: null, // v3.10.0: Middle name no longer in output
                                 last: result.normalizedRow['Last Name'] || null,
-                                suffix: result.normalizedRow['Suffix'] || null,
+                                suffix: null, // v3.10.0: Suffix no longer in output
                               }}
                             />
                           </td>
@@ -843,7 +843,7 @@ export default function IntelligentNormalization() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.8.1 STABLE</span>
+          <span>v3.10.0</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"

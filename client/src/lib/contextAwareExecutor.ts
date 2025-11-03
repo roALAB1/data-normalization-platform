@@ -39,10 +39,13 @@ export function processRowWithContext(
       const name = new NameEnhanced(value);
       cache.set(colName, name);
       
+      // v3.10.0: Remove "Name" column from output (only output First Name + Last Name)
+      delete normalized[colName];
+      
+      // v3.10.0: Always output First Name and Last Name when processing a name column
       if (name.isValid) {
-        normalized[colName] = name.full;
-      } else {
-        normalized[colName] = value; // Keep original if invalid
+        normalized['First Name'] = name.firstName || '';
+        normalized['Last Name'] = name.lastName || '';
       }
     } else {
       // Other types - normalize directly

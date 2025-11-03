@@ -923,10 +923,48 @@ export interface ParseResult {
     totalTime: number;
   };
   contextAnalysis?: ContextAnalysis;  // Context analysis results (feature temporarily disabled)
-}
+}export class NameEnhanced {
+  // Helper function for title case conversion
+  private toTitleCase(str: string): string {
+    if (!str) return str;
+    
+    // Name particles that should remain lowercase
+    const particles = new Set(['de', 'la', 'del', 'van', 'von', 'der', 'den', 'het', 'te', 'ter', 'ten', 'da', 'di', 'do', 'du']);
+    
+    return str
+      .split(' ')
+      .map((word, index) => {
+        if (!word) return word;
+        
+        const lowerWord = word.toLowerCase();
+        
+        // Keep particles lowercase (always, even at start)
+        if (particles.has(lowerWord)) {
+          return lowerWord;
+        }
+        
+        // Handle hyphenated names (e.g., "Smith-Johnson")
+        if (word.includes('-')) {
+          return word.split('-').map(part => 
+            part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+          ).join('-');
+        }
+        
+        // Handle apostrophes (e.g., "O'Connor")
+        if (word.includes("'")) {
+          const parts = word.split("'");
+          return parts.map((part, idx) => 
+            idx === 0 ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+          ).join("'");
+        }
+        
+        // Standard title case
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join(' ');
+  }
 
-export class NameEnhanced {
-  rawName: string;
+  // Core properties
   firstName: string | null = null;
   middleName: string | null = null;
   lastName: string | null = null;
@@ -1198,7 +1236,8 @@ export class NameEnhanced {
     }
 
     if (parts.length === 1) {
-      this.firstName = parts[0];
+      this.firstName = this.toTitleCase(parts[0]);
+      this.lastName = ''; // Empty string instead of null for single-word names
       this.isValid = true;
       this.parseTime = performance.now() - startTime;
       return;
@@ -1279,16 +1318,16 @@ export class NameEnhanced {
       
       // Reassign parts in Western order (given-family)
       if (givenNames.length === 1) {
-        this.firstName = givenNames[0];
-        this.lastName = familyName;
+        this.firstName = this.toTitleCase(givenNames[0]);
+        this.lastName = this.toTitleCase(familyName);
         this.isValid = true;
         this.parseTime = performance.now() - startTime;
         return;
       } else {
         // Multiple given names: first is firstName, middle ones are middleName, last is still family
-        this.firstName = givenNames[0];
+        this.firstName = this.toTitleCase(givenNames[0]);
         this.middleName = givenNames.slice(1).join(' ');
-        this.lastName = familyName;
+        this.lastName = this.toTitleCase(familyName);
         this.isValid = true;
         this.parseTime = performance.now() - startTime;
         return;
@@ -1296,7 +1335,7 @@ export class NameEnhanced {
     }
     
     // Standard Western name order parsing
-    this.firstName = parts[0];
+    this.firstName = this.toTitleCase(parts[0]);
     
     // Check if the last part is a generational suffix (Jr., Sr., II, III, etc.)
     let suffixPart: string | null = null;
@@ -1335,7 +1374,7 @@ export class NameEnhanced {
       i -= 1;
     }
 
-    this.lastName = lastNameParts.join(' ');
+    this.lastName = this.toTitleCase(lastNameParts.join(' '));
     this.middleName = middleParts.length > 0 ? middleParts.join(' ') : null;
     
     // Assign generational suffix if detected (combine with credential suffix if both exist)

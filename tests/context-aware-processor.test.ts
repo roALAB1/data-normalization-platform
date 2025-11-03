@@ -138,7 +138,7 @@ describe('Context-Aware CSV Processor', () => {
       const result = processRowWithContext(mockCSVRow, schema, plan);
       expect(result['First Name']).toBe('Aaron');
       expect(result['Last Name']).toBe('Johnson');
-      expect(result['Name']).toBe('Aaron Johnson');
+      // v3.10.0: "Name" column removed from output (only First + Last)
     });
 
     it('should clean -FNP from Last Name when Name has ARNP-FNP', () => {
@@ -149,7 +149,7 @@ describe('Context-Aware CSV Processor', () => {
       const result = processRowWithContext(mockCSVRow2, schema, plan);
       expect(result['First Name']).toBe('Sharon');
       expect(result['Last Name']).toBe('Lemoine');
-      expect(result['Name']).toBe('Sharon Lemoine');
+      // v3.10.0: "Name" column removed from output (only First + Last)
     });
 
     it('should clean title from First Name when Name has title', () => {
@@ -160,7 +160,7 @@ describe('Context-Aware CSV Processor', () => {
       const result = processRowWithContext(mockCSVRow3, schema, plan);
       expect(result['First Name']).toBe('Ivette');
       expect(result['Last Name']).toBe('Espinosa-Fernandez');
-      expect(result['Name']).toBe('Ivette Espinosa-Fernandez');
+      // v3.10.0: "Name" column removed from output (only First + Last)
     });
 
     it('should clean middle name and suffix from First/Last Name', () => {
@@ -171,7 +171,7 @@ describe('Context-Aware CSV Processor', () => {
       const result = processRowWithContext(mockCSVRow4, schema, plan);
       expect(result['First Name']).toBe('John');
       expect(result['Last Name']).toBe('Smith');
-      expect(result['Name']).toBe('John Smith');
+      // v3.10.0: "Name" column removed from output (only First + Last)
     });
 
     it('should not re-normalize when First/Last are already clean', () => {
@@ -215,7 +215,10 @@ describe('Context-Aware CSV Processor', () => {
       const plan = buildPlan(schema);
       
       const result = processRowWithContext(rowWithOnlyName, schema, plan);
-      expect(result['Name']).toBe('John Smith');
+      // v3.10.0: When only "Name" column exists, it should derive First + Last
+      expect(result['First Name']).toBe('John');
+      expect(result['Last Name']).toBe('Smith');
+      expect(result['Name']).toBeUndefined(); // Name column removed from output
     });
   });
 

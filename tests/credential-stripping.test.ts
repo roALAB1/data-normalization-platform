@@ -56,7 +56,7 @@ describe('Credential Stripping', () => {
     const { NameEnhanced } = await import('../client/src/lib/NameEnhanced');
     const name = new NameEnhanced('Darshana naik PT DPT');
     
-    expect(name.lastName).toBe('naik');
+    expect(name.lastName).toBe('Naik'); // Title case applied in v3.10.0
     expect(name.full).not.toContain('PT');
     expect(name.full).not.toContain('DPT');
   });

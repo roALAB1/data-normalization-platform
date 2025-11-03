@@ -236,12 +236,17 @@ export class IntelligentBatchProcessor {
               headers.forEach((header, index) => {
                 const value = row.data[header] || '';
                 const detection = detections[index];
+                
+                // Debug: Log name column detection
+                if (header.toLowerCase() === 'name') {
+                  console.log(`[DEBUG] Name column detected as: ${detection.detectedType}, confidence: ${detection.confidence}`);
+                }
 
                 if (detection.detectedType === 'name') {
                   // Full name - split into first and last
                   const split = nameSplitter.split(value);
                   splitName = { firstName: split.firstName, lastName: split.lastName };
-                  // Don't add to normalizedRow yet - we'll add First Name and Last Name columns later
+                  // v3.10.0: Don't add "Name" column to output (only output First Name + Last Name)
                 } else if (detection.detectedType === 'first_name') {
                   // First name - normalize and store
                   const name = new NameEnhanced(value);
