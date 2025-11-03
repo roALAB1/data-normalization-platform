@@ -1014,7 +1014,7 @@ export default function IntelligentNormalization() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.10.0</span>
+          <span>v3.11.0</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"
