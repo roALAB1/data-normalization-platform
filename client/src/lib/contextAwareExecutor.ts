@@ -47,45 +47,6 @@ export function processRowWithContext(
         normalized['First Name'] = name.firstName || '';
         normalized['Last Name'] = name.lastName || '';
       }
-    } else if (colSchema.type === 'location') {
-      // v3.12.0: Split location into Personal City and Personal State
-      // Input format: "Durham, North Carolina, United States" or "Durham, NC, United States"
-      // Output: Personal City: "Durham", Personal State: "NC"
-      const parts = value.split(',').map((p: string) => p.trim());
-      
-      if (parts.length >= 2) {
-        // First part is city
-        const city = parts[0];
-        normalized['Personal City'] = city.split(' ').map((w: string) => 
-          w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
-        ).join(' ');
-        
-        // Second part is state (could be full name or abbreviation)
-        const state = parts[1];
-        // If it's already an abbreviation (2 letters), uppercase it
-        if (state.length === 2) {
-          normalized['Personal State'] = state.toUpperCase();
-        } else {
-          // If it's a full state name, convert to abbreviation
-          const stateAbbreviations: Record<string, string> = {
-            'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
-            'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE', 'florida': 'FL', 'georgia': 'GA',
-            'hawaii': 'HI', 'idaho': 'ID', 'illinois': 'IL', 'indiana': 'IN', 'iowa': 'IA',
-            'kansas': 'KS', 'kentucky': 'KY', 'louisiana': 'LA', 'maine': 'ME', 'maryland': 'MD',
-            'massachusetts': 'MA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS', 'missouri': 'MO',
-            'montana': 'MT', 'nebraska': 'NE', 'nevada': 'NV', 'new hampshire': 'NH', 'new jersey': 'NJ',
-            'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC', 'north dakota': 'ND', 'ohio': 'OH',
-            'oklahoma': 'OK', 'oregon': 'OR', 'pennsylvania': 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
-            'south dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT', 'vermont': 'VT',
-            'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV', 'wisconsin': 'WI', 'wyoming': 'WY'
-          };
-          const stateLower = state.toLowerCase();
-          normalized['Personal State'] = stateAbbreviations[stateLower] || state.toUpperCase();
-        }
-      }
-      
-      // Remove original location column
-      delete normalized[colName];
     } else {
       // Other types - normalize directly
       normalized[colName] = normalizeValue(colSchema.type, value);

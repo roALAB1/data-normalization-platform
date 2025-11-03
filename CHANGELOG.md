@@ -1,28 +1,5 @@
 # Changelog
 
-## [3.11.0] - 2025-11-02
-
-### Added - Enrichment Requirements Hero Section
-- **Hero Section Design**: Beautiful gradient purple/indigo section with glass-morphism cards
-  - 6 requirement cards: First Name, Last Name, Address, City, State & ZIP, Phone
-  - Clear before → after examples with color coding (red input, green output)
-  - Bullet points explaining each normalization rule
-  - Positioned prominently above upload section
-  - Bottom CTA: "Ready for enrichment in AudienceLab"
-- **Responsive Layout**: Grid layout adapts to mobile (1 col), tablet (2 col), desktop (3 col)
-- **Visual Design**: 
-  - Glass-morphism cards with backdrop blur and white borders
-  - Color-coded examples (red-300 for input, green-300 for output)
-  - White text on gradient background for high contrast
-  - Consistent spacing and typography
-- **User Experience**: Users see exactly what normalization will do before uploading CSV
-
-### Technical Details
-- Updated `IntelligentNormalization.tsx` with enrichment requirements section
-- Created `ENRICHMENT_REQUIREMENTS_SUMMARY.md` reference document
-- Responsive grid with Tailwind CSS
-- Icons from lucide-react (User, MapPin, Phone)
-
 ## [3.10.0] - 2025-11-02
 
 ### Changed - Simplified Output Schema (Enrichment-Ready Format)
