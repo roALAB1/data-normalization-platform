@@ -4,7 +4,12 @@ Use these commands to rollback to previous stable versions if needed.
 
 ## Latest Versions
 
-**v3.13.5 STABLE (Current):** `webdev_rollback_checkpoint(version_id="2e25dfbd")`
+**v3.13.6 STABLE (Current):** `webdev_rollback_checkpoint(version_id="b720f2b0")`
+- Enrichment-ready output format hero section restored
+- Purple-to-magenta gradient with 6 transformation cards
+- All 139 tests passing
+
+**v3.13.5 STABLE:** `webdev_rollback_checkpoint(version_id="2e25dfbd")`
 - Hero section + ghost numbers fix
 - Enhanced UI with transformations display
 - All 139 tests passing
@@ -47,5 +52,5 @@ Copy the command for the version you want to rollback to and run it in the chat.
 
 Example:
 ```
-webdev_rollback_checkpoint(version_id="2e25dfbd")
+webdev_rollback_checkpoint(version_id="b720f2b0")
 ```
