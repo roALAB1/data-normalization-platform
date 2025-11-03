@@ -164,5 +164,4 @@
 - Update all docs (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS, todo.md)
 - Ask user to verify before saving checkpoint
 - Push to GitHub after checkpoint is verified
-- Use GitHub token: GITHUB_TOKEN_REDACTED
-- Username: roALAB1
+- GitHub credentials configured via git config
