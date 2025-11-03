@@ -1,7 +1,7 @@
 # Project TODO
 
 ## Current Status
-- **Latest Stable:** v3.8.1 - Final 5 Issues Fixed (93% clean, production ready)
+- **Latest Stable:** v3.9.1 - Bug Report System Complete (API + UI, production ready)
 - **Next:** v3.8.2 - Fix Remaining 2 Issues (Row 81, Row 170)
 
 ---
@@ -204,6 +204,79 @@ See VERSION_HISTORY.md for complete history.
 - [ ] Add warning column for flagged rows
 
 ### User-Reported Issues
-- [ ] Add "Report Issue" button to UI
+- [ ] Add "Report Issue" button to UI → **MOVED TO v3.9.0**
 - [ ] Build credentials tracking database
 - [ ] Allow users to flag incorrectly stripped/kept text
+
+---
+
+## v3.9.0 - Bug Report System Phase 1 [STABLE]
+
+**Status:** STABLE - API complete, tested with UI
+
+**Goal:** Allow users to report normalization issues directly from the UI
+
+**Features:**
+- [ ] Database schema for issue_reports table
+- [ ] API endpoint to submit bug reports
+- [ ] "Report Issue" button in results table
+- [ ] Report dialog with context capture
+- [ ] Admin dashboard to view reports
+- [ ] Export function for AI review
+
+**Tasks:**
+- [x] Read all required docs (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS)
+- [x] Create database migration for issue_reports table
+- [x] Create tests for bug report API (14 tests)
+- [x] Implement bug report API endpoints (5 endpoints)
+- [ ] Create UI components (Report button + dialog) - DEFERRED to v3.9.1
+- [x] Run tests and verify functionality (14/14 passing)
+- [x] Update documentation (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS)
+- [x] Ask user to verify API before checkpoint
+- [x] User verified - API working, report saved to database
+
+**Design Reference:** See `BUG_REPORT_SYSTEM_DESIGN.md` for full design
+
+
+## v3.9.1 - Bug Report UI Components [STABLE]
+
+**Status:** STABLE - End-to-end tested, production ready
+
+**Goal:** Add UI components for bug reporting (Report Issue button + submission dialog)
+
+**Features:**
+- [ ] Report Issue button in results table
+- [ ] Bug report submission dialog
+- [ ] Issue type selector
+- [ ] Severity selector
+- [ ] Description textarea
+- [ ] Expected output fields
+- [ ] Success/error feedback
+
+**Tasks:**
+- [x] Read all required docs (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS)
+- [x] Design UI components structure and user flow
+- [x] Create ReportIssueButton component
+- [x] Create ReportIssueDialog component
+- [x] Integrate into IntelligentNormalization page
+- [x] Test UI functionality in browser
+- [x] Update documentation (VERSION_HISTORY, todo.md)
+- [x] Ask user to verify before checkpoint
+- [x] User verified - Report submitted successfully, saved to database
+
+**Design Principles:**
+- Use shadcn/ui components (Button, Dialog, Select, Textarea)
+- Match existing app design (colors, spacing, typography)
+- Mobile-responsive
+- Clear success/error states
+- Accessible (keyboard navigation, ARIA labels)
+
+**User Flow:**
+1. User sees normalized result in table
+2. Clicks "Report Issue" button next to problematic result
+3. Dialog opens with pre-filled context (original input, actual output)
+4. User selects issue type and severity
+5. User optionally adds description and expected output
+6. User clicks "Submit Report"
+7. Success toast appears, dialog closes
+8. Report saved to database via tRPC API

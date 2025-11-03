@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2 } from "lucide-react";
+import { ReportIssueButton } from "@/components/ReportIssueButton";
 import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { NameEnhanced } from "@/lib/NameEnhanced";
@@ -776,6 +777,7 @@ export default function IntelligentNormalization() {
                             {header}
                           </th>
                         ))}
+                        <th className="text-left p-2 font-medium w-12"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -787,6 +789,18 @@ export default function IntelligentNormalization() {
                               {result.normalizedRow[header]}
                             </td>
                           ))}
+                          <td className="p-2">
+                            <ReportIssueButton
+                              originalInput={result.originalRow['Full Name'] || Object.values(result.originalRow).join(' ')}
+                              actualOutput={{
+                                full: result.normalizedRow['Full Name'] || null,
+                                first: result.normalizedRow['First Name'] || null,
+                                middle: result.normalizedRow['Middle Name'] || null,
+                                last: result.normalizedRow['Last Name'] || null,
+                                suffix: result.normalizedRow['Suffix'] || null,
+                              }}
+                            />
+                          </td>
                         </tr>
                       ))}
                     </tbody>

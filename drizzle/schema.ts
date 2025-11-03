@@ -153,3 +153,47 @@ export const credentialUsage = mysqlTable("credentialUsage", {
 
 export type CredentialUsage = typeof credentialUsage.$inferSelect;
 export type InsertCredentialUsage = typeof credentialUsage.$inferInsert;
+
+/**
+ * Issue reports table (v3.9.0)
+ * Comprehensive bug report system for all normalization issues
+ * Users can report issues directly from the UI with full context
+ */
+export const issueReports = mysqlTable("issueReports", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // Reference to users table (nullable for anonymous reports)
+  
+  // Context
+  originalInput: text("originalInput").notNull(), // The original input text
+  actualOutput: json("actualOutput").notNull(), // { full, first, middle, last, suffix }
+  expectedOutput: json("expectedOutput"), // What user expected (optional)
+  issueType: mysqlEnum("issueType", [
+    "credential_not_stripped",
+    "credential_incorrectly_stripped",
+    "name_split_wrong",
+    "special_char_issue",
+    "trailing_punctuation",
+    "leading_punctuation",
+    "other"
+  ]).notNull(),
+  
+  // User feedback
+  description: text("description"), // User's description
+  severity: mysqlEnum("severity", ["critical", "high", "medium", "low"]).default("medium").notNull(),
+  
+  // Analysis
+  status: mysqlEnum("status", ["pending", "analyzing", "analyzed", "fixed", "wont_fix"]).default("pending").notNull(),
+  pattern: varchar("pattern", { length: 255 }), // Auto-detected pattern
+  fixSuggestion: text("fixSuggestion"), // AI-generated fix suggestion
+  
+  // Metadata
+  version: varchar("version", { length: 32 }), // e.g., "v3.8.1"
+  metadata: json("metadata"), // Additional context
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IssueReport = typeof issueReports.$inferSelect;
+export type InsertIssueReport = typeof issueReports.$inferInsert;
