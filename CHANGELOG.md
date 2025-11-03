@@ -1,3 +1,62 @@
+## [3.9.1] - 2025-11-02
+
+### Added - Bug Report System UI
+- **ReportIssueButton Component**: Icon button next to each result row for reporting issues
+  - AlertCircle icon with tooltip
+  - Accessible (keyboard navigation, ARIA labels)
+  - Opens dialog on click
+- **ReportIssueDialog Component**: Modal form for submitting bug reports
+  - Pre-filled fields: Original Input, Actual Output (read-only)
+  - User inputs: Issue Type (dropdown), Severity (dropdown), Expected Output (optional), Description (optional)
+  - Submit button with loading state
+  - Success/error toast notifications
+  - Auto-resets form on success
+- **Integration**: Added Report Issue button column to results table in IntelligentNormalization page
+- **End-to-end Testing**: Verified report submission and database storage
+
+### Technical Details
+- Uses shadcn/ui components (Button, Dialog, Select, Textarea, Label, Input, Tooltip)
+- tRPC integration with `reports.submit` mutation
+- Mobile-responsive dialog
+- Loading states during API calls
+- Toast notifications for user feedback
+
+## [3.9.0] - 2025-11-02
+
+### Added - Bug Report System API
+- **Database Schema**: Created `issueReports` table with 15 columns
+  - Tracks original input, actual output, expected output
+  - Issue type, severity, status, description
+  - User info, version, timestamps
+- **5 tRPC API Endpoints**:
+  1. `reports.submit` - Submit bug report (public, anonymous OK)
+  2. `reports.list` - List reports with filters & pagination
+  3. `reports.getById` - Get single report
+  4. `reports.updateStatus` - Update status (requires auth)
+  5. `reports.stats` - Get statistics
+- **Issue Types Supported**:
+  - credential_not_stripped
+  - credential_incorrectly_stripped
+  - name_split_wrong
+  - special_char_issue
+  - trailing_punctuation
+  - leading_punctuation
+  - other
+- **14 Tests**: Full test coverage for all API endpoints
+
+### Technical Details
+- MySQL-compatible insert/update operations
+- Pagination support (limit, offset)
+- Filter by status, issue type, severity
+- Statistics aggregation (total, by status, by type)
+- User attribution (optional)
+
+### Documentation
+- Created `BUG_REPORT_SYSTEM_DESIGN.md` with 4 implementation approaches
+- Updated `VERSION_HISTORY.md` with v3.9.0 and v3.9.1 entries
+- Updated `FIX_PROCESS.md` with v3.9.1 rollback command
+- Updated `todo.md` to track bug report system features
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

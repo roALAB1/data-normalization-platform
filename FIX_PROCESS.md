@@ -85,7 +85,8 @@ pnpm test
 **If test fails 3 times → STOP and rollback to last working version.**
 
 **Rollback Commands:**
-- v3.8.1 STABLE (latest): `webdev_rollback_checkpoint(version_id="def79358")`
+- **v3.9.1 STABLE (latest): `webdev_rollback_checkpoint(version_id="33978c6f")`** ← Bug Report System
+- v3.8.1 STABLE: `webdev_rollback_checkpoint(version_id="def79358")` ← Before bug report system
 - v3.6.0: `webdev_rollback_checkpoint(version_id="c1420db")`
 - v3.4.1: `webdev_rollback_checkpoint(version_id="8c1056a")`
 

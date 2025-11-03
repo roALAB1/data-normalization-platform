@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.9.1 🚀
+
+**Bug Report System** 🐛  
+Users can now report normalization issues directly from the results table. Complete system with API endpoints, database storage, and intuitive UI. Each result row has a "Report Issue" button that opens a dialog for submitting detailed bug reports with issue type, severity, expected output, and description.
+
 ### What's New in v2.2.0 🚀
 
 **Simplified Single-Page Platform** 🎯  
