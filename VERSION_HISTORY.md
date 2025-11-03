@@ -1,5 +1,54 @@
 # Version History
 
+## v3.13.5 - Hero Section + Ghost Numbers Fix (2025-01-XX)
+
+**Status:** STABLE - UI enhancements complete
+
+### What Was Built:
+**Goal:** Restore hero section explaining enrichment features and fix ghost columns (_1, _2, _3) appearing in output.
+
+**Problem:** v3.13.3 rollback removed the hero section, and empty CSV columns were generating ghost column names (_1, _2, _3) in output.
+
+### Solution:
+
+1. **Hero Section:**
+   - Added enterprise-scale data normalization hero section
+   - Displays 4 feature cards: Names, Emails, Phone Numbers, Addresses
+   - Shows key capabilities for each data type
+   - Includes examples with before/after transformations
+
+2. **Enhanced Preview Transformations:**
+   - Shows actual sample data for each column type
+   - Displays before → after transformations with examples:
+     * Name: "Dr. John Smith, PhD" → "First Name: John, Last Name: Smith"
+     * First Name: "jOhN R." → "John"
+     * Last Name: "SMITH, PhD" → "Smith"
+     * Location: "Durham, North Carolina, United States" → "Personal City: Durham, Personal State: NC"
+   - Purple gradient background with indigo accents
+
+3. **Column Transformations Applied:**
+   - Added collapsible section after normalization
+   - Shows which columns were transformed and how
+   - Displays split badges for columns that generate multiple outputs
+   - Green checkmarks for completed transformations
+
+4. **Ghost Column Filtering:**
+   - Added regex filter `/^_\d+$/` to detect ghost columns
+   - Filtered from CSV download headers (line 322)
+   - Filtered from results table headers (line 959)
+   - Filtered from results table cells (line 971)
+
+### Files Modified:
+- `client/src/pages/IntelligentNormalization.tsx` - Hero section, transformations display, ghost column filtering
+
+### Impact:
+- Better user guidance with hero section showing available features
+- Cleaner CSV output without ghost columns (_1, _2, _3)
+- Improved visualization of transformations before and after normalization
+- Professional UI with purple/indigo color scheme
+
+---
+
 ## v3.13.4 - Middle Initial Removal + Location Splitting (2025-01-XX)
 
 **Status:** STABLE - All 139 tests passing, production ready
