@@ -12,6 +12,7 @@
 
 import { NameEnhanced } from './NameEnhanced';
 import { normalizeValue } from './normalizeValue';
+import { parseLocation } from './locationParser';
 import type { ColumnSchema } from './schemaAnalyzer';
 import type { NormalizationPlan } from './normalizationPlan';
 
@@ -87,6 +88,27 @@ export function processRowWithContext(
     if (!colSchema || colSchema.type === 'unknown') {
       // Keep original value for unknown types
       normalized[colName] = value;
+      return;
+    }
+    
+    // v3.13.4: Handle location splitting
+    // Check if this is a location column (type is 'address' and name contains 'location')
+    const isLocationColumn = colSchema.type === 'address' && /location/i.test(colName);
+    
+    if (isLocationColumn) {
+      const parsed = parseLocation(value);
+      
+      // Remove original Location column
+      delete normalized[colName];
+      
+      // Add Personal City and Personal State columns
+      if (parsed.city) {
+        normalized['Personal City'] = parsed.city;
+      }
+      if (parsed.state) {
+        normalized['Personal State'] = parsed.state;
+      }
+      
       return;
     }
     

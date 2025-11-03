@@ -610,3 +610,188 @@ pnpm db:push
 | 2025-11-02 | AI Agent | Initial creation with v3.7.0 lessons |
 
 **Remember:** This guide is only useful if we UPDATE it after every debugging session!
+
+
+---
+
+## v3.13.4 - Middle Initial Removal + Location Splitting (2025-01-XX)
+
+### Problem 1: Middle Initials in Last Name
+
+**Symptom:**
+- "James A. Simon" → Last Name: "A Simon" (should be "Simon")
+- "Jennifer R. Berman" → First Name: "Jennifer R." (should be "Jennifer")
+
+**Root Cause:**
+- Single-letter "A" was in `LAST_NAME_PREFIXES` array (line 750) for Portuguese/Spanish names like "João a Silva"
+- When parsing "James A Simon", the logic treated "A" as a last name prefix and added it to `lastNameParts`
+- No filtering for single-letter middle initials
+
+**Failed Approaches:**
+1. ❌ Filtering `middleParts` after the while loop - too late, "A" already in `lastNameParts`
+2. ❌ Removing "a" from `LAST_NAME_PREFIXES` - breaks Portuguese/Spanish name parsing
+
+**Optimal Solution:**
+1. ✅ Check `parts[i].length === 1` BEFORE treating as last name prefix (line 1366)
+2. ✅ Filter single-letter initials from `middleParts` after parsing (line 1383-1388)
+
+**Code:**
+```typescript
+// v3.13.4: Skip single-letter initials (A, B, etc.) - they're middle initials, not last name prefixes
+const isSingleLetterInitial = parts[i].length === 1;
+
+if (!isSingleLetterInitial && LAST_NAME_PREFIXES.includes(candidate as any)) {
+  lastNameParts = [parts[i], ...lastNameParts];
+  middleParts = parts.slice(1, i);
+}
+
+// v3.13.4: Filter out single-letter middle initials (A., B., etc.)
+middleParts = middleParts.filter(part => {
+  const cleaned = part.replace(/\./g, '');
+  return cleaned.length > 1;
+});
+```
+
+**Files Modified:**
+- `client/src/lib/NameEnhanced.ts` (lines 1366, 1383-1388)
+
+**Tests:**
+- `tests/v3134-critical-fixes.test.ts` - 4 tests for middle initial removal
+- Updated 2 old tests that expected middle initials to be kept
+
+---
+
+### Problem 2: Location Splitting Not Implemented
+
+**Symptom:**
+- Location column passed through unchanged: "Durham, North Carolina, United States"
+- No Personal City or Personal State columns in output
+- Enrichment tool requires separate city and state fields
+
+**Root Cause:**
+- `normalizeValue.ts` had TODO comment for location normalization (line 76-78)
+- Schema analyzer detects location columns as type `'address'`, not `'location'`
+- No location parsing logic existed
+
+**Failed Approaches:**
+1. ❌ Checking for `colSchema.type === 'location'` - schema uses `'address'` type
+2. ❌ Trying to return object from `normalizeValue` - it only returns strings
+3. ❌ State name matching before abbreviation matching - caused "Washington" to match WA instead of DC
+
+**Optimal Solution:**
+1. ✅ Created `locationParser.ts` with comprehensive US location parsing
+2. ✅ Added location splitting logic to `contextAwareExecutor.ts` (lines 94-113)
+3. ✅ Check for `colSchema.type === 'address' && /location/i.test(colName)`
+4. ✅ Prioritize state abbreviations over state names in parsing
+
+**Code:**
+```typescript
+// v3.13.4: Handle location splitting
+const isLocationColumn = colSchema.type === 'address' && /location/i.test(colName);
+
+if (isLocationColumn) {
+  const parsed = parseLocation(value);
+  
+  // Remove original Location column
+  delete normalized[colName];
+  
+  // Add Personal City and Personal State columns
+  if (parsed.city) {
+    normalized['Personal City'] = parsed.city;
+  }
+  if (parsed.state) {
+    normalized['Personal State'] = parsed.state;
+  }
+  
+  return;
+}
+```
+
+**Location Parser Features:**
+- Handles "City, State, Country" format
+- Handles "City State" format
+- Handles "City Area" format (San Francisco Bay Area)
+- Converts state names to 2-letter abbreviations
+- Prioritizes state abbreviations over state names
+- Infers state from well-known city names
+- Removes area suffixes (Bay Area, Metropolitan Area, etc.)
+
+**Files Modified:**
+- `client/src/lib/locationParser.ts` (NEW FILE)
+- `client/src/lib/contextAwareExecutor.ts` (lines 15, 94-113)
+
+**Tests:**
+- `tests/v3134-critical-fixes.test.ts` - 2 tests for location splitting
+- Covers edge cases: "Washington DC-Baltimore Area", "San Francisco Bay Area"
+
+---
+
+### Problem 3: Full Name Column Appearing in Output
+
+**Symptom:**
+- Full Name column sometimes appearing in output despite v3.10.0 deletion logic
+- User reported seeing "Name" column in normalized results
+
+**Root Cause:**
+- FALSE ALARM - v3.10.0 logic was working correctly
+- User's input CSV had all three columns: Name, First Name, Last Name
+- Context-aware processor correctly removes Name column and keeps First/Last
+- Issue was confusion about what columns were in the input vs output
+
+**Optimal Solution:**
+- ✅ No code changes needed - v3.10.0 logic is correct
+- ✅ Added tests to verify Full Name column removal works in all scenarios
+
+**Tests:**
+- `tests/v3134-critical-fixes.test.ts` - 3 tests for Full Name column removal
+- Covers: single name column, multiple name columns, column mapping scenarios
+
+---
+
+### Debugging Patterns Learned
+
+1. **Always check schema type assignment:**
+   - Use `analyzeSchema(headers)` to see what type is assigned
+   - Schema analyzer may use different type names than expected
+   - Example: "Location" columns get type `'address'`, not `'location'`
+
+2. **Prioritize specific patterns over general patterns:**
+   - State abbreviations (DC, CA) should be checked before state names (District of Columbia, California)
+   - Prevents ambiguous matches like "Washington" matching WA instead of DC
+
+3. **Single-letter handling requires special cases:**
+   - Single letters can be initials OR last name prefixes (Portuguese "a", "e")
+   - Check length before applying general rules
+   - Filter after parsing to remove unwanted single letters
+
+4. **Test with real user data:**
+   - User-provided CSV revealed edge cases not covered by unit tests
+   - "San Francisco Bay Area" format wasn't in original test suite
+   - "Washington DC-Baltimore Area" required special handling
+
+---
+
+### Testing Requirements for v3.13.4
+
+**Required Test Coverage:**
+1. Middle initial removal:
+   - "James A. Simon" → First: "James", Last: "Simon"
+   - "Jennifer R. Berman, MD" → First: "Jennifer", Last: "Berman"
+   - Single-letter last names still work: "James A" → First: "James", Last: "A"
+
+2. Location splitting:
+   - "Durham, North Carolina, United States" → City: "Durham", State: "NC"
+   - "San Francisco Bay Area" → City: "San Francisco", State: "CA"
+   - "Washington DC-Baltimore Area" → City: "Washington", State: "DC"
+
+3. Full Name column removal:
+   - Name column NOT in output when processing name data
+   - First Name and Last Name columns ARE in output
+   - Works with multiple name columns in input
+
+**Test Files:**
+- `tests/v3134-critical-fixes.test.ts` - 11 comprehensive tests
+- All 139 tests must pass before checkpoint
+
+---
+

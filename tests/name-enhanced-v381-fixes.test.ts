@@ -35,9 +35,10 @@ describe('v3.8.1 - Remaining 5 Issues', () => {
     it('should strip "M Ed" as a single credential (Row 404)', () => {
       const name = new NameEnhanced('Andie B Schwartz M Ed');
       expect(name.isValid).toBe(true);
-      expect(name.full).toBe('Andie B Schwartz'); // Full name includes middle initial
+      // v3.13.4: Middle initials are now filtered out
+      expect(name.full).toBe('Andie Schwartz'); // Middle initial 'B' removed
       expect(name.firstName).toBe('Andie');
-      expect(name.middleName).toBe('B');
+      expect(name.middleName).toBe(null); // v3.13.4: Single-letter initials filtered
       expect(name.lastName).toBe('Schwartz');
       // "M Ed" should be in suffix, not split
       expect(name.suffix).toContain('M Ed');

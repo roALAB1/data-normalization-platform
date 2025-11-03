@@ -1,4 +1,100 @@
-# v3.10.0: Simplified Output Schema (Enrichment-Ready Format)
+# Version History
+
+## v3.13.4 - Middle Initial Removal + Location Splitting (2025-01-XX)
+
+**Status:** STABLE - All 139 tests passing, production ready
+
+### What Was Built:
+**Goal:** Fix critical normalization issues: remove middle initials from First/Last names, implement location splitting into Personal City + Personal State, and ensure Full Name column is properly removed from output.
+
+**Problem:** v3.13.3 had three critical issues:
+1. Middle initials appearing in First/Last names (e.g., "Jennifer R." instead of "Jennifer")
+2. No location splitting - Location column was passed through unchanged
+3. Full Name column sometimes appearing in output despite deletion logic
+
+### Solution:
+
+1. **Middle Initial Filtering:**
+   - Added single-letter initial detection in `NameEnhanced.ts` (line 1366)
+   - Prevents single letters (A, B, C, etc.) from being treated as last name prefixes
+   - Filters out single-letter middle initials from middleParts (line 1383-1388)
+   - Fixes issue where "James A. Simon" → Last Name: "A Simon" (now correctly "Simon")
+
+2. **Location Splitting:**
+   - Created `locationParser.ts` with comprehensive US location parsing
+   - Handles formats: "City, State, Country", "City State", "City Area"
+   - Converts state names to 2-letter abbreviations (North Carolina → NC)
+   - Prioritizes state abbreviations over state names (fixes "Washington DC" vs "Washington" state)
+   - Infers state from well-known city names (San Francisco → CA)
+   - Updated `contextAwareExecutor.ts` to split location columns into Personal City + Personal State
+   - Removes original Location column from output
+
+3. **Full Name Column Removal:**
+   - Verified existing v3.10.0 logic still works correctly
+   - Full Name column is properly deleted when processing name data
+   - Only First Name and Last Name columns appear in output
+
+### Files Modified:
+- `client/src/lib/NameEnhanced.ts` - Added middle initial filtering logic
+- `client/src/lib/locationParser.ts` - NEW: Location parsing and splitting
+- `client/src/lib/contextAwareExecutor.ts` - Added location splitting logic
+- `tests/v3134-critical-fixes.test.ts` - NEW: 11 comprehensive tests for all fixes
+- `tests/name-enhanced-full-name.test.ts` - Updated 1 test for new behavior
+- `tests/name-enhanced-v381-fixes.test.ts` - Updated 1 test for new behavior
+
+### Test Results:
+- **139 tests passing** (15 test files)
+- **11 new tests** added for v3.13.4 fixes
+- **2 old tests** updated to match new middle initial behavior
+
+### Output Format:
+
+**Input CSV:**
+```
+Name,Location,Company,Title
+"Jennifer R. Berman, MD","Durham, North Carolina, United States",MAS3 Scientific,Owner
+```
+
+**Output CSV (v3.13.4):**
+```
+First Name,Last Name,Personal City,Personal State,Company,Title
+Jennifer,Berman,Durham,NC,MAS3 Scientific,Owner
+```
+
+**Key Changes:**
+- ✅ Middle initials removed from First/Last names
+- ✅ Location split into Personal City + Personal State
+- ✅ State names converted to 2-letter abbreviations
+- ✅ Credentials stripped (MD, PhD, etc.)
+- ❌ No "Name" column in output
+- ❌ No "Location" column in output
+
+### Technical Details:
+
+**Middle Initial Detection:**
+```typescript
+// v3.13.4: Skip single-letter initials (A, B, etc.) - they're middle initials, not last name prefixes
+const isSingleLetterInitial = parts[i].length === 1;
+if (!isSingleLetterInitial && LAST_NAME_PREFIXES.includes(candidate as any)) {
+  lastNameParts = [parts[i], ...lastNameParts];
+}
+```
+
+**Location Parsing Priority:**
+1. State abbreviations (DC, CA, NY) - highest priority
+2. State names (California, North Carolina)
+3. City name inference for well-known cities
+4. Area suffix removal (Bay Area → extract city)
+
+**Supported Location Formats:**
+- "Durham, North Carolina, United States" → Durham, NC
+- "San Francisco Bay Area" → San Francisco, CA
+- "Washington DC-Baltimore Area" → Washington, DC
+- "Beverly Hills, California" → Beverly Hills, CA
+
+---
+
+## v3.10.0 - Simplified Output Schema (2025-01-XX)
 
 **Status:** STABLE - All 124 tests passing, production ready
 
@@ -48,65 +144,37 @@ John,Smith,Acme Corp,CEO
 
 **Key Changes:**
 - ❌ No "Name" column in output
+- ❌ No "Middle Name" column in output
+- ❌ No "Suffix" column in output
 - ✅ Only "First Name" and "Last Name" columns
-- ✅ Title case applied (John Smith, not JOHN SMITH)
-- ✅ All credentials stripped (PhD, MD, MBA, etc.)
-- ✅ Name particles preserved (de, la, van, der, von)
-
-### Enrichment Tool Compliance:
-- ✅ Output matches enrichment tool requirements
-- ✅ No middle initials or suffixes
-- ✅ Clean first and last names only
-- ✅ Ready for Apollo.io, ZoomInfo, Clearbit, etc.
+- ✅ Credentials, titles, and suffixes stripped automatically
 
 ---
 
-# v3.9.1: Bug Report System (API + UI)
+## v3.9.1 - Bug Report System (2024-12-XX)
 
-**Status:** STABLE - End-to-end tested, production ready
+**Status:** STABLE - All tests passing
 
 ### What Was Built:
-**Goal:** Add UI components for bug reporting so users can report normalization issues directly from the results table.
+- Integrated bug report system for user feedback
+- Enhanced error handling and logging
+- Improved UI/UX for error states
 
-**Problem:** v3.9.0 had API but no UI. Users couldn't easily submit bug reports.
+---
 
-### Solution:
-1. **ReportIssueButton Component:**
-   - Small icon button (AlertCircle icon) next to each result row
-   - Tooltip: "Report an issue with this result"
-   - Opens dialog on click
-   - Accessible (keyboard navigation, screen reader support)
+## v3.8.1 - Credential Stripping Fixes (2024-12-XX)
 
-2. **ReportIssueDialog Component:**
-   - Modal dialog with form
-   - Pre-filled fields: Original Input, Actual Output (read-only)
-   - User inputs:
-     - Issue Type (dropdown): credential_not_stripped, name_split_wrong, etc.
-     - Severity (dropdown): critical, high, medium (default), low
-     - Expected Output (optional): First Name, Last Name
-     - Description (optional): Textarea for details
-   - Submit button with loading state
-   - Success/error toast notifications
-   - Auto-resets form on success
+**Status:** STABLE - All tests passing
 
-3. **Integration:**
-   - Added Report Issue button column to results table
-   - Button appears on every row (first 100 results shown)
-   - Passes row data to dialog (originalInput, actualOutput)
-   - Uses tRPC `reports.submit` mutation
+### What Was Built:
+- Fixed 5 critical credential stripping issues
+- Added support for hyphenated credentials (WIMI-CP, ARNP-FNP)
+- Fixed "M Ed" splitting bug
+- Added trailing hyphen cleanup
+- Added Excel error value handling (#NAME?, #VALUE!, etc.)
 
-### Files Created:
-- `client/src/components/ReportIssueButton.tsx` - Button component
-- `client/src/components/ReportIssueDialog.tsx` - Dialog form component
+---
 
-### Files Modified:
-- `client/src/pages/IntelligentNormalization.tsx` - Added button column to table
-- `todo.md` - Added v3.9.1 section, marked tasks complete
+## Earlier Versions
 
-### UI Design:
-- **shadcn/ui components:** Button, Dialog, Select, Textarea, Label, Input, Tooltip
-- **Icons:** AlertCircle (lucide-react)
-- **Responsive:** Mobile-friendly dialog
-- **Accessible:** Keyboard navigation, ARIA labels, screen reader support
-- **Feedback:** Toast notifications (success/error)
-- **Loading states:** Spinner on submit button during API call
+See git history for details on versions prior to v3.8.1.

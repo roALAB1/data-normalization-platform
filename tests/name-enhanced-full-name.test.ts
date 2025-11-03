@@ -69,7 +69,8 @@ describe('NameEnhanced - Full Name Credential Stripping', () => {
     expect(name2.full).toBe('Heather Quaile');
     
     // Name with multiple parts and credentials
+    // v3.13.4: Middle initials are now filtered out
     const name3 = new NameEnhanced('Andie B Schwartz M Ed RDN LDN CSCS RYT');
-    expect(name3.full).toBe('Andie B Schwartz');
+    expect(name3.full).toBe('Andie Schwartz'); // Middle initial 'B' removed
   });
 });
