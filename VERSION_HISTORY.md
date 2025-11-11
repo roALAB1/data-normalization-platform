@@ -1,4 +1,54 @@
-# VERSION HISTORY
+# Version History
+
+## v3.15.1 - CRITICAL BUG FIX: Column Filtering in Output CSV (2025-11-11)
+
+**Status:** STABLE - Production ready, all tests passing
+
+### What Was Fixed:
+**Goal:** Fix critical bug where deleted columns were being re-added to output CSV instead of respecting user's column selection.
+
+**Problem:** User deletes 69 columns from 78-column CSV, keeping only 9. But output CSV still contained ALL 78 columns instead of just the 9 selected columns.
+
+### Root Cause Analysis:
+
+The `processRowWithContext` function was not filtering output columns. It started with `{ ...row }` (all columns from input) and only modified specific ones, leaving deleted columns in the output.
+
+**Code Issue:**
+- Line 27 in contextAwareExecutor.ts: `const normalized = { ...row };` copied ALL columns
+- Function modified specific columns but never removed the deleted ones
+- Result rows contained all 78 original columns instead of 9 selected
+
+### Solution:
+
+**Added Phase 4: Column Filtering** at the end of normalization pipeline:
+1. Accept `outputColumns` parameter (list of columns user selected)
+2. Create filtered object with only selected columns
+3. Return filtered row instead of full row
+
+**Files Modified:**
+- `client/src/lib/contextAwareExecutor.ts` - Added Phase 4 column filtering
+- `client/src/workers/normalization.worker.ts` - Updated to pass outputColumns
+- `shared/normalization/intelligent/ChunkedNormalizer.ts` - Updated to accept outputColumns
+- `client/src/pages/IntelligentNormalization.tsx` - Extract outputColumns from columnMappings
+- `server/jobRouter.ts` - Accept columnMappings in submitBatch input
+- `server/queue/JobQueue.ts` - Added columnMappings to NormalizationJobData
+- `server/queue/BatchWorker.ts` - Pass columnMappings to processor
+- `server/services/IntelligentBatchProcessor.ts` - Filter output columns
+
+### Test Results:
+✅ **All 4 unit tests passing:**
+- Test 1: No filtering returns all columns
+- Test 2: Filter to 9 columns returns exactly 9
+- Test 3: Deleted columns NOT in output
+- Test 4: All selected columns ARE in output
+
+### Impact:
+- Users can now delete columns and output will ONLY contain selected columns
+- Applies to both client-side processing and backend batch jobs
+- No regressions - all existing functionality intact
+
+---
+
 
 ## v3.14.0 - Name Parsing Improvements: Job Titles, Emojis, Foreign Prefixes (2025-01-XX)
 
