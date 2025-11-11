@@ -71,11 +71,17 @@ export class ChunkedNormalizer {
 
   /**
    * Process chunks in parallel
+   * 
+   * @param chunks - Array of data chunks to process
+   * @param strategy - Normalization strategy
+   * @param onProgress - Progress callback
+   * @param outputColumns - Optional list of columns to include in output
    */
   async processChunks(
     chunks: any[][],
     strategy: NormalizationStrategy,
-    onProgress?: ChunkProgressCallback
+    onProgress?: ChunkProgressCallback,
+    outputColumns?: string[]
   ): Promise<any[][]> {
     // Initialize stats
     this.stats = {
@@ -118,7 +124,7 @@ export class ChunkedNormalizer {
         const currentIndex = chunkIndex++;
         const chunk = chunks[currentIndex];
 
-        const promise = this.processChunk(chunk, strategy, currentIndex)
+        const promise = this.processChunk(chunk, strategy, currentIndex, outputColumns)
           .then((result) => {
             results[currentIndex] = result;
             this.stats.processedChunks++;
@@ -156,7 +162,8 @@ export class ChunkedNormalizer {
   private async processChunk(
     chunk: any[],
     strategy: NormalizationStrategy,
-    chunkIndex: number
+    chunkIndex: number,
+    outputColumns?: string[]
   ): Promise<any[]> {
     // Get available worker (round-robin)
     const worker = this.workers[chunkIndex % this.workers.length];
@@ -199,6 +206,7 @@ export class ChunkedNormalizer {
           chunk,
           strategy,
           chunkIndex,
+          outputColumns,
         },
       };
 

@@ -180,6 +180,7 @@ export const jobRouter = router({
       z.object({
         fileContent: z.string(),
         fileName: z.string(),
+        columnMappings: z.record(z.string()).optional(), // Mapping of column names to types
         config: z.object({
           preserveAccents: z.boolean().optional(),
           defaultCountry: z.string().optional(),
@@ -232,6 +233,7 @@ export const jobRouter = router({
         type: "intelligent",
         inputFileKey,
         inputFileUrl,
+        columnMappings: input.columnMappings,
         config: input.config,
       });
 

@@ -252,3 +252,31 @@
 - contributor_employer wrongly detected as Phone
 - contributor_occupation needs Job Title support
 - contributor_street_2 should be excluded from output
+
+---
+
+## v3.15.1 - CRITICAL BUG FIX: Deleted Columns Re-Added to Output
+
+**Status:** COMPLETED ✅
+
+**CRITICAL BUG FOUND:** ❌
+- User deletes 69 columns, keeps only 9
+- Output CSV still contains ALL 78 columns
+- Deleted columns are being re-added to the output
+- Full Name column was deleted but still being split in transformations
+- System ignores columnMappings and outputs all original columns
+
+**Root Cause:**
+- Backend job processor not filtering output to only selected columns
+- CSV download includes all original columns instead of just columnMappings
+- Column selection UI works but backend ignores it
+
+**Tasks:**
+- [ ] Investigate IntelligentBatchProcessor - how it handles columnMappings
+- [ ] Investigate CSV download logic - how it builds output columns
+- [ ] Fix job processor to only output selected columns
+- [ ] Fix CSV download to respect columnMappings
+- [ ] Test with user's CSV file (2025-ro-khanna-list_n11j6w.csv)
+- [ ] Verify output only contains 9 selected columns (not 78)
+- [ ] Create checkpoint v3.15.1
+

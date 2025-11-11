@@ -18,11 +18,17 @@ import type { NormalizationPlan } from './normalizationPlan';
 
 /**
  * Process a single row with context awareness
+ * 
+ * @param row - The input row data
+ * @param schema - The column schema
+ * @param plan - The normalization plan
+ * @param outputColumns - Optional list of columns to include in output. If provided, all other columns are removed.
  */
 export function processRowWithContext(
   row: any,
   schema: ColumnSchema[],
-  plan: NormalizationPlan
+  plan: NormalizationPlan,
+  outputColumns?: string[]
 ): any {
   const normalized = { ...row };
   const cache = new Map<string, NameEnhanced>(); // Cache normalized results
@@ -143,6 +149,22 @@ export function processRowWithContext(
     
     normalized[colName] = normalizeValue(colSchema.type, value);
   });
+  
+  // Phase 4: Filter output columns if specified
+  // Only include columns that are in outputColumns list
+  if (outputColumns && outputColumns.length > 0) {
+    const outputSet = new Set(outputColumns);
+    const filtered: Record<string, any> = {};
+    
+    // Include only columns in the output list
+    outputColumns.forEach(col => {
+      if (col in normalized) {
+        filtered[col] = normalized[col];
+      }
+    });
+    
+    return filtered;
+  }
   
   return normalized;
 }

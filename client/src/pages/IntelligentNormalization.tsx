@@ -251,6 +251,9 @@ export default function IntelligentNormalization() {
         }
       );
 
+      // Get output columns (only the columns selected by user)
+      const outputColumns = columnMappings.map(m => m.columnName);
+      
       // Process chunks with normalizer
       const normalizedChunks = await normalizer.processChunks(
         chunks,
@@ -258,7 +261,8 @@ export default function IntelligentNormalization() {
         (normStats) => {
           const progressPercent = 50 + (normStats.processedChunks / normStats.totalChunks) * 50;
           setProgress(progressPercent);
-        }
+        },
+        outputColumns
       );
 
       // Flatten results

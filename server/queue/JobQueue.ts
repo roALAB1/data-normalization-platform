@@ -26,6 +26,7 @@ export interface NormalizationJobData {
     defaultCountry?: string;
     [key: string]: any;
   };
+  columnMappings?: Record<string, string>; // Mapping of column names to types (e.g., { "first_name": "first_name", "email": "email" })
 }
 
 /**

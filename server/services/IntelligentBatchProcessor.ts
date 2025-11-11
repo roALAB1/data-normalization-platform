@@ -165,9 +165,14 @@ export class IntelligentBatchProcessor {
 
   /**
    * Process CSV file with intelligent multi-column normalization
+   * 
+   * @param csvContent - The CSV file content
+   * @param columnMappings - Optional mapping of column names to types. If provided, only these columns are processed and output.
+   * @param onProgress - Optional progress callback
    */
   public async process(
     csvContent: string,
+    columnMappings?: Record<string, string>,
     onProgress?: (progress: ProcessingProgress) => void
   ): Promise<{
     csv: string;
@@ -236,6 +241,11 @@ export class IntelligentBatchProcessor {
               headers.forEach((header, index) => {
                 const value = row.data[header] || '';
                 const detection = detections[index];
+                
+                // Skip columns not in columnMappings (if columnMappings is provided)
+                if (columnMappings && !(header in columnMappings)) {
+                  return; // Skip this column
+                }
                 
                 // Debug: Log name column detection
                 if (header.toLowerCase() === 'name') {

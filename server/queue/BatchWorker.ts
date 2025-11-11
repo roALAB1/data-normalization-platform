@@ -97,6 +97,7 @@ export class BatchWorker {
         const processor = new IntelligentBatchProcessor();
         const result = await processor.process(
           csvContent,
+          job.data.columnMappings,
           (progress) => {
             // Update job progress
             job.updateProgress(progress);

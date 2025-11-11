@@ -18,6 +18,7 @@ export interface WorkerMessage {
       columns: Array<{ name: string; type: string }>;
     };
     chunkIndex: number;
+    outputColumns?: string[]; // Columns to include in output
   };
 }
 
@@ -38,7 +39,8 @@ export interface WorkerResponse {
  */
 function processChunk(
   chunk: any[],
-  strategy: { columns: Array<{ name: string; type: string }> }
+  strategy: { columns: Array<{ name: string; type: string }> },
+  outputColumns?: string[]
 ): any[] {
   // Build schema and plan once for the entire chunk
   const headers = strategy.columns.map(c => c.name);
@@ -49,8 +51,8 @@ function processChunk(
   const plan = buildPlan(schema);
   
   return chunk.map((row) => {
-    // Use context-aware processing
-    return processRowWithContext(row, schema, plan);
+    // Use context-aware processing with output column filtering
+    return processRowWithContext(row, schema, plan, outputColumns);
   });
 }
 
@@ -65,11 +67,11 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   }
 
   if (type === 'process' && payload) {
-    const { chunk, strategy, chunkIndex } = payload;
+    const { chunk, strategy, chunkIndex, outputColumns } = payload;
 
     try {
       // Process chunk
-      const results = processChunk(chunk, strategy);
+      const results = processChunk(chunk, strategy, outputColumns);
 
       // Send results back to main thread
       const response: WorkerResponse = {
