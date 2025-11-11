@@ -1,0 +1,157 @@
+COMPREHENSIVE MILITARY & POLICE RANKS FOR CREDENTIAL STRIPPING
+
+=== MILITARY RANKS ===
+
+ARMY OFFICER RANKS:
+- Gen (General) - variations: Gen., GEN
+- Lt Gen (Lieutenant General) - variations: Lt. Gen., LT GEN, LtGen
+- Maj Gen (Major General) - variations: Maj. Gen., MAJ GEN, MajGen
+- Brig Gen (Brigadier General) - variations: Brig. Gen., BRIG GEN, BrigGen, BG
+- Col (Colonel) - variations: Col., COL
+- Lt Col (Lieutenant Colonel) - variations: Lt. Col., LT COL, LtCol, LTC
+- Maj (Major) - variations: Maj., MAJ
+- Capt (Captain) - variations: Capt., CAPT, CPT
+- 1st Lt (First Lieutenant) - variations: 1st Lt., 1LT, 1stLt
+- 2nd Lt (Second Lieutenant) - variations: 2nd Lt., 2LT, 2ndLt
+
+ARMY ENLISTED RANKS:
+- Sgt Maj of the Army - variations: Sgt. Maj. of the Army, SMA
+- Command Sgt Maj - variations: Command Sgt. Maj., CSM
+- Sgt Maj (Sergeant Major) - variations: Sgt. Maj., SGM
+- 1st Sgt (First Sergeant) - variations: 1st Sgt., 1SG
+- Master Sgt (Master Sergeant) - variations: Master Sgt., MSG, MSgt
+- Sgt 1st Class (Sergeant First Class) - variations: Sgt. 1st Class, SFC
+- Staff Sgt (Staff Sergeant) - variations: Staff Sgt., SSG, SSgt
+- Sgt (Sergeant) - variations: Sgt., SGT
+- Cpl (Corporal) - variations: Cpl., CPL
+- Spc (Specialist) - variations: Spc., SPC, Spec
+- Pfc (Private First Class) - variations: Pfc., PFC
+- Pvt (Private) - variations: Pvt., PVT
+
+MARINES ENLISTED RANKS (unique to Marines):
+- Sgt Maj of the Marine Corps - variations: Sgt. Maj. of the Marine Corps, SgtMajMC
+- Sgt Maj (Sergeant Major) - variations: Sgt. Maj., SgtMaj
+- Master Gunnery Sgt (Master Gunnery Sergeant) - variations: Master Gunnery Sgt., MGySgt, MGyS gt
+- 1st Sgt (First Sergeant) - variations: 1st Sgt., 1stSgt
+- Master Sgt (Master Sergeant) - variations: Master Sgt., MSgt
+- Gunnery Sgt (Gunnery Sergeant) - variations: Gunnery Sgt., GySgt
+- Staff Sgt (Staff Sergeant) - variations: Staff Sgt., SSgt
+- Sgt (Sergeant) - variations: Sgt., Sgt
+- Cpl (Corporal) - variations: Cpl., Cpl
+- Lance Cpl (Lance Corporal) - variations: Lance Cpl., LCpl
+
+AIR FORCE ENLISTED RANKS:
+- Chief Master Sgt of the Air Force - variations: Chief Master Sgt. of the Air Force, CMSAF
+- Command Chief Master Sgt - variations: Command Chief Master Sgt., CCM
+- Chief Master Sgt - variations: Chief Master Sgt., CMSgt
+- Senior Master Sgt - variations: Senior Master Sgt., SMSgt
+- Master Sgt - variations: Master Sgt., MSgt
+- Tech Sgt (Technical Sergeant) - variations: Tech Sgt., TSgt
+- Staff Sgt - variations: Staff Sgt., SSgt
+- Senior Airman - variations: Senior Airman, SrA
+- Airman 1st Class - variations: Airman 1st Class, A1C
+- Airman - variations: Airman, Amn
+- Airman Basic - variations: Airman Basic, AB
+
+NAVY RANKS (unique naming):
+- Admiral - variations: Adm, Adm., ADM
+- Vice Admiral - variations: Vice Adm, Vice Adm., VADM
+- Rear Admiral - variations: Rear Adm, Rear Adm., RADM
+- Captain - variations: Capt, Capt., CAPT
+- Commander - variations: Cmdr, Cmdr., CDR
+- Lieutenant Commander - variations: Lt Cmdr, Lt. Cmdr., LCDR
+- Lieutenant - variations: Lt, Lt., LT
+- Lieutenant Junior Grade - variations: Lt JG, Lt. JG, LTJG
+- Ensign - variations: Ens, Ens., ENS
+- Chief Petty Officer - variations: CPO, Chief
+- Petty Officer 1st Class - variations: PO1, Petty Officer 1st Class
+- Petty Officer 2nd Class - variations: PO2, Petty Officer 2nd Class
+- Petty Officer 3rd Class - variations: PO3, Petty Officer 3rd Class
+
+WARRANT OFFICER RANKS (all branches):
+- Chief Warrant Officer 5 - variations: CW5, CWO5, Chief Warrant Officer 5
+- Chief Warrant Officer 4 - variations: CW4, CWO4, Chief Warrant Officer 4
+- Chief Warrant Officer 3 - variations: CW3, CWO3, Chief Warrant Officer 3
+- Chief Warrant Officer 2 - variations: CW2, CWO2, Chief Warrant Officer 2
+- Warrant Officer 1 - variations: WO1, W1, Warrant Officer 1
+
+RETIRED INDICATORS:
+- (ret)
+- (Ret)
+- Ret.
+- Ret
+- Retired
+- (retired)
+- (Retired)
+
+=== POLICE & LAW ENFORCEMENT RANKS ===
+
+POLICE DEPARTMENT RANKS:
+- Chief of Police - variations: Chief, Police Chief, Ch., Chief of Police
+- Deputy Chief - variations: Deputy Chief, Dep. Chief, DC
+- Assistant Chief - variations: Assistant Chief, Asst. Chief, AC
+- Commander - variations: Cmdr, Cmdr., Commander
+- Captain - variations: Capt, Capt., Captain, CPT
+- Lieutenant - variations: Lt, Lt., Lieutenant, LT
+- Sergeant - variations: Sgt, Sgt., Sergeant, SGT
+- Corporal - variations: Cpl, Cpl., Corporal, CPL
+- Detective - variations: Det, Det., Detective, DET
+- Police Officer - variations: Officer, PO, P.O., Ofc, Ofc.
+- Patrol Officer - variations: Patrol Officer, Patrolman
+
+SHERIFF'S OFFICE RANKS:
+- Sheriff - variations: Sheriff, Sher.
+- Undersheriff - variations: Undersheriff, Under Sheriff
+- Assistant Sheriff - variations: Assistant Sheriff, Asst. Sheriff
+- Chief Deputy - variations: Chief Deputy, Ch. Deputy
+- Captain - variations: Capt, Capt., Captain
+- Lieutenant - variations: Lt, Lt., Lieutenant
+- Sergeant - variations: Sgt, Sgt., Sergeant
+- Corporal - variations: Cpl, Cpl., Corporal
+- Deputy - variations: Deputy, Dep., Deputy Sheriff
+- Deputy Sheriff - variations: Deputy Sheriff, Dep. Sheriff
+
+STATE POLICE/HIGHWAY PATROL RANKS:
+- Superintendent - variations: Supt, Supt., Superintendent
+- Colonel - variations: Col, Col., Colonel
+- Lieutenant Colonel - variations: Lt Col, Lt. Col., Lieutenant Colonel
+- Major - variations: Maj, Maj., Major
+- Captain - variations: Capt, Capt., Captain
+- Lieutenant - variations: Lt, Lt., Lieutenant
+- Sergeant - variations: Sgt, Sgt., Sergeant
+- Corporal - variations: Cpl, Cpl., Corporal
+- Trooper - variations: Trooper, Tpr, Tpr.
+- Trooper First Class - variations: Trooper 1st Class, TFC
+
+CORRECTIONS/PRISON RANKS:
+- Warden - variations: Warden, Wdn.
+- Deputy Warden - variations: Deputy Warden, Dep. Warden
+- Captain - variations: Capt, Capt., Captain
+- Lieutenant - variations: Lt, Lt., Lieutenant
+- Sergeant - variations: Sgt, Sgt., Sergeant
+- Correctional Officer - variations: CO, C.O., Correctional Officer, Corrections Officer
+
+FEDERAL LAW ENFORCEMENT:
+- Special Agent in Charge - variations: SAC, S.A.C., Special Agent in Charge
+- Assistant Special Agent in Charge - variations: ASAC, A.S.A.C.
+- Supervisory Special Agent - variations: SSA, S.S.A.
+- Special Agent - variations: SA, S.A., Special Agent
+- US Marshal - variations: US Marshal, U.S. Marshal, Marshal
+- Deputy US Marshal - variations: Deputy US Marshal, Deputy U.S. Marshal
+
+RETIRED INDICATORS (same as military):
+- (ret)
+- (Ret)
+- Ret.
+- Ret
+- Retired
+- (retired)
+- (Retired)
+
+=== IMPLEMENTATION NOTES ===
+
+1. All variations with/without periods should be added
+2. All variations with/without spaces should be added
+3. Retired indicators should be handled separately (strip the rank AND the retired indicator)
+4. Some abbreviations are ambiguous (e.g., "CO" could be Commanding Officer or Correctional Officer)
+5. Period-handling regex from v3.13.7 should work for these too (makes periods optional)

@@ -1,0 +1,42 @@
+ARMY RANKS (from DINFOS)
+
+Commissioned Officers:
+O-10: general → Gen.
+O-9: lieutenant general → Lt. Gen.
+O-8: major general → Maj. Gen.
+O-7: brigadier general → Brig. Gen.
+O-6: colonel → Col.
+O-5: lieutenant colonel → Lt. Col.
+O-4: major → Maj.
+O-3: captain → Capt.
+O-2: first lieutenant → 1st Lt.
+O-1: second lieutenant → 2nd Lt.
+
+Enlisted Personnel:
+E-9: sergeant major of the Army → Sgt. Maj. of the Army
+E-9: command sergeant major → Command Sgt. Maj.
+E-9: sergeant major → Sgt. Maj.
+E-8: first sergeant → 1st Sgt.
+E-8: master sergeant → Master Sgt.
+E-7: sergeant first class → Sgt. 1st Class
+E-6: staff sergeant → Staff Sgt.
+E-5: sergeant → Sgt.
+E-4: corporal → Cpl.
+E-4: specialist → Spc.
+E-3: private first class → Pfc.
+E-2: private → Pvt.
+E-1: private → Pvt.
+
+AIR FORCE RANKS (same as Army for officers)
+
+MARINES RANKS
+(Need to scroll to see full list)
+
+NAVY RANKS
+(Need to scroll to see full list)
+
+COAST GUARD RANKS
+(Need to scroll to see full list)
+
+SPACE FORCE RANKS
+(Need to scroll to see full list)

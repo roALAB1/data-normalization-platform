@@ -4,9 +4,10 @@ Use these commands to rollback to previous stable versions if needed.
 
 ## Latest Versions
 
-**v3.13.6 STABLE (Current):** `webdev_rollback_checkpoint(version_id="b720f2b0")`
+**v3.13.6 STABLE (Current):** `webdev_rollback_checkpoint(version_id="c22ce886")`
 - Enrichment-ready output format hero section restored
 - Purple-to-magenta gradient with 6 transformation cards
+- Footer version updated to v3.13.6
 - All 139 tests passing
 
 **v3.13.5 STABLE:** `webdev_rollback_checkpoint(version_id="2e25dfbd")`

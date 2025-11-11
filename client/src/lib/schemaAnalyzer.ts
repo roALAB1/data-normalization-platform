@@ -6,20 +6,29 @@
  * - Column roles (full, component, variant)
  * - Column relationships (which columns are related)
  * - Column context (personal, business, mobile, landline, etc.)
+ * 
+ * v3.14.1: Now includes data quality analysis to choose best source columns
  */
+
+import { analyzeColumnQuality } from './dataQualityAnalyzer';
 
 export interface ColumnSchema {
   name: string;
-  type: 'name' | 'first-name' | 'last-name' | 'email' | 'phone' | 'address' | 'location' | 'company' | 'unknown';
+  type: 'name' | 'first-name' | 'last-name' | 'email' | 'phone' | 'address' | 'location' | 'company' | 'job-title' | 'unknown';
   role: 'full' | 'component' | 'variant' | 'independent';
   relatedTo?: string[]; // Which columns are related to this one
   context?: 'personal' | 'business' | 'mobile' | 'landline' | 'home' | 'work';
+  qualityScore?: number; // 0-100 score based on data quality analysis
+  qualityIssues?: string[]; // List of detected quality issues
+  sampleValues?: string[]; // Sample values from this column (first 3)
 }
 
 /**
  * Analyze CSV headers to detect column relationships
+ * 
+ * v3.14.1: Now accepts optional sample data for intelligent quality analysis
  */
-export function analyzeSchema(headers: string[]): ColumnSchema[] {
+export function analyzeSchema(headers: string[], sampleData?: any[]): ColumnSchema[] {
   const schemas: ColumnSchema[] = [];
   
   // Normalize headers for matching (lowercase, trim)
@@ -79,6 +88,38 @@ export function analyzeSchema(headers: string[]): ColumnSchema[] {
       });
     }
   }
+  
+  // Detect company columns FIRST (before phone, to avoid false matches)
+  headers.forEach((header, i) => {
+    const normalized = normalizedHeaders[i];
+    
+    // Skip if already processed
+    if (schemas.some(s => s.name === header)) return;
+    
+    if (/company|organization|employer|business/i.test(normalized)) {
+      schemas.push({
+        name: header,
+        type: 'company',
+        role: 'independent'
+      });
+    }
+  });
+  
+  // Detect job title columns
+  headers.forEach((header, i) => {
+    const normalized = normalizedHeaders[i];
+    
+    // Skip if already processed
+    if (schemas.some(s => s.name === header)) return;
+    
+    if (/job.?title|occupation|position|role|title/i.test(normalized)) {
+      schemas.push({
+        name: header,
+        type: 'job-title',
+        role: 'independent'
+      });
+    }
+  });
   
   // Detect phone columns
   headers.forEach((header, i) => {
@@ -150,22 +191,6 @@ export function analyzeSchema(headers: string[]): ColumnSchema[] {
     }
   });
   
-  // Detect company columns
-  headers.forEach((header, i) => {
-    const normalized = normalizedHeaders[i];
-    
-    // Skip if already processed
-    if (schemas.some(s => s.name === header)) return;
-    
-    if (/company|organization|employer|business/i.test(normalized)) {
-      schemas.push({
-        name: header,
-        type: 'company',
-        role: 'independent'
-      });
-    }
-  });
-  
   // Mark remaining columns as unknown
   headers.forEach(header => {
     if (!schemas.some(s => s.name === header)) {
@@ -176,6 +201,22 @@ export function analyzeSchema(headers: string[]): ColumnSchema[] {
       });
     }
   });
+  
+  // v3.14.1: Analyze data quality if sample data is provided
+  if (sampleData && sampleData.length > 0) {
+    schemas.forEach(schema => {
+      // Extract values for this column from sample data
+      const values = sampleData.map(row => row[schema.name] || '').filter(v => v).slice(0, 100); // Sample first 100 rows
+      
+      // Store first 3 sample values for preview
+      schema.sampleValues = values.slice(0, 3);
+      
+      // Analyze quality
+      const quality = analyzeColumnQuality(schema.name, schema.type, values);
+      schema.qualityScore = Math.round(quality.overall);
+      schema.qualityIssues = quality.issues;
+    });
+  }
   
   return schemas;
 }

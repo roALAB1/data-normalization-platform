@@ -1,0 +1,1012 @@
+NAME PARSING FAILURE REPORT
+================================================================================
+
+Total rows analyzed: 8006
+Failures found: 198
+Failure rate: 2.47%
+
+================================================================================
+FAILURE TYPES BREAKDOWN
+================================================================================
+multiple_words_in_last_name              -  105 occurrences
+job_title_in_last_name                   -   69 occurrences
+empty_last_name                          -   35 occurrences
+emoji_in_last_name                       -    7 occurrences
+emoji_in_first_name                      -    6 occurrences
+job_title_in_first_name                  -    5 occurrences
+trailing_hyphen_in_last_name             -    5 occurrences
+trailing_hyphen_in_first_name            -    1 occurrences
+
+================================================================================
+ALL FAILURES (complete list)
+================================================================================
+
+Row 40:
+  First Name: Maree
+  Last Name: Moscati CEO
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 167:
+  First Name: Beall
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 205:
+  First Name: Marcel
+  Last Name: van der Stroom
+  Reasons: multiple_words_in_last_name
+
+Row 379:
+  First Name: Andy
+  Last Name: Le Roy
+  Reasons: multiple_words_in_last_name
+
+Row 550:
+  First Name: Walter
+  Last Name: van den Broeck
+  Reasons: multiple_words_in_last_name
+
+Row 625:
+  First Name: Sandra
+  Last Name: de Novellis
+  Reasons: multiple_words_in_last_name
+
+Row 830:
+  First Name: Lizelle
+  Last Name: van Vuuren
+  Reasons: multiple_words_in_last_name
+
+Row 888:
+  First Name: • Christopher Dean
+  Last Name: Owner/President CFL Integrated Business Solutions
+  Reasons: job_title_in_last_name, emoji_in_first_name, multiple_words_in_last_name
+
+Row 945:
+  First Name: Erika
+  Last Name: von Itter
+  Reasons: multiple_words_in_last_name
+
+Row 1089:
+  First Name: Mario
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 1114:
+  First Name: Karim
+  Last Name: de Martino
+  Reasons: multiple_words_in_last_name
+
+Row 1118:
+  First Name: Hayden
+  Last Name: van Hulzen
+  Reasons: multiple_words_in_last_name
+
+Row 1217:
+  First Name: Jetske
+  Last Name: van Dijk
+  Reasons: multiple_words_in_last_name
+
+Row 1223:
+  First Name: Kurina
+  Last Name: Knowles - Virtual Business Manager
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 1247:
+  First Name: Meena
+  Last Name: Photographer
+  Reasons: job_title_in_last_name
+
+Row 1253:
+  First Name: Chandra Brooks,
+  Last Name: TEDx and Keynote Speaker
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 1256:
+  First Name: Stacy
+  Last Name: Advisor
+  Reasons: job_title_in_last_name
+
+Row 1270:
+  First Name: Alexandra
+  Last Name: Watson - Founder
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 1355:
+  First Name: Cheri
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 1398:
+  First Name: Brian
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 1464:
+  First Name: Hugo
+  Last Name: van Dijk
+  Reasons: multiple_words_in_last_name
+
+Row 1508:
+  First Name: RAJNEESH
+  Last Name: MAHAJAN Certified SAFe® 6 Practice Consultant
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 1551:
+  First Name: Maria
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 1552:
+  First Name: Christian
+  Last Name: de Boisredon
+  Reasons: multiple_words_in_last_name
+
+Row 1654:
+  First Name: Diaa
+  Last Name: El All
+  Reasons: multiple_words_in_last_name
+
+Row 1657:
+  First Name: Lori
+  Last Name: Dixon Ed.S. and
+  Reasons: multiple_words_in_last_name
+
+Row 1701:
+  First Name: Odonnell
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 1731:
+  First Name: Ranchelle
+  Last Name: van Bryce
+  Reasons: multiple_words_in_last_name
+
+Row 1756:
+  First Name: ? Corinna
+  Last Name: Kromer
+  Reasons: emoji_in_first_name
+
+Row 1795:
+  First Name: Eva
+  Last Name: de Donlea
+  Reasons: multiple_words_in_last_name
+
+Row 1818:
+  First Name: Kerry
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 1874:
+  First Name: Darryl Lasker, MSHRM /
+  Last Name: Dashry Creations
+  Reasons: multiple_words_in_last_name
+
+Row 1895:
+  First Name: Geert
+  Last Name: van Vlijmen
+  Reasons: multiple_words_in_last_name
+
+Row 1910:
+  First Name: Paul Simpson-
+  Last Name: Speaker- Business and Sales Coach
+  Reasons: job_title_in_last_name, trailing_hyphen_in_first_name, multiple_words_in_last_name
+
+Row 1921:
+  First Name: Ilario
+  Last Name: di Bon
+  Reasons: multiple_words_in_last_name
+
+Row 1963:
+  First Name: Maureen
+  Last Name: de Murden
+  Reasons: multiple_words_in_last_name
+
+Row 1973:
+  First Name: Jasna
+  Last Name: Designer
+  Reasons: job_title_in_last_name
+
+Row 1986:
+  First Name: Karen
+  Last Name: Bath Fraes
+  Reasons: multiple_words_in_last_name
+
+Row 1991:
+  First Name: Fiona Kelly - Executive PA Forum
+  Last Name: Global
+  Reasons: job_title_in_first_name
+
+Row 1994:
+  First Name: Kimberly
+  Last Name: -
+  Reasons: trailing_hyphen_in_last_name
+
+Row 1999:
+  First Name: Cary
+  Last Name: Advisor
+  Reasons: job_title_in_last_name
+
+Row 2008:
+  First Name: Eugene
+  Last Name: de Souza
+  Reasons: multiple_words_in_last_name
+
+Row 2010:
+  First Name: Chris
+  Last Name: Holter-
+  Reasons: trailing_hyphen_in_last_name
+
+Row 2017:
+  First Name: Joli
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 2024:
+  First Name: Joanne
+  Last Name: Greener - Virtual Business Manager
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 2031:
+  First Name: (Lady) BJ
+  Last Name: Stephens Your MAGIC and DYNAMICITY Creator
+  Reasons: multiple_words_in_last_name
+
+Row 2149:
+  First Name: Ola
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 2167:
+  First Name: Brigitte
+  Last Name: van der Pluijm
+  Reasons: multiple_words_in_last_name
+
+Row 2190:
+  First Name: Farhan
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 2209:
+  First Name: Fransen
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 2271:
+  First Name: Ross
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 2272:
+  First Name: Timothy Simard
+  Last Name: CEO and Founder of AlyxHealth
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 2286:
+  First Name: Alexander
+  Last Name: von Welczeck
+  Reasons: multiple_words_in_last_name
+
+Row 2293:
+  First Name: Jenny
+  Last Name: von Podewils
+  Reasons: multiple_words_in_last_name
+
+Row 2295:
+  First Name: Silvana
+  Last Name: da Luca
+  Reasons: multiple_words_in_last_name
+
+Row 2307:
+  First Name: Pete
+  Last Name: de Mare
+  Reasons: multiple_words_in_last_name
+
+Row 2320:
+  First Name: Katie
+  Last Name: Swartz she/her
+  Reasons: multiple_words_in_last_name
+
+Row 2354:
+  First Name: Stephani Roberts,
+  Last Name: Consultant
+  Reasons: job_title_in_last_name
+
+Row 2356:
+  First Name: Chris
+  Last Name: del Grande
+  Reasons: multiple_words_in_last_name
+
+Row 2439:
+  First Name: Lisa
+  Last Name: de Nermont
+  Reasons: multiple_words_in_last_name
+
+Row 2441:
+  First Name: Shounak
+  Last Name: Gupte - Freelance SEO Consultant Melbourne
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 2450:
+  First Name: Jonathan
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 2486:
+  First Name: Michael
+  Last Name: von Irvin
+  Reasons: multiple_words_in_last_name
+
+Row 2502:
+  First Name: Katrina
+  Last Name: Owner
+  Reasons: job_title_in_last_name
+
+Row 2514:
+  First Name: Kira
+  Last Name: la Forgia
+  Reasons: multiple_words_in_last_name
+
+Row 2527:
+  First Name: Nik Cree
+  Last Name: ? Online Visibility and Branding Expert ?
+  Reasons: job_title_in_last_name, emoji_in_last_name, multiple_words_in_last_name
+
+Row 2541:
+  First Name: Gabriela
+  Last Name: Garzón ⭐️ Mentor-Life and Business Strategist
+  Reasons: job_title_in_last_name, emoji_in_last_name, multiple_words_in_last_name
+
+Row 2564:
+  First Name: Aleksandra
+  Last Name: Leader
+  Reasons: job_title_in_last_name
+
+Row 2631:
+  First Name: Sahara
+  Last Name: de Vore
+  Reasons: multiple_words_in_last_name
+
+Row 2669:
+  First Name: Deborah
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 2694:
+  First Name: Tracey
+  Last Name: Speaker
+  Reasons: job_title_in_last_name
+
+Row 2695:
+  First Name: Micky (Kerwick) Lazic, Communication
+  Last Name: Strategist and Transformational Coach
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 2697:
+  First Name: Mindy
+  Last Name: van Vleet
+  Reasons: multiple_words_in_last_name
+
+Row 2716:
+  First Name: Jason
+  Last Name: Meredith - Leadership and Talent Management Coach
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 2848:
+  First Name: Sharon Piel
+  Last Name: #NAME?
+  Reasons: emoji_in_last_name
+
+Row 2866:
+  First Name: Pamela
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 2869:
+  First Name: Galit
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 2884:
+  First Name: Elise
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 2913:
+  First Name: Deborah
+  Last Name: Designer
+  Reasons: job_title_in_last_name
+
+Row 2965:
+  First Name: Sarah
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 2974:
+  First Name: Small
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 3079:
+  First Name: Margarita
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 3087:
+  First Name: Michelle
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 3134:
+  First Name: Nickquolette
+  Last Name: Strategist
+  Reasons: job_title_in_last_name
+
+Row 3138:
+  First Name: Bowman-Ottomanelli
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 3154:
+  First Name: Sunil
+  Last Name: Kishore - Premier Fellow BetterUp
+  Reasons: multiple_words_in_last_name
+
+Row 3172:
+  First Name: Edyta
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 3178:
+  First Name: Susan
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 3186:
+  First Name: Rod
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 3207:
+  First Name: Moana
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 3210:
+  First Name: Jacquelyn
+  Last Name: van Tuyl
+  Reasons: multiple_words_in_last_name
+
+Row 3288:
+  First Name: Kimberly
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 3329:
+  First Name: J
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 3353:
+  First Name: K
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 3384:
+  First Name: Sonia
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 3437:
+  First Name: Coach
+  Last Name: Denell
+  Reasons: job_title_in_first_name
+
+Row 3672:
+  First Name: Cameron
+  Last Name: Architect
+  Reasons: job_title_in_last_name
+
+Row 3690:
+  First Name: Cristina
+  Last Name: da Costa
+  Reasons: multiple_words_in_last_name
+
+Row 3750:
+  First Name: Ganzak
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 3751:
+  First Name: Barrett
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 3854:
+  First Name: Rachel
+  Last Name: te Iwi
+  Reasons: multiple_words_in_last_name
+
+Row 3920:
+  First Name: Reggie
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 4018:
+  First Name: Damian
+  Last Name: Expert
+  Reasons: job_title_in_last_name
+
+Row 4147:
+  First Name: Coach
+  Last Name: Sutton
+  Reasons: job_title_in_first_name
+
+Row 4168:
+  First Name: Steven
+  Last Name: van Cohen
+  Reasons: multiple_words_in_last_name
+
+Row 4185:
+  First Name: Jessica
+  Last Name: Architect
+  Reasons: job_title_in_last_name
+
+Row 4335:
+  First Name: Cheryl L. Fields,
+  Last Name: Financial Educator
+  Reasons: multiple_words_in_last_name
+
+Row 4425:
+  First Name: Coach
+  Last Name: Quapp
+  Reasons: job_title_in_first_name
+
+Row 4434:
+  First Name: Joe
+  Last Name: Roberts ? The Skid Row CEO
+  Reasons: job_title_in_last_name, emoji_in_last_name, multiple_words_in_last_name
+
+Row 4458:
+  First Name: Greg
+  Last Name: Charanduk - Business Owner - Consultant - Author
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 4471:
+  First Name: Raul
+  Last Name: Speaker
+  Reasons: job_title_in_last_name
+
+Row 4473:
+  First Name: Author
+  Last Name: Jones
+  Reasons: job_title_in_first_name
+
+Row 4515:
+  First Name: Charles
+  Last Name: Speaker
+  Reasons: job_title_in_last_name
+
+Row 4561:
+  First Name: Jesse
+  Last Name: di Lillo
+  Reasons: multiple_words_in_last_name
+
+Row 4593:
+  First Name: Linda
+  Last Name: Wiley Bing
+  Reasons: multiple_words_in_last_name
+
+Row 4660:
+  First Name: Smith
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 4744:
+  First Name: Renee Sunday,M.D.
+  Last Name: #NAME?
+  Reasons: emoji_in_last_name
+
+Row 4766:
+  First Name: Malouf
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 4783:
+  First Name: Ducreay
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 4861:
+  First Name: George Horrigan
+  Last Name: Innovation and Business Planning Expert
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 4981:
+  First Name: Tony
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 4996:
+  First Name: Chris
+  Last Name: Speaker
+  Reasons: job_title_in_last_name
+
+Row 5027:
+  First Name: Rebecca Roberts Eckstein, MA, CEC, PCC
+  Last Name: Admission and Eckstein Executive Coaching
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 5052:
+  First Name: Attram
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 5089:
+  First Name: Benecia
+  Last Name: Strategist
+  Reasons: job_title_in_last_name
+
+Row 5107:
+  First Name: Bettie
+  Last Name: van Straaten
+  Reasons: multiple_words_in_last_name
+
+Row 5122:
+  First Name: Guy
+  Last Name: la Rocque
+  Reasons: multiple_words_in_last_name
+
+Row 5123:
+  First Name: Samuel
+  Last Name: Author
+  Reasons: job_title_in_last_name
+
+Row 5159:
+  First Name: Emma
+  Last Name: van Heusen
+  Reasons: multiple_words_in_last_name
+
+Row 5181:
+  First Name: иαѕѕєя
+  Last Name: αнмα∂ ѕує∂
+  Reasons: multiple_words_in_last_name
+
+Row 5182:
+  First Name: Scott
+  Last Name: de Ruyter
+  Reasons: multiple_words_in_last_name
+
+Row 5184:
+  First Name: Estelle
+  Last Name: -
+  Reasons: trailing_hyphen_in_last_name
+
+Row 5199:
+  First Name: Richard Seaman
+  Last Name: Leadership Consultant
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 5207:
+  First Name: Sonny
+  Last Name: de Meester
+  Reasons: multiple_words_in_last_name
+
+Row 5236:
+  First Name: Nekia
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 5247:
+  First Name: Emily Letran
+  Last Name: Executive Coach- Marketing Strategist - Speaker
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 5287:
+  First Name: Shea
+  Last Name: Vaughn-TV and Podcast Media
+  Reasons: multiple_words_in_last_name
+
+Row 5297:
+  First Name: Pheby
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 5363:
+  First Name: Olivia
+  Last Name: Strategist
+  Reasons: job_title_in_last_name
+
+Row 5458:
+  First Name: Dammeier
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 5514:
+  First Name: Louisa Havers,
+  Last Name: Success and Leadership Adviser
+  Reasons: multiple_words_in_last_name
+
+Row 5518:
+  First Name: Baiju Solanki ?
+  Last Name: Performance Psychologist
+  Reasons: emoji_in_first_name, multiple_words_in_last_name
+
+Row 5588:
+  First Name: Kelly
+  Last Name: Author
+  Reasons: job_title_in_last_name
+
+Row 5671:
+  First Name: Jazz
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 5694:
+  First Name: Morris
+  Last Name: Speaker
+  Reasons: job_title_in_last_name
+
+Row 5700:
+  First Name: Nancy
+  Last Name: -
+  Reasons: trailing_hyphen_in_last_name
+
+Row 5707:
+  First Name: Steve
+  Last Name: Strategist
+  Reasons: job_title_in_last_name
+
+Row 5786:
+  First Name: Johann
+  Last Name: de Kock
+  Reasons: multiple_words_in_last_name
+
+Row 5924:
+  First Name: Harry
+  Last Name: Strategist
+  Reasons: job_title_in_last_name
+
+Row 6026:
+  First Name: Sarah
+  Last Name: Platt - Social Media Manager
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 6076:
+  First Name: Tyrone
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 6108:
+  First Name: Magi
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 6116:
+  First Name: Derek
+  Last Name: Coach
+  Reasons: job_title_in_last_name
+
+Row 6122:
+  First Name: ? Wendy Stevens
+  Last Name: Guerrilla Marketing Consultant?
+  Reasons: job_title_in_last_name, emoji_in_first_name, emoji_in_last_name, multiple_words_in_last_name
+
+Row 6182:
+  First Name: Viveka
+  Last Name: von Rosen
+  Reasons: multiple_words_in_last_name
+
+Row 6193:
+  First Name: Tino
+  Last Name: da Silva
+  Reasons: multiple_words_in_last_name
+
+Row 6195:
+  First Name: Dean
+  Last Name: -
+  Reasons: trailing_hyphen_in_last_name
+
+Row 6249:
+  First Name: Marlon
+  Last Name: de Cruz
+  Reasons: multiple_words_in_last_name
+
+Row 6257:
+  First Name: Joe
+  Last Name: de Sena
+  Reasons: multiple_words_in_last_name
+
+Row 6294:
+  First Name: Michael Edward Bradford MA
+  Last Name: SOULutions - Intuitive BreakThru Specialist
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 6362:
+  First Name: Mieke
+  Last Name: van Son
+  Reasons: multiple_words_in_last_name
+
+Row 6417:
+  First Name: Chloe
+  Last Name: di Leo
+  Reasons: multiple_words_in_last_name
+
+Row 6514:
+  First Name: Lindsey
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 6527:
+  First Name: Tiffin
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 6602:
+  First Name: Nannette
+  Last Name: de Praeter
+  Reasons: multiple_words_in_last_name
+
+Row 6644:
+  First Name: Happiness
+  Last Name: Strategic Advisor Executive Coach
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 6646:
+  First Name: Khyal
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 6654:
+  First Name: Grace
+  Last Name: de la Rosa
+  Reasons: multiple_words_in_last_name
+
+Row 6671:
+  First Name: Katrina Julia,
+  Last Name: Creator and CEO
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 6725:
+  First Name: Neal
+  Last Name: Author
+  Reasons: job_title_in_last_name
+
+Row 6732:
+  First Name: Nicole B. Simpson®️
+  Last Name: Entrepreneur
+  Reasons: emoji_in_first_name
+
+Row 6751:
+  First Name: Brown
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 6790:
+  First Name: Oscar
+  Last Name: van Elten
+  Reasons: multiple_words_in_last_name
+
+Row 6842:
+  First Name: Damiaan
+  Last Name: van Zanen
+  Reasons: multiple_words_in_last_name
+
+Row 6912:
+  First Name: Gertjan
+  Last Name: de Wilde
+  Reasons: multiple_words_in_last_name
+
+Row 6952:
+  First Name: Etienne
+  Last Name: van Diermen
+  Reasons: multiple_words_in_last_name
+
+Row 6967:
+  First Name: Joren
+  Last Name: de Koning
+  Reasons: multiple_words_in_last_name
+
+Row 7003:
+  First Name: Helms
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 7054:
+  First Name: Isabella
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 7082:
+  First Name: Marco
+  Last Name: de Paulis
+  Reasons: multiple_words_in_last_name
+
+Row 7140:
+  First Name: Stefan
+  Last Name: van Duin
+  Reasons: multiple_words_in_last_name
+
+Row 7201:
+  First Name: Francois
+  Last Name: Le Menn
+  Reasons: multiple_words_in_last_name
+
+Row 7216:
+  First Name: Youssef
+  Last Name: El Allame
+  Reasons: multiple_words_in_last_name
+
+Row 7276:
+  First Name: Francesco
+  Last Name: de Camilli
+  Reasons: multiple_words_in_last_name
+
+Row 7333:
+  First Name: Steve
+  Last Name: van Dorn
+  Reasons: multiple_words_in_last_name
+
+Row 7357:
+  First Name: Jennifer
+  Last Name: van der Valk
+  Reasons: multiple_words_in_last_name
+
+Row 7407:
+  First Name: Sabine Binns
+  Last Name: Clarity Breathwork™ and Somatic Coach
+  Reasons: job_title_in_last_name, multiple_words_in_last_name
+
+Row 7465:
+  First Name: Chekesha
+  Last Name: van Putten
+  Reasons: multiple_words_in_last_name
+
+Row 7584:
+  First Name: Martin
+  Last Name: van der Werff
+  Reasons: multiple_words_in_last_name
+
+Row 7606:
+  First Name: ????
+  Last Name: ??????
+  Reasons: emoji_in_first_name, emoji_in_last_name
+
+Row 7647:
+  First Name: Tom
+  Last Name: Le Sueur
+  Reasons: multiple_words_in_last_name
+
+Row 7680:
+  First Name: Amy
+  Last Name: von Rosen
+  Reasons: multiple_words_in_last_name
+
+Row 7824:
+  First Name: Luca
+  Last Name: van der Ploeg
+  Reasons: multiple_words_in_last_name
+
+Row 7863:
+  First Name: Liana
+  Last Name: Strategist
+  Reasons: job_title_in_last_name
+
+Row 7869:
+  First Name: Ryan
+  Last Name: van Sickle
+  Reasons: multiple_words_in_last_name
+
+Row 7887:
+  First Name: Davis
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 7946:
+  First Name: Joanna
+  Last Name: 
+  Reasons: empty_last_name
+
+Row 7985:
+  First Name: Henk-Jan
+  Last Name: van Ettekoven
+  Reasons: multiple_words_in_last_name

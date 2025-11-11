@@ -91,6 +91,35 @@ export function processRowWithContext(
       return;
     }
     
+    // v3.14.1: Handle full names in First Name column
+    // If First Name contains 2+ words, split it using NameEnhanced
+    if (colSchema.type === 'first-name') {
+      // Clean the value first (remove bullets, special chars, etc.)
+      let cleaned = value.trim();
+      cleaned = cleaned.replace(/^[•●▪▫‣?!]+\s*/g, ''); // Remove bullets
+      cleaned = cleaned.replace(/^(Dr\.?|Prof\.?|Mr\.?|Mrs\.?|Ms\.?|Miss\.?|Reverend)\s+/i, ''); // Remove titles
+      cleaned = cleaned.replace(/^\([^)]+\)\s*/g, ''); // Remove parenthetical prefixes
+      cleaned = cleaned.replace(/[,"]+$/g, ''); // Remove trailing commas/quotes
+      cleaned = cleaned.replace(/^["]+/g, ''); // Remove leading quotes
+      cleaned = cleaned.replace(/\s+/g, ' ').trim(); // Normalize whitespace
+      
+      const words = cleaned.split(/\s+/).filter(w => w.length > 1 || /^[A-Z]$/.test(w));
+      
+      if (words.length >= 2) {
+        // This is a full name - use NameEnhanced to split it properly
+        const name = new NameEnhanced(cleaned);
+        if (name.isValid && name.firstName && name.lastName) {
+          normalized[colName] = name.firstName;
+          // Also populate Last Name if it exists in the schema
+          const lastNameCol = schema.find(s => s.type === 'last-name');
+          if (lastNameCol) {
+            normalized[lastNameCol.name] = name.lastName;
+          }
+          return;
+        }
+      }
+    }
+    
     // v3.13.4: Handle location splitting
     // Check if this is a location column (type is 'address' and name contains 'location')
     const isLocationColumn = colSchema.type === 'address' && /location/i.test(colName);

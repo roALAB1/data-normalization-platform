@@ -42,7 +42,10 @@ function processChunk(
 ): any[] {
   // Build schema and plan once for the entire chunk
   const headers = strategy.columns.map(c => c.name);
-  const schema = analyzeSchema(headers);
+  
+  // v3.14.1: Pass sample data (first 100 rows) for quality analysis
+  const sampleData = chunk.slice(0, 100);
+  const schema = analyzeSchema(headers, sampleData);
   const plan = buildPlan(schema);
   
   return chunk.map((row) => {

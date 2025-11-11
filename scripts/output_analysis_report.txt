@@ -1,0 +1,895 @@
+COMPREHENSIVE CREDENTIAL STRIPPING FAILURE REPORT
+================================================================================
+
+Total rows analyzed: 8006
+Failures found: 148
+Failure rate: 1.85%
+
+================================================================================
+ALL MISSING CREDENTIALS (sorted by frequency)
+================================================================================
+V                              -    6 occurrences
+-                              -    4 occurrences
+Bleen-Mba                      -    2 occurrences
+Ullman-Mba                     -    2 occurrences
+Weber-Lindskoog                -    1 occurrences
+Solomon-Orlick                 -    1 occurrences
+James-Jenkins                  -    1 occurrences
+Walker-Leidy                   -    1 occurrences
+Miller-Rios                    -    1 occurrences
+Yoshida-Mah                    -    1 occurrences
+Forsyth-Mort                   -    1 occurrences
+Flores-Young                   -    1 occurrences
+Herkert-Oakland                -    1 occurrences
+Houtas-Panetta                 -    1 occurrences
+Cirino-Lee                     -    1 occurrences
+Kent-Hume                      -    1 occurrences
+Parker-Naples                  -    1 occurrences
+Taylor-Smith                   -    1 occurrences
+Tate-Rainey                    -    1 occurrences
+Bonte-Lebair                   -    1 occurrences
+Banks-Lear                     -    1 occurrences
+Britton-Arnold                 -    1 occurrences
+Wright-Bell                    -    1 occurrences
+Heyward-Bey                    -    1 occurrences
+Harris-Edwards                 -    1 occurrences
+Ciciora-Gold                   -    1 occurrences
+Grant-Shaw                     -    1 occurrences
+El-Chibini                     -    1 occurrences
+Abu-Seif                       -    1 occurrences
+Lennox-King                    -    1 occurrences
+L-J                            -    1 occurrences
+Holter-                        -    1 occurrences
+Maxwell-Hyslop                 -    1 occurrences
+Perrin-Stalker                 -    1 occurrences
+Deverell-Smith                 -    1 occurrences
+Sant-Cassia                    -    1 occurrences
+Matin-Lewis                    -    1 occurrences
+Hill-Manuel                    -    1 occurrences
+Bertrant-Puig                  -    1 occurrences
+Trehan-Young                   -    1 occurrences
+Lamour-Thomas                  -    1 occurrences
+Jurnett-Lewis                  -    1 occurrences
+Bc-Ded                         -    1 occurrences
+Cross-Jules                    -    1 occurrences
+Davis-Owusu                    -    1 occurrences
+Coleman-Brown                  -    1 occurrences
+Reed-Enever                    -    1 occurrences
+Jones-Hughes                   -    1 occurrences
+Dawe-Gillis                    -    1 occurrences
+Hsieh-Hornstra                 -    1 occurrences
+Drew-Jensen                    -    1 occurrences
+Reed-Gilkison                  -    1 occurrences
+Stimson-Greek                  -    1 occurrences
+Champion-Cain                  -    1 occurrences
+Thornley-Brown                 -    1 occurrences
+Lewis-Ellis                    -    1 occurrences
+Wicker-Campbell                -    1 occurrences
+Kovalova-Woods                 -    1 occurrences
+Igah-Phillips                  -    1 occurrences
+Garner-Moore                   -    1 occurrences
+Leverett-Pitts                 -    1 occurrences
+Ben-Dror                       -    1 occurrences
+Lapid-Bogda                    -    1 occurrences
+Redding-Hinton                 -    1 occurrences
+Bittle-Patton                  -    1 occurrences
+White-Alexander                -    1 occurrences
+Rubio-Teyolia                  -    1 occurrences
+Hasl-Kelchner                  -    1 occurrences
+Mcallister-Zaas                -    1 occurrences
+Osborn-Humbert                 -    1 occurrences
+Mulligan-Fdn                   -    1 occurrences
+Boss-D'itri                    -    1 occurrences
+Bc-Hwnc                        -    1 occurrences
+Fogden-Moore                   -    1 occurrences
+Lockland-Bell                  -    1 occurrences
+Wynn-Bishop                    -    1 occurrences
+Wolf-Soffer                    -    1 occurrences
+Percil-Mercieca                -    1 occurrences
+Strater-Vidal                  -    1 occurrences
+Lavoy-Eddington                -    1 occurrences
+Adams-Robinson                 -    1 occurrences
+Cureton-Robles                 -    1 occurrences
+Gray-Sadler                    -    1 occurrences
+Screen-Sdvosb                  -    1 occurrences
+White-Johnson                  -    1 occurrences
+Rivers-Cannon                  -    1 occurrences
+Jones-Mitchell                 -    1 occurrences
+Taylor-Klaus                   -    1 occurrences
+Lopez-Schlapia                 -    1 occurrences
+Herring-Lee                    -    1 occurrences
+Irby-Wilkins                   -    1 occurrences
+Lloyd-Roberts                  -    1 occurrences
+El-Hawi                        -    1 occurrences
+Mandell-Chance                 -    1 occurrences
+Long-Ferguson                  -    1 occurrences
+Brown-Lyons                    -    1 occurrences
+Pearson-Wood                   -    1 occurrences
+Le Neve-Foster                 -    1 occurrences
+-Hrm                           -    1 occurrences
+Togo-Figa                      -    1 occurrences
+Dalla-Camina                   -    1 occurrences
+Parry-Jones                    -    1 occurrences
+Crespo-Garcia                  -    1 occurrences
+Villarose-Matta                -    1 occurrences
+Petta-Pelletier                -    1 occurrences
+Grimes-Bone                    -    1 occurrences
+Gower-Johnson                  -    1 occurrences
+Bartfai-Walcott                -    1 occurrences
+El-Abdallah                    -    1 occurrences
+Courtenay-Smith                -    1 occurrences
+Ben-Khelifa                    -    1 occurrences
+Al-Sudais                      -    1 occurrences
+Bradley-Cook                   -    1 occurrences
+Elliott-Lindo                  -    1 occurrences
+Russell-Parsons                -    1 occurrences
+Shields-Manley                 -    1 occurrences
+Mendes-Sheldon                 -    1 occurrences
+-Phd                           -    1 occurrences
+Phd                            -    1 occurrences
+-Fellow                        -    1 occurrences
+Glean-Jones                    -    1 occurrences
+Moreno-Damgaard                -    1 occurrences
+Cay-Santos                     -    1 occurrences
+Fisher-Cohen                   -    1 occurrences
+Frey-Mott                      -    1 occurrences
+Luba-Lucas                     -    1 occurrences
+Sauer-Klein                    -    1 occurrences
+Kingman-Joslyn                 -    1 occurrences
+Juarez-Gosselin                -    1 occurrences
+Barth-Dwyer                    -    1 occurrences
+Sarfo-Mensah                   -    1 occurrences
+Colosimo-Miller                -    1 occurrences
+Roca-Quesada                   -    1 occurrences
+Miteva-Regos                   -    1 occurrences
+Shuey-Kelley                   -    1 occurrences
+Davis-Hunter                   -    1 occurrences
+Moore-Stepnitz                 -    1 occurrences
+Egey-Samu                      -    1 occurrences
+Pmhnp-Bc                       -    1 occurrences
+Mccord-Snook                   -    1 occurrences
+Watson-Ladson                  -    1 occurrences
+
+================================================================================
+ALL FAILURES (complete list)
+================================================================================
+
+Row 50:
+  Input Name: Jennifer Weber-Lindskoog
+  Output: Jennifer Weber-Lindskoog
+  Potential Credentials: Weber-Lindskoog
+
+Row 75:
+  Input Name: ✊Heidi Solomon-Orlick
+  Output: Heidi Solomon-Orlick
+  Potential Credentials: Solomon-Orlick
+
+Row 114:
+  Input Name: Nakia James-Jenkins, SPHR, SHRM-SCP
+  Output: Nakia James-Jenkins
+  Potential Credentials: James-Jenkins
+
+Row 139:
+  Input Name: Andrea Walker-Leidy
+  Output: Andrea Walker-Leidy
+  Potential Credentials: Walker-Leidy
+
+Row 220:
+  Input Name: Benjamin Miller-Rios?
+  Output: Benjamin Miller-Rios
+  Potential Credentials: Miller-Rios
+
+Row 278:
+  Input Name: Ken "Duncan" Yoshida-Mah
+  Output: Ken Yoshida-Mah
+  Potential Credentials: Yoshida-Mah
+
+Row 341:
+  Input Name: Mark V.
+  Output: Mark V
+  Potential Credentials: V
+
+Row 365:
+  Input Name: Elise Forsyth-Mort
+  Output: Elise Forsyth-Mort
+  Potential Credentials: Forsyth-Mort
+
+Row 392:
+  Input Name: Amy Flores-Young
+  Output: Amy Flores-Young
+  Potential Credentials: Flores-Young
+
+Row 407:
+  Input Name: Marita Herkert-Oakland
+  Output: Marita Herkert-Oakland
+  Potential Credentials: Herkert-Oakland
+
+Row 439:
+  Input Name: Dina Houtas-Panetta
+  Output: Dina Houtas-Panetta
+  Potential Credentials: Houtas-Panetta
+
+Row 472:
+  Input Name: Isha V.
+  Output: Isha V
+  Potential Credentials: V
+
+Row 1056:
+  Input Name: Aida Cirino-Lee
+  Output: Aida Cirino-Lee
+  Potential Credentials: Cirino-Lee
+
+Row 1095:
+  Input Name: Sergio V.
+  Output: Sergio V
+  Potential Credentials: V
+
+Row 1142:
+  Input Name: Jay Kent-Hume
+  Output: Jay Kent-Hume
+  Potential Credentials: Kent-Hume
+
+Row 1150:
+  Input Name: Anna Parker-Naples
+  Output: Anna Parker-Naples
+  Potential Credentials: Parker-Naples
+
+Row 1185:
+  Input Name: Krystyne Taylor-Smith
+  Output: Krystyne Taylor-Smith
+  Potential Credentials: Taylor-Smith
+
+Row 1197:
+  Input Name: Kaitlin V.
+  Output: Kaitlin V
+  Potential Credentials: V
+
+Row 1267:
+  Input Name: Dahlia Tate-Rainey MBA, CHHC, AADP
+  Output: Dahlia Tate-Rainey
+  Potential Credentials: Tate-Rainey
+
+Row 1290:
+  Input Name: Stephanie Bonte-Lebair
+  Output: Stephanie Bonte-Lebair
+  Potential Credentials: Bonte-Lebair
+
+Row 1513:
+  Input Name: JOHN BANKS-LEAR
+  Output: John Banks-Lear
+  Potential Credentials: Banks-Lear
+
+Row 1517:
+  Input Name: Emily Britton-Arnold
+  Output: Emily Britton-Arnold
+  Potential Credentials: Britton-Arnold
+
+Row 1625:
+  Input Name: Zoe Wright-Bell, ACC
+  Output: Zoe Wright-Bell
+  Potential Credentials: Wright-Bell
+
+Row 1629:
+  Input Name: Tawanna Heyward-Bey
+  Output: Tawanna Heyward-Bey
+  Potential Credentials: Heyward-Bey
+
+Row 1655:
+  Input Name: Joy Harris-Edwards
+  Output: Joy Harris-Edwards
+  Potential Credentials: Harris-Edwards
+
+Row 1669:
+  Input Name: Casey Ciciora-Gold, M.S.
+  Output: Casey Ciciora-Gold
+  Potential Credentials: Ciciora-Gold
+
+Row 1678:
+  Input Name: Janice Grant-Shaw
+  Output: Janice Grant-Shaw
+  Potential Credentials: Grant-Shaw
+
+Row 1698:
+  Input Name: Sabrina El-Chibini
+  Output: Sabrina El-Chibini
+  Potential Credentials: El-Chibini
+
+Row 1790:
+  Input Name: Dina Abu-Seif, MA
+  Output: Dina Abu-Seif
+  Potential Credentials: Abu-Seif
+
+Row 1791:
+  Input Name: Gilbert Lennox-King
+  Output: Gilbert Lennox-King
+  Potential Credentials: Lennox-King
+
+Row 1896:
+  Input Name: Fernando De Obeso L-J
+  Output: Fernando L-J
+  Potential Credentials: L-J
+
+Row 1994:
+  Input Name: Kimberly Pereira - M.Ed, RP, CCC
+  Output: Kimberly -
+  Potential Credentials: -
+
+Row 2010:
+  Input Name: Chris Holter- MBA, ACC
+  Output: Chris Holter-
+  Potential Credentials: Holter-
+
+Row 2067:
+  Input Name: Rebecca Maxwell-Hyslop
+  Output: Rebecca Maxwell-Hyslop
+  Potential Credentials: Maxwell-Hyslop
+
+Row 2069:
+  Input Name: Rachel Perrin-Stalker, BA (Hons)
+  Output: Rachel Perrin-Stalker
+  Potential Credentials: Perrin-Stalker
+
+Row 2128:
+  Input Name: Louise Deverell-Smith
+  Output: Louise Deverell-Smith
+  Potential Credentials: Deverell-Smith
+
+Row 2182:
+  Input Name: Henri Sant-Cassia
+  Output: Henri Sant-Cassia
+  Potential Credentials: Sant-Cassia
+
+Row 2516:
+  Input Name: James Matin-Lewis
+  Output: James Matin-Lewis
+  Potential Credentials: Matin-Lewis
+
+Row 2536:
+  Input Name: Stephanie Hill-Manuel
+  Output: Stephanie Hill-Manuel
+  Potential Credentials: Hill-Manuel
+
+Row 2555:
+  Input Name: Olivia BERTRANT-PUIG
+  Output: Olivia Bertrant-Puig
+  Potential Credentials: Bertrant-Puig
+
+Row 2575:
+  Input Name: Bobbi Trehan-Young
+  Output: Bobbi Trehan-Young
+  Potential Credentials: Trehan-Young
+
+Row 2595:
+  Input Name: Ingrid Lamour-Thomas, MNM
+  Output: Ingrid Lamour-Thomas
+  Potential Credentials: Lamour-Thomas
+
+Row 2638:
+  Input Name: Tammy Jurnett-Lewis, RN, BSN (As seen in Forbes Magazine)
+  Output: Tammy Jurnett-Lewis
+  Potential Credentials: Jurnett-Lewis
+
+Row 2648:
+  Input Name: Christi Crawford , LPN, BC-DEd, CDP, BCPA
+  Output: Christi Bc-Ded
+  Potential Credentials: Bc-Ded
+
+Row 2659:
+  Input Name: Nicoleen Cross-Jules
+  Output: Nicoleen Cross-Jules
+  Potential Credentials: Cross-Jules
+
+Row 2662:
+  Input Name: Kadian Davis-Owusu
+  Output: Kadian Davis-Owusu
+  Potential Credentials: Davis-Owusu
+
+Row 2686:
+  Input Name: Toni   Coleman-Brown
+  Output: Toni Coleman-Brown
+  Potential Credentials: Coleman-Brown
+
+Row 2706:
+  Input Name: Linda Reed-Enever
+  Output: Linda Reed-Enever
+  Potential Credentials: Reed-Enever
+
+Row 2765:
+  Input Name: Claire Jones-Hughes
+  Output: Claire Jones-Hughes
+  Potential Credentials: Jones-Hughes
+
+Row 2845:
+  Input Name: Cecelia Dawe-Gillis
+  Output: Cecelia Dawe-Gillis
+  Potential Credentials: Dawe-Gillis
+
+Row 2895:
+  Input Name: Melody Hsieh-Hornstra
+  Output: Melody Hsieh-Hornstra
+  Potential Credentials: Hsieh-Hornstra
+
+Row 2911:
+  Input Name: Katie Drew-Jensen
+  Output: Katie Drew-Jensen
+  Potential Credentials: Drew-Jensen
+
+Row 2940:
+  Input Name: Sally V.
+  Output: Sally V
+  Potential Credentials: V
+
+Row 2941:
+  Input Name: Carmen Reed-Gilkison
+  Output: Carmen Reed-Gilkison
+  Potential Credentials: Reed-Gilkison
+
+Row 2995:
+  Input Name: Desiree Stimson-Greek
+  Output: Desiree Stimson-Greek
+  Potential Credentials: Stimson-Greek
+
+Row 3056:
+  Input Name: Gina Champion-Cain
+  Output: Gina Champion-Cain
+  Potential Credentials: Champion-Cain
+
+Row 3081:
+  Input Name: Anne Thornley-Brown MBA
+  Output: Anne Thornley-Brown
+  Potential Credentials: Thornley-Brown
+
+Row 3099:
+  Input Name: Lasenta Lewis-Ellis, GC, CM, CQM-C
+  Output: Lasenta Lewis-Ellis
+  Potential Credentials: Lewis-Ellis
+
+Row 3125:
+  Input Name: Stephanie Wicker-Campbell
+  Output: Stephanie Wicker-Campbell
+  Potential Credentials: Wicker-Campbell
+
+Row 3185:
+  Input Name: Lucy Kovalova-Woods
+  Output: Lucy Kovalova-Woods
+  Potential Credentials: Kovalova-Woods
+
+Row 3387:
+  Input Name: Dr. Katherine Igah-Phillips, MD, MHA
+  Output: Katherine Igah-Phillips
+  Potential Credentials: Igah-Phillips
+
+Row 3411:
+  Input Name: Venice Garner-Moore, LCSW
+  Output: Venice Garner-Moore
+  Potential Credentials: Garner-Moore
+
+Row 3413:
+  Input Name: Tammara Leverett-Pitts
+  Output: Tammara Leverett-Pitts
+  Potential Credentials: Leverett-Pitts
+
+Row 3489:
+  Input Name: Ronen Ben-Dror
+  Output: Ronen Ben-Dror
+  Potential Credentials: Ben-Dror
+
+Row 3613:
+  Input Name: Ginger Lapid-Bogda PhD
+  Output: Ginger Lapid-Bogda
+  Potential Credentials: Lapid-Bogda
+
+Row 3684:
+  Input Name: Kamilah Redding-Hinton
+  Output: Kamilah Redding-Hinton
+  Potential Credentials: Redding-Hinton
+
+Row 3687:
+  Input Name: Sylvia Bittle-Patton, Ph.D.
+  Output: Sylvia Bittle-Patton
+  Potential Credentials: Bittle-Patton
+
+Row 3716:
+  Input Name: Tina White-Alexander, MSW, LCSW, LISW, CPLC
+  Output: Tina White-Alexander
+  Potential Credentials: White-Alexander
+
+Row 3725:
+  Input Name: Marla Rubio-Teyolia, M.S.
+  Output: Marla Rubio-Teyolia
+  Potential Credentials: Rubio-Teyolia
+
+Row 3813:
+  Input Name: Hanna Hasl-Kelchner, M.B.A., J.D.
+  Output: Hanna Hasl-Kelchner
+  Potential Credentials: Hasl-Kelchner
+
+Row 3898:
+  Input Name: Robin McAllister-Zaas
+  Output: Robin Mcallister-Zaas
+  Potential Credentials: Mcallister-Zaas
+
+Row 3905:
+  Input Name: Suzanna Osborn-Humbert
+  Output: Suzanna Osborn-Humbert
+  Potential Credentials: Osborn-Humbert
+
+Row 3916:
+  Input Name: Jennifer Bleen-MBA, PMP, PSMI, PSPO, PMI-ACP, PSD, PST, CSM
+  Output: Jennifer Bleen-Mba
+  Potential Credentials: Bleen-Mba, Bleen-Mba
+
+Row 4049:
+  Input Name: Justin Mulligan-FDN
+  Output: Justin Mulligan-Fdn
+  Potential Credentials: Mulligan-Fdn
+
+Row 4129:
+  Input Name: Nikola Boss-D’Itri
+  Output: Nikola Boss-D'itri
+  Potential Credentials: Boss-D'itri
+
+Row 4205:
+  Input Name: Sherry Anne Hole MN BN RN BC-HN BC-HWNC RIHC,
+  Output: Sherry Bc-Hwnc
+  Potential Credentials: Bc-Hwnc
+
+Row 4275:
+  Input Name: Nikki Fogden-Moore
+  Output: Nikki Fogden-Moore
+  Potential Credentials: Fogden-Moore
+
+Row 4342:
+  Input Name: Lisa Lockland-Bell
+  Output: Lisa Lockland-Bell
+  Potential Credentials: Lockland-Bell
+
+Row 4403:
+  Input Name: Kaylene Wynn-Bishop
+  Output: Kaylene Wynn-Bishop
+  Potential Credentials: Wynn-Bishop
+
+Row 4412:
+  Input Name: Lea Wolf-Soffer
+  Output: Lea Wolf-Soffer
+  Potential Credentials: Wolf-Soffer
+
+Row 4440:
+  Input Name: Karlyn Percil-Mercieca
+  Output: Karlyn Percil-Mercieca
+  Potential Credentials: Percil-Mercieca
+
+Row 4648:
+  Input Name: Pompe Strater-Vidal
+  Output: Pompe Strater-Vidal
+  Potential Credentials: Strater-Vidal
+
+Row 4665:
+  Input Name: Darlene Lavoy-Eddington
+  Output: Darlene Lavoy-Eddington
+  Potential Credentials: Lavoy-Eddington
+
+Row 4754:
+  Input Name: Dr. Brenetia Adams-Robinson, SPHR, CLC, NLPP
+  Output: Brenetia Adams-Robinson
+  Potential Credentials: Adams-Robinson
+
+Row 4767:
+  Input Name: Cynthia Cureton-Robles
+  Output: Cynthia Cureton-Robles
+  Potential Credentials: Cureton-Robles
+
+Row 4791:
+  Input Name: Kati 'Jazzy' Gray-Sadler
+  Output: Kati Gray-Sadler
+  Potential Credentials: Gray-Sadler
+
+Row 4796:
+  Input Name: Reginald Screen-SDVOSB
+  Output: Reginald Screen-Sdvosb
+  Potential Credentials: Screen-Sdvosb
+
+Row 4856:
+  Input Name: Adair White-johnson, Ph.D.
+  Output: Adair White-Johnson
+  Potential Credentials: White-Johnson
+
+Row 4917:
+  Input Name: Dr. Terriyln Rivers-Cannon
+  Output: Terriyln Rivers-Cannon
+  Potential Credentials: Rivers-Cannon
+
+Row 4929:
+  Input Name: Jennifer Jones-Mitchell
+  Output: Jennifer Jones-Mitchell
+  Potential Credentials: Jones-Mitchell
+
+Row 4941:
+  Input Name: Elaine Taylor-Klaus, MCC, CPCC
+  Output: Elaine Taylor-Klaus
+  Potential Credentials: Taylor-Klaus
+
+Row 4947:
+  Input Name: Andrea Lopez-Schlapia
+  Output: Andrea Lopez-Schlapia
+  Potential Credentials: Lopez-Schlapia
+
+Row 4986:
+  Input Name: La Shonda Herring-Lee
+  Output: la Herring-Lee
+  Potential Credentials: Herring-Lee
+
+Row 5039:
+  Input Name: Rose Irby-Wilkins, PhD
+  Output: Rose Irby-Wilkins
+  Potential Credentials: Irby-Wilkins
+
+Row 5184:
+  Input Name: Estelle Gibson - CPA, ACC
+  Output: Estelle -
+  Potential Credentials: -
+
+Row 5201:
+  Input Name: Colleen Lloyd-Roberts
+  Output: Colleen Lloyd-Roberts
+  Potential Credentials: Lloyd-Roberts
+
+Row 5254:
+  Input Name: Raffy El-hawi
+  Output: Raffy El-Hawi
+  Potential Credentials: El-Hawi
+
+Row 5268:
+  Input Name: Anissa Mandell-Chance
+  Output: Anissa Mandell-Chance
+  Potential Credentials: Mandell-Chance
+
+Row 5306:
+  Input Name: Vivs Long-Ferguson
+  Output: Vivs Long-Ferguson
+  Potential Credentials: Long-Ferguson
+
+Row 5396:
+  Input Name: Ouida Brown-Lyons
+  Output: Ouida Brown-Lyons
+  Potential Credentials: Brown-Lyons
+
+Row 5564:
+  Input Name: Sarah Pearson-Wood
+  Output: Sarah Pearson-Wood
+  Potential Credentials: Pearson-Wood
+
+Row 5700:
+  Input Name: Nancy Sardella 818-995-6646
+  Output: Nancy -
+  Potential Credentials: -
+
+Row 5720:
+  Input Name: Tom Le Neve-Foster
+  Output: Tom Le Neve-Foster
+  Potential Credentials: Le Neve-Foster
+
+Row 5862:
+  Input Name: Monica Pretlow Quinones MBA-HRM
+  Output: Monica -Hrm
+  Potential Credentials: -Hrm
+
+Row 5864:
+  Input Name: Rochelle Togo-Figa
+  Output: Rochelle Togo-Figa
+  Potential Credentials: Togo-Figa
+
+Row 5971:
+  Input Name: Megan Dalla-Camina
+  Output: Megan Dalla-Camina
+  Potential Credentials: Dalla-Camina
+
+Row 6134:
+  Input Name: Julie Parry-Jones
+  Output: Julie Parry-Jones
+  Potential Credentials: Parry-Jones
+
+Row 6195:
+  Input Name: Dean Lovett - CPA, MBA
+  Output: Dean -
+  Potential Credentials: -
+
+Row 6241:
+  Input Name: Nadine Crespo-Garcia M.A. BCBA
+  Output: Nadine Crespo-Garcia
+  Potential Credentials: Crespo-Garcia
+
+Row 6315:
+  Input Name: April Villarose-Matta
+  Output: April Villarose-Matta
+  Potential Credentials: Villarose-Matta
+
+Row 6330:
+  Input Name: Tina Petta-Pelletier
+  Output: Tina Petta-Pelletier
+  Potential Credentials: Petta-Pelletier
+
+Row 6331:
+  Input Name: Joyce Grimes-Bone
+  Output: Joyce Grimes-Bone
+  Potential Credentials: Grimes-Bone
+
+Row 6358:
+  Input Name: Angela Gower-Johnson
+  Output: Angela Gower-Johnson
+  Potential Credentials: Gower-Johnson
+
+Row 6477:
+  Input Name: Katalin Bártfai-Walcott
+  Output: Katalin Bartfai-Walcott
+  Potential Credentials: Bartfai-Walcott
+
+Row 6485:
+  Input Name: Maher El-Abdallah
+  Output: Maher El-Abdallah
+  Potential Credentials: El-Abdallah
+
+Row 6600:
+  Input Name: Tash Courtenay-Smith
+  Output: Tash Courtenay-Smith
+  Potential Credentials: Courtenay-Smith
+
+Row 6863:
+  Input Name: Sadok Ben-Khelifa
+  Output: Sadok Ben-Khelifa
+  Potential Credentials: Ben-Khelifa
+
+Row 6890:
+  Input Name: Mohammed  Al-Sudais  محمدالسديس
+  Output: Mohammed Al-Sudais
+  Potential Credentials: Al-Sudais
+
+Row 7044:
+  Input Name: Greta V.
+  Output: Greta V
+  Potential Credentials: V
+
+Row 7047:
+  Input Name: Russell Bradley-Cook ⚡️
+  Output: Russell Bradley-Cook
+  Potential Credentials: Bradley-Cook
+
+Row 7110:
+  Input Name: Emir Elliott-Lindo
+  Output: Emir Elliott-Lindo
+  Potential Credentials: Elliott-Lindo
+
+Row 7165:
+  Input Name: Hugh Russell-Parsons
+  Output: Hugh Russell-Parsons
+  Potential Credentials: Russell-Parsons
+
+Row 7237:
+  Input Name: Mickey Belle Shields-Manley, CFMP
+  Output: Mickey Shields-Manley
+  Potential Credentials: Shields-Manley
+
+Row 7248:
+  Input Name: Adriana Mendes-Sheldon
+  Output: Adriana Mendes-Sheldon
+  Potential Credentials: Mendes-Sheldon
+
+Row 7265:
+  Input Name: Christopher H. Loo, MD-PhD
+  Output: Christopher -Phd
+  Potential Credentials: -Phd, Phd
+
+Row 7268:
+  Input Name: Carrie Davenport CMP-Fellow ,CEM,CSEP
+  Output: Carrie -Fellow
+  Potential Credentials: -Fellow
+
+Row 7289:
+  Input Name: Camela Glean-Jones
+  Output: Camela Glean-Jones
+  Potential Credentials: Glean-Jones
+
+Row 7299:
+  Input Name: Jeffry  Ullman-MBA
+  Output: Jeffry Ullman-Mba
+  Potential Credentials: Ullman-Mba, Ullman-Mba
+
+Row 7338:
+  Input Name: Amalia Moreno-Damgaard
+  Output: Amalia Moreno-Damgaard
+  Potential Credentials: Moreno-Damgaard
+
+Row 7396:
+  Input Name: Connie Cay-Santos
+  Output: Connie Cay-Santos
+  Potential Credentials: Cay-Santos
+
+Row 7421:
+  Input Name: Aaron Fisher-Cohen
+  Output: Aaron Fisher-Cohen
+  Potential Credentials: Fisher-Cohen
+
+Row 7442:
+  Input Name: Anne Frey-Mott
+  Output: Anne Frey-Mott
+  Potential Credentials: Frey-Mott
+
+Row 7443:
+  Input Name: Annette Luba-Lucas
+  Output: Annette Luba-Lucas
+  Potential Credentials: Luba-Lucas
+
+Row 7525:
+  Input Name: Jenny Sauer-Klein
+  Output: Jenny Sauer-Klein
+  Potential Credentials: Sauer-Klein
+
+Row 7550:
+  Input Name: Kelly Kingman-Joslyn
+  Output: Kelly Kingman-Joslyn
+  Potential Credentials: Kingman-Joslyn
+
+Row 7576:
+  Input Name: Marcos Juarez-Gosselin
+  Output: Marcos Juarez-Gosselin
+  Potential Credentials: Juarez-Gosselin
+
+Row 7620:
+  Input Name: Ryan Barth-Dwyer
+  Output: Ryan Barth-Dwyer
+  Potential Credentials: Barth-Dwyer
+
+Row 7669:
+  Input Name: Lois Sarfo-Mensah
+  Output: Lois Sarfo-Mensah
+  Potential Credentials: Sarfo-Mensah
+
+Row 7686:
+  Input Name: Teresa Colosimo-Miller
+  Output: Teresa Colosimo-Miller
+  Potential Credentials: Colosimo-Miller
+
+Row 7715:
+  Input Name: Monica Roca-Quesada
+  Output: Monica Roca-Quesada
+  Potential Credentials: Roca-Quesada
+
+Row 7765:
+  Input Name: Milena Miteva-Regos
+  Output: Milena Miteva-Regos
+  Potential Credentials: Miteva-Regos
+
+Row 7838:
+  Input Name: Chris Shuey-Kelley
+  Output: Chris Shuey-Kelley
+  Potential Credentials: Shuey-Kelley
+
+Row 7915:
+  Input Name: Julie  Davis-Hunter
+  Output: Julie Davis-Hunter
+  Potential Credentials: Davis-Hunter
+
+Row 7959:
+  Input Name: Miranda Moore-Stepnitz M.S.
+  Output: Miranda Moore-Stepnitz
+  Potential Credentials: Moore-Stepnitz
+
+Row 7960:
+  Input Name: Zsolt Egey-Samu
+  Output: Zsolt Egey-Samu
+  Potential Credentials: Egey-Samu
+
+Row 7961:
+  Input Name: Elizabeth  Martell FNP-BC PMHNP-BC
+  Output: Elizabeth Pmhnp-Bc
+  Potential Credentials: Pmhnp-Bc
+
+Row 7964:
+  Input Name: Colette McCord-Snook
+  Output: Colette Mccord-Snook
+  Potential Credentials: Mccord-Snook
+
+Row 7975:
+  Input Name: Donna Watson-Ladson, MS, LPC, NBCC
+  Output: Donna Watson-Ladson
+  Potential Credentials: Watson-Ladson

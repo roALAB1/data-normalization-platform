@@ -609,7 +609,7 @@ export default function IntelligentNormalization() {
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                       <span className="text-gray-400 truncate">(415) 555-1234</span>
                       <span className="text-gray-300 hidden sm:inline">→</span>
-                      <span className="text-indigo-600 font-medium truncate">+1 415-555-1234</span>
+                      <span className="text-indigo-600 font-medium truncate">14155551234</span>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                       <span className="text-gray-400 truncate">44 20 7946 0958</span>
@@ -768,6 +768,7 @@ export default function IntelligentNormalization() {
                             <SelectItem value="phone">Phone</SelectItem>
                             <SelectItem value="address">Address</SelectItem>
                             <SelectItem value="company">Company</SelectItem>
+                            <SelectItem value="job_title">Job Title</SelectItem>
                             <SelectItem value="city">City</SelectItem>
                             <SelectItem value="state">State</SelectItem>
                             <SelectItem value="zip">ZIP Code</SelectItem>
@@ -852,7 +853,7 @@ export default function IntelligentNormalization() {
                               <div className="flex items-center gap-2 text-gray-600 ml-4">
                                 <span className="text-gray-500">(415) 555-1234</span>
                                 <span className="text-indigo-600">→</span>
-                                <span className="text-indigo-700 font-medium">+1 415-555-1234</span>
+                                <span className="text-indigo-700 font-medium">14155551234</span>
                               </div>
                             </div>
                           );
@@ -864,6 +865,28 @@ export default function IntelligentNormalization() {
                                 <span className="text-gray-500">123 MAIN STREET</span>
                                 <span className="text-indigo-600">→</span>
                                 <span className="text-indigo-700 font-medium">123 Main St</span>
+                              </div>
+                            </div>
+                          );
+                        } else if (type === 'company') {
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">ACME CORP INC</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">Acme Corp Inc</span>
+                              </div>
+                            </div>
+                          );
+                        } else if (type === 'job_title') {
+                          preview = (
+                            <div key={idx} className="space-y-1">
+                              <div className="font-medium text-gray-900">{mapping.columnName}:</div>
+                              <div className="flex items-center gap-2 text-gray-600 ml-4">
+                                <span className="text-gray-500">SENIOR MANAGER - SALES</span>
+                                <span className="text-indigo-600">→</span>
+                                <span className="text-indigo-700 font-medium">Senior Manager - Sales</span>
                               </div>
                             </div>
                           );
@@ -1178,7 +1201,7 @@ export default function IntelligentNormalization() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.13.6</span>
+          <span>v3.13.7</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"
