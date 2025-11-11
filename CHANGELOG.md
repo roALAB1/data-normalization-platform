@@ -1,142 +1,86 @@
 # Changelog
 
-## [3.13.5] - 2025-01-XX - STABLE
+All notable changes to the Data Normalization Platform are documented in this file.
 
-### Added - Hero Section + UI Enhancements
-- **Hero Section**: Enterprise-scale data normalization feature showcase
-  - 4 feature cards: Names, Emails, Phone Numbers, Addresses
-  - Key capabilities listed for each data type
-  - Before/after transformation examples
-- **Enhanced Preview Transformations**: Shows actual sample data before normalization
-  - Name: "Dr. John Smith, PhD" → "First Name: John, Last Name: Smith"
-  - First Name: "jOhN R." → "John"
-  - Last Name: "SMITH, PhD" → "Smith"
-  - Location: "Durham, North Carolina, United States" → "Personal City: Durham, Personal State: NC"
-  - Purple gradient background with indigo accents
-- **Column Transformations Applied**: Post-normalization summary section
-  - Collapsible section with purple gradient header
-  - Shows which columns were transformed and how
-  - Split badges for columns generating multiple outputs
-  - Green checkmarks for completed transformations
+## [3.15.1] - 2025-11-11
 
-### Fixed - Ghost Columns
-- **CSV Download**: Filtered ghost columns (_1, _2, _3) from CSV headers using regex `/^_\d+$/`
-- **Results Table**: Filtered ghost columns from table headers and cells
-- **Cleaner Output**: No more empty column artifacts in exported data
+### Fixed
+- **CRITICAL BUG FIX:** Column filtering in output CSV
+  - User deletes 69 columns from 78-column CSV, keeping only 9
+  - Output CSV was containing ALL 78 columns instead of just 9 selected
+  - Root cause: `processRowWithContext` was not filtering output columns
+  - Solution: Added Phase 4 column filtering at end of normalization pipeline
+  - Now output respects user's column selection across both client-side and backend processing
 
 ### Changed
-- Professional UI with purple/indigo color scheme for transformations
-- Better user guidance with feature cards and examples
-- Improved visualization of data transformations
+- Updated `processRowWithContext` to accept `outputColumns` parameter
+- Enhanced normalization pipeline to filter columns before returning results
+- Extended backend `submitBatch` endpoint to accept `columnMappings`
 
 ### Technical Details
-- All 139 tests passing
-- Ghost column regex filter: `/^_\d+$/`
-- Applied to 3 locations: CSV download (line 322), table headers (line 959), table cells (line 971)
+- Files Modified: 8 files across client, shared, and server
+- Tests: All 4 unit tests passing (column filtering logic verified)
+- Impact: Users can now delete columns and output will ONLY contain selected columns
 
 ---
 
-## [3.13.4] - 2025-01-XX - STABLE
+## [3.14.0] - 2025-01-XX
 
-### Fixed - Critical Normalization Issues
-- **Middle Initial Removal**: Single-letter initials (A., B., R.) now properly filtered from First/Last names
-  - "Jennifer R. Berman" → First: "Jennifer", Last: "Berman" (not "Jennifer R.")
-  - "James A. Simon" → First: "James", Last: "Simon" (not Last: "A Simon")
-  - Fixed single-letter "a" being treated as last name prefix (Portuguese/Spanish names)
-- **Location Splitting**: Location columns now split into Personal City + Personal State
-  - "Durham, North Carolina, United States" → City: "Durham", State: "NC"
-  - "San Francisco Bay Area" → City: "San Francisco", State: "CA"
-  - "Washington DC-Baltimore Area" → City: "Washington", State: "DC"
-  - State names converted to 2-letter abbreviations
-  - Original Location column removed from output
-- **Full Name Column Removal**: Verified v3.10.0 logic still works correctly
-  - Only First Name and Last Name columns in output
+### Fixed
+- Job title removal now works by removing titles instead of rejecting entire name
+- Added 8 missing job title keywords (Advisor, Expert, Speaker, Keynote, TEDx, Author, Coach, Photographer)
+- Improved name parsing for 198 failure cases (2.47% of 8,006 rows)
 
 ### Added
-- **locationParser.ts**: Comprehensive US location parsing module
-  - Handles "City, State, Country" format
-  - Handles "City Area" format (Bay Area, Metropolitan Area)
-  - Infers state from well-known city names
-  - Prioritizes state abbreviations over state names
-  - Supports 50+ US states and territories
-- **11 New Tests**: Comprehensive test coverage for all fixes
-  - Middle initial removal (4 tests)
-  - Location splitting (2 tests)
-  - Full Name column removal (3 tests)
-  - Output schema validation (2 tests)
+- Comprehensive test suite with 29 tests for name parsing edge cases
+- Support for foreign name prefixes (van, de, von, Le, El)
+- Emoji and special character removal in names
+
+### Test Results
+- 266/266 tests passing (5 skipped edge cases)
+- 26/29 v3.14.0 tests passing (90% success rate)
+- ~70% improvement in parsing success rate
+
+---
+
+## [3.13.8] - 2025-01-XX
+
+### Fixed
+- Phone preview format now shows digits only
+- Added CSM, CBC credentials to recognition list
+
+---
+
+## [3.13.7] - 2025-01-XX
+
+### Fixed
+- Credential regex pattern now makes periods optional (EdD matches Ed.D.)
+- Added CCC-SLP, ESDP, WELL AP credentials
+
+---
+
+## [3.13.6] - 2025-01-XX
 
 ### Changed
-- **NameEnhanced.ts**: Added single-letter initial detection
-  - Prevents single letters from being treated as last name prefixes
-  - Filters single-letter middle initials from middleParts
-- **contextAwareExecutor.ts**: Added location splitting logic
-  - Detects location columns (type 'address' + name contains 'location')
-  - Splits into Personal City + Personal State
-  - Removes original Location column
-
-### Technical Details
-- All 139 tests passing (15 test files)
-- Updated 2 old tests to match new middle initial behavior
-- Full documentation updated (VERSION_HISTORY, DEBUGGING_GUIDE, ARCHITECTURE_DECISIONS)
-- Production ready
+- Updated footer version number
+- Restored v3.11.0 enrichment-ready output format hero section
 
 ---
 
-## [3.9.1] - 2025-11-02
+## [3.13.5] - 2025-01-XX
 
-### Added - Bug Report System UI
-- **ReportIssueButton Component**: Icon button next to each result row for reporting issues
-  - AlertCircle icon with tooltip
-  - Accessible (keyboard navigation, ARIA labels)
-  - Opens dialog on click
-- **ReportIssueDialog Component**: Modal form for submitting bug reports
-  - Pre-filled fields: Original Input, Actual Output (read-only)
-  - User inputs: Issue Type (dropdown), Severity (dropdown), Expected Output (optional), Description (optional)
-  - Submit button with loading state
-  - Success/error toast notifications
-  - Auto-resets form on success
-- **Integration**: Added Report Issue button column to results table in IntelligentNormalization page
-- **End-to-end Testing**: Verified report submission and database storage
-
-### Technical Details
-- Uses shadcn/ui components (Button, Dialog, Select, Textarea, Label, Input, Tooltip)
-- tRPC integration with `reports.submit` mutation
-- Mobile-responsive dialog
-- Loading states during API calls
-- Toast notifications for user feedback
-
-## [3.9.0] - 2025-11-02
-
-### Added - Bug Report System API
-- **Database Schema**: Created `issueReports` table with 15 columns
-  - Tracks original input, actual output, expected output
-  - Issue type, severity, status, description
-  - User info, version, timestamps
-- **5 tRPC API Endpoints**:
-  1. `reports.submit` - Submit bug report (public, anonymous OK)
-  2. `reports.list` - List reports with filters & pagination
-  3. `reports.getById` - Get single report
-  4. `reports.updateStatus` - Update status (requires auth)
-  5. `reports.stats` - Get statistics
-- **Issue Types Supported**:
-  - credential_not_stripped
-  - credential_incorrectly_stripped
-  - name_split_wrong
-  - special_char_issue
-  - trailing_punctuation
-  - leading_punctuation
-  - other
-- **14 Tests**: Full test coverage for all API endpoints
-
-### Technical Details
-- MySQL-compatible insert/update operations
-- Pagination support (limit, offset)
-- Filter by status, issue type, severity
-- Anonymous reporting supported
-- Version tracking for debugging
+### Added
+- Hero section with gradient background
+- Ghost numbers fix in phone normalization
 
 ---
 
-## Earlier Versions
+## [3.13.4] - 2025-01-XX
 
-See git history for versions prior to v3.9.0.
+### Fixed
+- Middle initial removal in name normalization
+- Location splitting for address fields
+
+---
+
+For earlier versions, see VERSION_HISTORY.md
