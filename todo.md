@@ -298,3 +298,31 @@
   - Verify State normalization works in preview
 - [x] Test both fixes with sample CSV
 - [ ] Create checkpoint v3.15.2
+
+---
+
+## v3.15.3 - CRITICAL BUG: Phone Numbers Not Being Normalized
+
+**Status:** IN PROGRESS
+
+**Issue:** Phone numbers in output CSV are identical to input - not being normalized
+- Input: `(904) 786-0081`
+- Expected Output: `9047860081` (digits only)
+- Actual Output: `(904) 786-0081` (unchanged)
+
+**Root Cause:** Phone normalization not working in intelligent normalization pipeline
+
+**Tasks:**
+- [x] Investigate contextAwareExecutor phone normalization
+  - Found: PhoneEnhanced.parse() doesn't exist, should use constructor
+  - Found: normalizeValue.ts was accessing phone.international (doesn't exist)
+  - Found: IntelligentNormalization.tsx was calling non-existent static method
+- [x] Check if phone detection is working
+  - Phone detection works, but normalization output was wrong
+- [x] Fix phone normalization logic
+  - Updated normalizeValue.ts to use phone.result.digitsOnly
+  - Updated IntelligentNormalization.tsx to use new PhoneEnhanced() constructor
+  - Both now return digits-only format: (904) 786-0081 → 9047860081
+- [x] Test with sample phone numbers
+  - Dev server running and hot-reloaded with fixes
+- [ ] Create checkpoint v3.15.3

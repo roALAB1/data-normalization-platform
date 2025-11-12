@@ -190,8 +190,8 @@ export default function IntelligentNormalization() {
           return email.isValid ? email.normalized : value;
         }
         case 'phone': {
-          const phone = PhoneEnhanced.parse(value);
-          return phone.isValid ? phone.digitsOnly : value;
+          const phone = new PhoneEnhanced(value);
+          return phone.isValid ? (phone.result.digitsOnly || phone.result.e164Format || value) : value;
         }
         case 'address': {
           const result = AddressFormatter.normalize(value);

@@ -137,7 +137,7 @@ export function normalizeValue(type: string, value: string): string {
       }
       case 'phone': {
         const phone = new PhoneEnhanced(value);
-        return phone.isValid ? phone.international : value;
+        return phone.isValid ? (phone.result.digitsOnly || phone.result.e164Format || value) : value;
       }
       case 'address': {
         return AddressFormatter.format(value);
