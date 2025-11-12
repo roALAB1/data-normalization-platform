@@ -410,3 +410,24 @@
   - Dev server hot-reloaded with all fixes
   - Ready for user testing
 - [ ] Create checkpoint v3.15.6
+
+---
+
+## v3.15.7 - DEBUG: Phone/ZIP Normalization Still Not Working
+
+**Status:** PARTIAL SUCCESS - ZIP FIXED, PHONE STILL BROKEN
+
+**Issue:** Despite code fixes in v3.15.6, phone and ZIP normalization still not applied to output
+- Row 25: Phone `(989) 797-7675` → Should be `+19897977675` but unchanged
+- Row 27: ZIP `8840` → Should be `08840` but unchanged  
+- Row 28: Phone `(239) 332-1048` → Should be `+12393321048` but unchanged
+
+**Hypothesis:** Worker may be cached or not using updated normalizeValue.ts code
+
+**Tasks:**
+- [ ] Check if worker is importing normalizeValue.ts correctly
+- [ ] Add console.log to normalizeValue to verify it's being called
+- [ ] Check if column types are being passed correctly to normalizeValue
+- [ ] Verify schemaAnalyzer is detecting phone/ZIP types
+- [ ] Test with hard refresh to clear worker cache
+- [ ] Create checkpoint v3.15.7

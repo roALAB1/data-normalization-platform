@@ -42,12 +42,13 @@ function processChunk(
   strategy: { columns: Array<{ name: string; type: string }> },
   outputColumns?: string[]
 ): any[] {
-  // Build schema and plan once for the entire chunk
-  const headers = strategy.columns.map(c => c.name);
+  // Build schema from strategy types (don't re-analyze!)
+  const schema = strategy.columns.map(col => ({
+    name: col.name,
+    type: col.type as any, // Use the type from strategy
+    role: 'independent' as const,
+  }));
   
-  // v3.14.1: Pass sample data (first 100 rows) for quality analysis
-  const sampleData = chunk.slice(0, 100);
-  const schema = analyzeSchema(headers, sampleData);
   const plan = buildPlan(schema);
   
   return chunk.map((row) => {

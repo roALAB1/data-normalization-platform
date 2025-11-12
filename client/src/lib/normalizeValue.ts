@@ -12,6 +12,11 @@ import { AddressFormatter } from '../../../shared/normalization/addresses/Addres
 export function normalizeValue(type: string, value: string): string {
   if (!value) return '';
 
+  // DEBUG: Log all phone and ZIP normalization attempts
+  if (type === 'phone' || type === 'zip') {
+    console.log(`[normalizeValue] type=${type}, value="${value}"`);
+  }
+
   try {
     switch (type) {
       case 'name': {
