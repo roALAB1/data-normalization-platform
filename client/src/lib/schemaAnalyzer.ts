@@ -14,7 +14,7 @@ import { analyzeColumnQuality } from './dataQualityAnalyzer';
 
 export interface ColumnSchema {
   name: string;
-  type: 'name' | 'first-name' | 'last-name' | 'email' | 'phone' | 'address' | 'location' | 'company' | 'job-title' | 'unknown';
+  type: 'name' | 'first-name' | 'last-name' | 'email' | 'phone' | 'address' | 'location' | 'company' | 'job-title' | 'zip' | 'city' | 'state' | 'country' | 'unknown';
   role: 'full' | 'component' | 'variant' | 'independent';
   relatedTo?: string[]; // Which columns are related to this one
   context?: 'personal' | 'business' | 'mobile' | 'landline' | 'home' | 'work';
@@ -182,11 +182,36 @@ export function analyzeSchema(headers: string[], sampleData?: any[]): ColumnSche
     // Skip if already processed
     if (schemas.some(s => s.name === header)) return;
     
-    if (/address|street|location|city|state|zip|postal/i.test(normalized)) {
+    // Detect specific address components first
+    if (/\bzip\b|\bpostal/i.test(normalized)) {
+      schemas.push({
+        name: header,
+        type: 'zip',
+        role: 'independent'
+      });
+    } else if (/\bcity\b/i.test(normalized)) {
+      schemas.push({
+        name: header,
+        type: 'city',
+        role: 'independent'
+      });
+    } else if (/\bstate\b/i.test(normalized)) {
+      schemas.push({
+        name: header,
+        type: 'state',
+        role: 'independent'
+      });
+    } else if (/\bcountry\b/i.test(normalized)) {
+      schemas.push({
+        name: header,
+        type: 'country',
+        role: 'independent'
+      });
+    } else if (/address|street|location/i.test(normalized)) {
       schemas.push({
         name: header,
         type: 'address',
-        role: 'independent' // TODO: Detect component relationships
+        role: 'independent'
       });
     }
   });

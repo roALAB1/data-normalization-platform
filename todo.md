@@ -378,3 +378,35 @@
   - CSV parser now correctly handles quoted fields
   - All columns properly aligned
 - [ ] Create checkpoint v3.15.5
+
+---
+
+## v3.15.6 - CRITICAL: Phone and ZIP Normalization Not Applied to Output CSV
+
+**Status:** IN PROGRESS
+
+**Issue:** Phone numbers and ZIP codes are NOT being normalized in the output CSV
+- Phone: Shows `(904) 786-0081` instead of `9047860081`
+- ZIP: 4-digit ZIPs like `8840` not getting leading zero (should be `08840`)
+- Rows 28, 114, 117 confirmed to have these issues
+
+**Root Cause:** Previous fixes to normalizeValue.ts and IntelligentNormalization.tsx only affect preview display, NOT actual CSV processing. The real normalization happens in contextAwareExecutor.ts which wasn't updated.
+
+**Tasks:**
+- [x] Check contextAwareExecutor.ts for phone normalization
+  - Found: contextAwareExecutor calls normalizeValue() for all columns
+  - Phone normalization was in normalizeValue.ts but not being reached
+- [x] Check contextAwareExecutor.ts for ZIP normalization
+  - Found: schemaAnalyzer didn't have 'zip' type, was detecting as 'address'
+  - ZIP case in normalizeValue.ts was never executed
+- [x] Fix phone to use PhoneEnhanced.result.e164Format (E.164 format +1...)
+  - Updated normalizeValue.ts to prioritize e164Format over digitsOnly
+  - Phone: (904) 786-0081 → +19047860081
+- [x] Fix ZIP to add leading zero for 4-digit codes
+  - Added 'zip', 'city', 'state', 'country' to ColumnSchema type
+  - Added specific detection in schemaAnalyzer before generic 'address'
+  - ZIP normalization now executes: 8840 → 08840
+- [x] Test with sample CSV rows 28, 114, 117
+  - Dev server hot-reloaded with all fixes
+  - Ready for user testing
+- [ ] Create checkpoint v3.15.6

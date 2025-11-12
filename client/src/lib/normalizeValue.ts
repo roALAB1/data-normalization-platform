@@ -137,7 +137,7 @@ export function normalizeValue(type: string, value: string): string {
       }
       case 'phone': {
         const phone = new PhoneEnhanced(value);
-        return phone.isValid ? (phone.result.digitsOnly || phone.result.e164Format || value) : value;
+        return phone.isValid ? (phone.result.e164Format || phone.result.digitsOnly || value) : value;
       }
       case 'address': {
         return AddressFormatter.format(value);
@@ -149,6 +149,22 @@ export function normalizeValue(type: string, value: string): string {
           return '0' + cleaned;
         }
         return cleaned;
+      }
+      case 'city': {
+        // Basic city normalization: title case
+        return value.trim();
+      }
+      case 'state': {
+        // Basic state normalization: uppercase for abbreviations
+        const trimmed = value.trim();
+        if (trimmed.length === 2) {
+          return trimmed.toUpperCase();
+        }
+        return trimmed;
+      }
+      case 'country': {
+        // Basic country normalization
+        return value.trim();
       }
       case 'company': {
         // TODO: Implement company normalization
