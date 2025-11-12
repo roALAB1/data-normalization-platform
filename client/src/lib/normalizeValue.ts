@@ -141,8 +141,32 @@ export function normalizeValue(type: string, value: string): string {
         return email.isValid ? email.normalized : value;
       }
       case 'phone': {
-        const phone = new PhoneEnhanced(value);
-        return phone.isValid ? (phone.result.e164Format || phone.result.digitsOnly || value) : value;
+        try {
+          // Simple regex-based phone normalization (foolproof method)
+          // Extract all digits from the phone number
+          const digits = value.replace(/\D/g, '');
+          
+          console.log(`[normalizeValue] SIMPLE phone normalization: "${value}" -> digits: "${digits}"`);
+          
+          // If we have 10 digits, assume US number and add +1
+          if (digits.length === 10) {
+            const e164 = `+1${digits}`;
+            console.log(`[normalizeValue] phone normalized: "${value}" -> "${e164}"`);
+            return e164;
+          }
+          // If we have 11 digits starting with 1, format as +1...
+          if (digits.length === 11 && digits.startsWith('1')) {
+            const e164 = `+${digits}`;
+            console.log(`[normalizeValue] phone normalized: "${value}" -> "${e164}"`);
+            return e164;
+          }
+          // Otherwise keep original
+          console.log(`[normalizeValue] phone kept original (${digits.length} digits): "${value}"`);
+          return value;
+        } catch (error) {
+          console.error(`[normalizeValue] phone error:`, error);
+          return value;
+        }
       }
       case 'address': {
         return AddressFormatter.format(value);
