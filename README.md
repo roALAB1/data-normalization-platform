@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.15.1 🚀
+
+**CRITICAL BUG FIX: Column Filtering in Output CSV** 🔧  
+Fixed critical bug where deleted columns were being re-added to output CSV. Users can now delete columns from their CSV and the output will ONLY contain the selected columns (not all original columns). Added Phase 4 column filtering to normalization pipeline. All 4 unit tests passing. Production ready!
+
 ### What's New in v3.13.5 🚀
 
 **Hero Section + Ghost Numbers Fix** ✨  

@@ -22,6 +22,7 @@ interface ColumnMapping {
   detectedType: string;
   confidence: number;
   overrideType?: string;
+  sampleValues?: string[];
 }
 
 interface ProcessingResult {
@@ -136,6 +137,7 @@ export default function IntelligentNormalization() {
           columnName: header,
           detectedType: detection.type,
           confidence: detection.confidence,
+          sampleValues: samples[header]?.slice(0, 3) || [],
         };
       });
 
@@ -194,6 +196,45 @@ export default function IntelligentNormalization() {
         case 'address': {
           const result = AddressFormatter.normalize(value);
           return result.normalized;
+        }
+        case 'state': {
+          const stateMap: Record<string, string> = {
+            'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR',
+            'california': 'CA', 'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE',
+            'florida': 'FL', 'georgia': 'GA', 'hawaii': 'HI', 'idaho': 'ID',
+            'illinois': 'IL', 'indiana': 'IN', 'iowa': 'IA', 'kansas': 'KS',
+            'kentucky': 'KY', 'louisiana': 'LA', 'maine': 'ME', 'maryland': 'MD',
+            'massachusetts': 'MA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS',
+            'missouri': 'MO', 'montana': 'MT', 'nebraska': 'NE', 'nevada': 'NV',
+            'new hampshire': 'NH', 'new jersey': 'NJ', 'new mexico': 'NM', 'new york': 'NY',
+            'north carolina': 'NC', 'north dakota': 'ND', 'ohio': 'OH', 'oklahoma': 'OK',
+            'oregon': 'OR', 'pennsylvania': 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
+            'south dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT',
+            'vermont': 'VT', 'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV',
+            'wisconsin': 'WI', 'wyoming': 'WY'
+          };
+          const normalized = value.toLowerCase().trim();
+          return stateMap[normalized] || value.toUpperCase();
+        }
+        case 'city': {
+          return value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+        case 'zip': {
+          return value.replace(/\s/g, '').substring(0, 5);
+        }
+        case 'country': {
+          return value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+        case 'company': {
+          return value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+        case 'first_name': {
+          const name = new NameEnhanced(value);
+          return name.isValid ? name.firstName : value;
+        }
+        case 'last_name': {
+          const name = new NameEnhanced(value);
+          return name.isValid ? name.lastName : value;
         }
         default:
           return value;
@@ -741,6 +782,12 @@ export default function IntelligentNormalization() {
                           <p className="text-sm text-gray-500">
                             Detected as: {mapping.detectedType}
                           </p>
+                          {/* Sample data from input column */}
+                          {file && (
+                            <p className="text-xs text-gray-400 mt-1">
+                              Examples: {mapping.sampleValues?.slice(0, 3).join(', ') || 'N/A'}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3">

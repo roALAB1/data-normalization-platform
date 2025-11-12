@@ -280,3 +280,21 @@
 - [ ] Verify output only contains 9 selected columns (not 78)
 - [ ] Create checkpoint v3.15.1
 
+
+---
+
+## v3.15.2 - UI Improvements: Sample Data Display & State Normalization Preview
+
+**Status:** IN PROGRESS
+
+**Tasks:**
+- [x] Add sample data display under "Detected as:" labels
+  - Show first 2-3 examples from input column
+  - Display below the "Detected as: [type]" text
+  - Format: "Examples: value1, value2, value3"
+- [x] Fix State normalization preview not showing
+  - State column shows "Detected as: state" but no preview transformation
+  - Add State to preview transformations in contextAwareExecutor
+  - Verify State normalization works in preview
+- [x] Test both fixes with sample CSV
+- [ ] Create checkpoint v3.15.2
