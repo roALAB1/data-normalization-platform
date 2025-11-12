@@ -119,17 +119,45 @@ export default function IntelligentNormalization() {
         throw new Error("CSV file must have at least a header and one data row");
       }
 
-      const headers = lines[0].split(",").map((h) => h.trim()).filter(h => h.length > 0);
-      const sampleRows = lines.slice(1, Math.min(6, lines.length));
-      const samples: Record<string, string[]> = {};
-      
-      headers.forEach(header => {
-        samples[header] = sampleRows.map(row => {
-          const values = row.split(",");
-          const idx = headers.indexOf(header);
-          return values[idx]?.trim() || "";
-        });
-      });
+// Parse CSV properly handling quoted fields
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+const headers = parseCSVLine(lines[0]);
+const sampleRows = lines.slice(1, Math.min(6, lines.length));
+const samples: Record<string, string[]> = {};
+
+headers.forEach(header => {
+  samples[header] = sampleRows.map(row => {
+    const values = parseCSVLine(row);
+    const idx = headers.indexOf(header);
+    return values[idx]?.trim() || "";
+  });
+});
 
       const mappings: ColumnMapping[] = headers.map((header) => {
         const detection = detectColumnType(header, samples[header]);

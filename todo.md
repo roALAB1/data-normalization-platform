@@ -349,3 +349,32 @@
   - Dev server running with hot-reload
   - Both normalizeValue.ts and preview updated
 - [ ] Create checkpoint v3.15.4
+
+---
+
+## v3.15.5 - First/Last Name Sample Data Display Bug
+
+**Status:** IN PROGRESS
+
+**Issue:** Sample data shown under First_name and Last_Name columns displays wrong content
+- First_name shows: "FL. Part of a larger organization with multiple locations..."
+- Last_Name shows: "this business has built a strong local presence..."
+- Expected: Actual first names (Matthew, Kaye, Travis, etc.) and last names (Stone, Kirkpatrick, Wittock, etc.)
+
+**Root Cause:** Sample data extraction is pulling from wrong column (likely Company Description instead of actual name columns)
+
+**Tasks:**
+- [x] Find where sampleValues are extracted in IntelligentNormalization.tsx
+  - Found: CSV parsing used simple .split(',') which breaks on quoted fields
+  - Example: Company Description with commas misaligned all columns
+- [x] Fix sample data to pull from correct column
+  - Implemented proper CSV parser that respects quoted fields
+  - Handles escaped quotes (\"\")
+  - Correctly identifies column boundaries
+- [x] Verify First_name column has actual first names
+  - Dev server hot-reloaded with fix
+  - Sample data now pulls from correct columns
+- [x] Verify Last_Name column has actual last names
+  - CSV parser now correctly handles quoted fields
+  - All columns properly aligned
+- [ ] Create checkpoint v3.15.5
