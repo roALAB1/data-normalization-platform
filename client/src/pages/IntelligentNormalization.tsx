@@ -220,7 +220,12 @@ export default function IntelligentNormalization() {
           return value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
         case 'zip': {
-          return value.replace(/\s/g, '').substring(0, 5);
+          const cleaned = value.replace(/\s/g, '').substring(0, 5);
+          // If 4-digit ZIP code, add leading zero (e.g., 2210 → 02210)
+          if (cleaned.length === 4 && /^\d{4}$/.test(cleaned)) {
+            return '0' + cleaned;
+          }
+          return cleaned;
         }
         case 'country': {
           return value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');

@@ -142,6 +142,14 @@ export function normalizeValue(type: string, value: string): string {
       case 'address': {
         return AddressFormatter.format(value);
       }
+      case 'zip': {
+        const cleaned = value.replace(/\s/g, '').substring(0, 5);
+        // If 4-digit ZIP code, add leading zero (e.g., 2210 → 02210)
+        if (cleaned.length === 4 && /^\d{4}$/.test(cleaned)) {
+          return '0' + cleaned;
+        }
+        return cleaned;
+      }
       case 'company': {
         // TODO: Implement company normalization
         return value;

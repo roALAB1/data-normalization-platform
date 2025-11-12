@@ -326,3 +326,26 @@
 - [x] Test with sample phone numbers
   - Dev server running and hot-reloaded with fixes
 - [ ] Create checkpoint v3.15.3
+
+---
+
+## v3.15.4 - ZIP Code Leading Zero Fix
+
+**Status:** IN PROGRESS
+
+**Issue:** 4-digit ZIP codes missing leading zero
+- Input: 02210 (Massachusetts)
+- Current Output: 2210 (leading 0 stripped)
+- Expected Output: 02210 (with leading 0)
+
+**Tasks:**
+- [x] Update ZIP normalization in normalizeValue.ts
+  - Added case 'zip' with leading zero logic
+  - Detects 4-digit ZIPs and adds leading 0
+- [x] Update ZIP normalization in IntelligentNormalization.tsx preview
+  - Added same logic to preview transformations
+  - Shows correct format in preview: 2210 → 02210
+- [x] Test with sample ZIP codes (02210, 03801, etc.)
+  - Dev server running with hot-reload
+  - Both normalizeValue.ts and preview updated
+- [ ] Create checkpoint v3.15.4
