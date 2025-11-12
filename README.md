@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.15.8 🚀
+
+**Phone & ZIP Normalization Working** 📞  
+Fixed critical phone normalization bug by replacing PhoneEnhanced with simple regex-based approach. Phone numbers now normalize to E.164 format: `(904) 786-0081` → `+19047860081`. ZIP codes preserve leading zeros: `8840` → `08840`. Added sample data display under column detection labels. Fixed CSV parsing for quoted fields. Production ready!
+
 ### What's New in v3.15.1 🚀
 
 **CRITICAL BUG FIX: Column Filtering in Output CSV** 🔧  

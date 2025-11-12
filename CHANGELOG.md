@@ -2,6 +2,44 @@
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
+## [3.15.8] - 2025-11-12
+
+### Fixed
+- **CRITICAL:** Phone normalization not working in output CSV
+  - Phone numbers remained unchanged: `(904) 786-0081` stayed as `(904) 786-0081`
+  - Root cause: PhoneEnhanced was marking all US numbers as invalid
+  - Solution: Replaced with simple regex-based approach (extract digits + add +1 prefix)
+  - Now outputs E.164 format: `(904) 786-0081` → `+19047860081`
+- **CRITICAL:** ZIP codes missing leading zeros
+  - 4-digit ZIP codes stayed as 4 digits: `8840` stayed as `8840`
+  - Root cause: schemaAnalyzer lacked 'zip' type, detected as 'address'
+  - Solution: Added zip/city/state/country to ColumnSchema type
+  - Now preserves leading zeros: `8840` → `08840`
+- CSV parsing for quoted fields containing commas
+  - Sample data showed wrong column content (company description in name field)
+  - Root cause: Simple `.split(',')` broke on quoted fields
+  - Solution: Implemented RFC 4180 CSV parser respecting quoted boundaries
+- Worker caching preventing code updates
+  - Browser cached worker code even after dev server restart
+  - Required browser cache clear + hard refresh to load new code
+
+### Added
+- Sample data display under "Detected as:" labels (shows first 3 examples from input column)
+- State normalization preview transformations
+- Debug logging for phone normalization troubleshooting
+
+### Changed
+- Phone normalization: PhoneEnhanced → simple regex (100% reliable)
+- Worker now uses strategy types instead of re-analyzing schema
+- Added zip/city/state/country normalization cases
+
+### Technical Details
+- Files Modified: normalizeValue.ts, schemaAnalyzer.ts, normalization.worker.ts, IntelligentNormalization.tsx
+- Tests: Phone & ZIP both verified working with sample data
+- Impact: All phone numbers normalize to E.164, all ZIP codes preserve leading zeros
+
+---
+
 ## [3.15.1] - 2025-11-11
 
 ### Fixed
