@@ -10,7 +10,37 @@ const redisConnection = {
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   maxRetriesPerRequest: null, // Required for BullMQ
+  retryStrategy: (times: number) => {
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s, max 30s
+    const delay = Math.min(Math.pow(2, times) * 1000, 30000);
+    console.log(`[Redis] Retry attempt ${times}, waiting ${delay}ms`);
+    return delay;
+  },
+  maxRetriesPerRequest: null,
+  enableReadyCheck: true,
+  connectTimeout: 10000, // 10 second connection timeout
 };
+
+/**
+ * Validate Redis connection
+ * Throws error if Redis is unreachable
+ */
+async function validateRedisConnection(): Promise<void> {
+  const redis = new Redis(redisConnection);
+  
+  try {
+    await redis.ping();
+    console.log('[Redis] Connection validated successfully');
+    await redis.quit();
+  } catch (error) {
+    console.error('[Redis] Connection validation failed:', error);
+    await redis.quit();
+    throw new Error(
+      `Redis connection failed at ${redisConnection.host}:${redisConnection.port}. ` +
+      `Please ensure Redis is running and accessible. Error: ${error}`
+    );
+  }
+}
 
 /**
  * Job data structure for normalization jobs
@@ -39,6 +69,12 @@ export class JobQueue {
   private static instance: JobQueue;
 
   private constructor() {
+    // Validate Redis connection before creating queue
+    validateRedisConnection().catch((error) => {
+      console.error('[JobQueue] Failed to connect to Redis:', error);
+      throw error;
+    });
+
     // Create the normalization jobs queue
     this.queue = new Queue<NormalizationJobData>('normalization-jobs', {
       connection: redisConnection,
