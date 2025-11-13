@@ -459,3 +459,25 @@
   - ✅ (352) 245-5595 → +13522455595
   - ✅ (850) 878-1185 → +18508781185
 - [ ] Create checkpoint v3.15.8
+
+---
+
+## v3.16.0 - Infrastructure Fixes: TypeScript, Redis, Environment Validation
+
+**Status:** IN PROGRESS
+
+**Critical Issues to Fix:**
+- [ ] Issue #1: Fix TypeScript configuration error (tsconfig.node.json)
+- [ ] Issue #2: Add Redis connection validation with retry logic
+- [ ] Issue #3: Add environment variable validation with Zod
+
+**Tasks:**
+- [ ] Create checkpoint before starting fixes
+- [ ] Fix tsconfig.node.json: Add composite: true, change noEmit to false
+- [ ] Add Redis connection validation in JobQueue.ts
+- [ ] Add connection retry logic with exponential backoff
+- [ ] Create server/env.ts with Zod validation
+- [ ] Validate all required environment variables on startup
+- [ ] Test all fixes
+- [ ] Create checkpoint v3.16.0
+- [ ] Push to GitHub with updated documentation
