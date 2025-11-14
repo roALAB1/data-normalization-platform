@@ -123,8 +123,9 @@ export class PhoneEnhanced {
     }
   }
 
-  private getTypeDescription(type: NumberType): string {
-    const descriptions: Record<NumberType, string> = {
+  private getTypeDescription(type: NumberType | undefined): string {
+    if (!type) return 'Unknown';
+    const descriptions: { [key: string]: string } = {
       'FIXED_LINE': 'Fixed Line (Landline)',
       'MOBILE': 'Mobile',
       'FIXED_LINE_OR_MOBILE': 'Fixed Line or Mobile',
@@ -137,7 +138,7 @@ export class PhoneEnhanced {
       'UAN': 'UAN (Universal Access Number)',
       'VOICEMAIL': 'Voicemail'
     };
-    return descriptions[type] || type;
+    return descriptions[type] || String(type);
   }
 
   // Get formatted phone number in specific format
@@ -184,7 +185,7 @@ export class PhoneEnhanced {
 
   // Get country calling code
   static getCallingCode(country: CountryCode): number {
-    return getCountryCallingCode(country);
+    return getCountryCallingCode(country) as unknown as number;
   }
 
   // Get country name from code

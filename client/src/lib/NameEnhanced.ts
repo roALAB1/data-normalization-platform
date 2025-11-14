@@ -1094,7 +1094,7 @@ ALL_CREDENTIALS.forEach(cred => {
 /**
  * Check if a string is a known credential
  */
-function isCredential(value: string, caseSensitive: boolean = false): boolean {
+function _isCredential(value: string, caseSensitive: boolean = false): boolean {
   if (caseSensitive) {
     return CREDENTIALS_SET.has(value as any);
   }
@@ -1118,7 +1118,7 @@ function isGenerationalSuffix(value: string): boolean {
 /**
  * Check if a string is a title
  */
-function isTitle(value: string): boolean {
+function _isTitle(value: string): boolean {
   if (TITLES_SET.has(value as any)) {
     return true;
   }
@@ -1129,7 +1129,7 @@ function isTitle(value: string): boolean {
 /**
  * Check if a string is a last name prefix
  */
-function isLastNamePrefix(value: string): boolean {
+function _isLastNamePrefix(value: string): boolean {
   const normalized = value.toLowerCase();
   return LAST_NAME_PREFIXES_SET.has(normalized as any) || 
          LAST_NAME_PREFIXES.some(prefix => prefix.toLowerCase() === normalized);
@@ -1290,6 +1290,7 @@ export interface ParseResult {
   }
 
   // Core properties
+  rawName: string;
   firstName: string | null = null;
   middleName: string | null = null;
   lastName: string | null = null;
@@ -1605,8 +1606,8 @@ export interface ParseResult {
       // TODO: Re-enable Asian name detection after credential fix is verified
       // this.contextAnalysis = analyzeContext(this.options.context);
       this.contextAnalysis = null;
-      if (this.contextAnalysis.detectedCulture && this.contextAnalysis.confidence >= 60) {
-        this.recordRepair(text, text, `context_detected_${this.contextAnalysis.detectedCulture}_from_${this.contextAnalysis.sources.join('_and_')}`);
+      if (this.contextAnalysis?.detectedCulture && this.contextAnalysis.confidence >= 60) {
+        this.recordRepair(text, text, `context_detected_${this.contextAnalysis.detectedCulture}_from_${this.contextAnalysis.sources?.join('_and_')}`);
       }
     }
     
@@ -1619,7 +1620,7 @@ export interface ParseResult {
     const lastPartConfidence = 0;
     
     // Boost confidence using context if available
-    if (this.contextAnalysis && this.contextAnalysis.confidence >= 60) {
+    if (this.contextAnalysis && this.contextAnalysis?.confidence >= 60) {
       // TODO: Re-enable confidence boosting after Asian name detection is restored
       // firstPartConfidence = boostConfidenceWithContext(firstPartConfidence, this.contextAnalysis);
     }
@@ -1634,7 +1635,7 @@ export interface ParseResult {
     let shouldReorder = false;
     
     // Lower threshold if context strongly suggests Asian culture
-    const confidenceThreshold = (this.contextAnalysis && this.contextAnalysis.confidence >= 80) ? 70 : 85;
+    const confidenceThreshold = (this.contextAnalysis && this.contextAnalysis?.confidence >= 80) ? 70 : 85;
     
     if (firstPartConfidence >= confidenceThreshold) {
       // First part is a known Asian surname

@@ -15,7 +15,7 @@ import { AddressFormatter } from "@shared/normalization/addresses/AddressFormatt
 import { StreamingCSVProcessor, type StreamingStats } from "@shared/normalization/intelligent/StreamingCSVProcessor";
 import { ChunkedNormalizer } from "@shared/normalization/intelligent/ChunkedNormalizer";
 import { ProgressiveDownloader } from "@/lib/ProgressiveDownloader";
-import type { NormalizationStrategy } from "@shared/normalization/intelligent/UnifiedNormalizationEngine";
+import type { NormalizationPlan } from "@shared/normalization/intelligent/UnifiedNormalizationEngine";
 
 interface ColumnMapping {
   columnName: string;
@@ -288,7 +288,7 @@ headers.forEach(header => {
 
     try {
       // Create strategy from column mappings
-      const strategy: NormalizationStrategy = {
+      const strategy: NormalizationPlan = {
         columns: columnMappings.map(m => ({
           name: m.columnName,
           type: m.overrideType || m.detectedType,
@@ -1285,7 +1285,7 @@ headers.forEach(header => {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.17.0</span>
+          <span>v3.17.1</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"

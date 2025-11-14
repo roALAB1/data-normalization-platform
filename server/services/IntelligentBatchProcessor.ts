@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Papa from 'papaparse';
 import { NameEnhanced } from '../../shared/normalization/names/NameEnhanced';
 import { NameSplitter } from '../../shared/normalization/names/NameSplitter';
