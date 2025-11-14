@@ -839,4 +839,4 @@
 
 ### Verification
 - [x] Verify release published
-- [ ] Create final checkpoint
+- [x] Create final checkpoint
