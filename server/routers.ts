@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { jobRouter } from "./jobRouter";
 import { reportRouter } from "./reportRouter";
 import { metricsRouter } from "./metricsRouter";
+import { monitoringRouter } from "./monitoringRouter";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -28,6 +29,9 @@ export const appRouter = router({
 
   // Memory metrics monitoring (v3.19.0)
   metrics: metricsRouter,
+
+  // PgBouncer connection pool monitoring
+  monitoring: monitoringRouter,
 });
 
 export type AppRouter = typeof appRouter;

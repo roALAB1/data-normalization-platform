@@ -88,6 +88,15 @@ async function startServer() {
     const { startJobQueue } = await import("../jobProcessor.js");
     startJobQueue();
     console.log("[JobQueue] Background job processor started");
+
+    // Start connection pool metrics collection
+    try {
+      const { startConnectionPoolMetricsCollection } = await import("./connectionPoolMetrics.js");
+      startConnectionPoolMetricsCollection(15000); // Collect every 15 seconds
+      console.log("[Monitoring] Connection pool metrics collection started");
+    } catch (error) {
+      console.warn("[Monitoring] Failed to start connection pool metrics:", error);
+    }
   });
 }
 
