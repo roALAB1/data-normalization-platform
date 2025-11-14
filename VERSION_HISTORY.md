@@ -1,5 +1,99 @@
 # VERSION HISTORY
 
+## v3.19.2 - Company Name Detection Fix & Results Preservation (2025-11-14)
+
+**Status:** STABLE - Bug fix and UX improvement
+
+### Issues Fixed:
+
+#### 1. Company Name Column Detection Bug ✅
+
+**Problem:** Company name columns were being incorrectly detected as person names and split into "First Name + Last Name" columns, which was wrong.
+
+**Root Cause:** In `IntelligentBatchProcessor.detectColumnType()`, the generic name check (`lowerName.includes('name')`) was catching "Company Name" before the company-specific check could run.
+
+**Fix:**
+- Added company name detection BEFORE generic name check (line 95-100)
+- Keywords: company, organization, business, corp, firm, enterprise
+- Added 'company' case in `normalizeValue()` method
+- Company names now normalized with title case while preserving abbreviations (IBM, LLC, Inc.)
+- Added company transformation display in UI with purple "normalize" badge
+
+**Impact:**
+- Company name columns are no longer split
+- Company names are normalized as single entities
+- Proper title casing applied ("acme corporation" → "Acme Corporation")
+- Abbreviations preserved ("IBM LLC" stays "IBM LLC")
+
+#### 2. Results Preservation Feature ✅
+
+**Problem:** When users clicked "Monitoring" after processing a CSV, they lost their results and couldn't download the CSV or view the output anymore.
+
+**Solution:**
+- Created `ResultsContext` to store processing results globally
+- Results automatically saved to context when processing completes
+- Results restored from context when navigating back to home page
+- "Process Another File" button clears context for fresh start
+
+**User Flow:**
+1. Upload and process CSV file
+2. View results and transformations
+3. Click "Monitoring" button to check worker performance
+4. View real-time metrics and charts
+5. Click "Home" button to return
+6. Results are still there - download CSV, view output, etc.
+
+**Impact:**
+- Seamless navigation between results and monitoring
+- No data loss when checking system performance
+- Better user experience for long-running jobs
+- Download CSV button remains functional after navigation
+
+### Technical Implementation:
+
+**Company Detection:**
+```typescript
+// IntelligentBatchProcessor.ts line 95-100
+if (lowerName.includes('company') || lowerName.includes('organization') || 
+    lowerName.includes('business') || lowerName.includes('corp') || 
+    lowerName.includes('firm') || lowerName.includes('enterprise')) {
+  return { columnName, detectedType: 'company', confidence: 0.95 };
+}
+```
+
+**Results Context:**
+```typescript
+// ResultsContext.tsx
+interface ResultsState {
+  file: File | null;
+  columnMappings: ColumnMapping[];
+  results: ProcessingResult[];
+  allResults: any[][];
+  stats: ProcessingStats | null;
+  outputColumns: string[];
+  hasResults: boolean;
+}
+```
+
+### Files Changed:
+
+**Backend:**
+- `server/services/IntelligentBatchProcessor.ts` - Added company detection and normalization
+
+**Frontend:**
+- `client/src/contexts/ResultsContext.tsx` - New context for results preservation
+- `client/src/App.tsx` - Added ResultsProvider wrapper
+- `client/src/pages/IntelligentNormalization.tsx` - Integrated useResults hook
+- `client/src/pages/MemoryMonitoringDashboard.tsx` - Already has Home button (v3.19.1)
+
+### Time to Implement:
+
+- Company name detection fix: 20 minutes
+- Results preservation feature: 35 minutes
+- **Total:** 55 minutes
+
+---
+
 ## v3.19.1 - Metrics Integration & Navigation Improvements (2025-11-14)
 
 **Status:** STABLE - Metrics collection fully integrated into ChunkedNormalizer

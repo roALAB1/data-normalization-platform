@@ -92,6 +92,13 @@ export class IntelligentBatchProcessor {
     if (lowerName.includes('phone') || lowerName.includes('tel') || lowerName.includes('mobile')) {
       return { columnName, detectedType: 'phone', confidence: Math.max(phoneConf, 0.7) };
     }
+    // Check for company name columns FIRST (before generic name check)
+    if (lowerName.includes('company') || lowerName.includes('organization') || 
+        lowerName.includes('business') || lowerName.includes('corp') || 
+        lowerName.includes('firm') || lowerName.includes('enterprise')) {
+      return { columnName, detectedType: 'company', confidence: 0.95 };
+    }
+    
     // Check for first name / last name columns
     if (lowerName.match(/^(first|given)[_\s-]?name$/i) || lowerName === 'fname') {
       return { columnName, detectedType: 'first_name', confidence: 0.95 };
@@ -99,6 +106,8 @@ export class IntelligentBatchProcessor {
     if (lowerName.match(/^(last|sur|family)[_\s-]?name$/i) || lowerName === 'lname') {
       return { columnName, detectedType: 'last_name', confidence: 0.95 };
     }
+    
+    // Generic name check (for person names only)
     if (lowerName.includes('name') || lowerName.includes('contact')) {
       return { columnName, detectedType: 'name', confidence: Math.max(nameConf, 0.7) };
     }
@@ -152,6 +161,26 @@ export class IntelligentBatchProcessor {
           const address = AddressFormatter.format(value);
           return {
             normalized: address,
+            isValid: true,
+          };
+        }
+        
+        case 'company': {
+          // Simple company name normalization: title case, trim whitespace
+          const normalized = value
+            .trim()
+            .split(/\s+/)
+            .map(word => {
+              // Preserve all-caps abbreviations (IBM, LLC, Inc.)
+              if (word.length <= 4 && word === word.toUpperCase()) {
+                return word;
+              }
+              // Title case for regular words
+              return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(' ');
+          return {
+            normalized,
             isValid: true,
           };
         }

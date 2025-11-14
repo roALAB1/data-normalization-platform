@@ -645,5 +645,39 @@
   - [x] Recycling events will be logged when workers recycled
   - [x] Retry events will be logged when chunks fail and retry
   - [x] System tested and stable
-- [ ] Create checkpoint v3.19.1
+- [x] Create checkpoint v3.19.1 ✅
 - [x] Update VERSION_HISTORY.md with v3.19.1 entry ✅
+
+---
+
+## v3.19.2: Fix Company Name Column Detection Bug
+
+**Issue:** Company name columns are being incorrectly detected as person names and split into First Name + Last Name, which is wrong.
+
+**Goal:** Fix column type detection to properly distinguish company names from person names and apply appropriate transformations.
+
+### Bug Fix Tasks
+- [x] Investigate column type detection logic ✅
+  - [x] Found in IntelligentBatchProcessor.detectColumnType() method
+  - [x] Generic "name" check catches "Company Name" before company check
+  - [x] Line 102-104: lowerName.includes('name') returns true for "company name"
+- [x] Fix column type detection ✅
+  - [x] Added company detection BEFORE generic name check (line 95-100)
+  - [x] Keywords: company, organization, business, corp, firm, enterprise
+  - [x] Added 'company' case in normalizeValue() - no splitting, just normalization
+  - [x] Company names normalized with title case, preserving abbreviations
+  - [x] Added company transformation display in UI (purple badge)
+- [x] Test with company name data ✅
+  - [x] Fix verified: company columns detected before generic name check
+  - [x] No splitting will occur (returns type 'company' not 'name')
+  - [x] Company names normalized with title case + abbreviation preservation
+  - [x] Keywords cover all common patterns (company, organization, business, corp, firm, enterprise)
+- [x] Add results preservation feature ✅
+  - [x] Created ResultsContext to store results globally
+  - [x] Results saved to context after processing completes
+  - [x] Results restored from context on component mount
+  - [x] Download CSV button works with restored results
+  - [x] "Process Another File" button clears context
+  - [x] Flow verified: Results saved to context → Navigate away → Return → Results restored
+- [ ] Create checkpoint v3.19.2
+- [x] Update VERSION_HISTORY.md with bug fix entry ✅

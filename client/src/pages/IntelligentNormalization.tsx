@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2, Trash2, Activity } from "lucide-react";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { NameEnhanced } from "@/lib/NameEnhanced";
 import { PhoneEnhanced } from "@shared/normalization/phones/PhoneEnhanced";
@@ -17,6 +17,7 @@ import { StreamingCSVProcessor, type StreamingStats } from "@shared/normalizatio
 import { ChunkedNormalizer } from "@shared/normalization/intelligent/ChunkedNormalizer";
 import { ProgressiveDownloader } from "@/lib/ProgressiveDownloader";
 import type { NormalizationPlan } from "@shared/normalization/intelligent/UnifiedNormalizationEngine";
+import { useResults } from "@/contexts/ResultsContext";
 
 interface ColumnMapping {
   columnName: string;
@@ -82,6 +83,7 @@ function formatBytes(bytes: number): string {
 }
 
 export default function IntelligentNormalization() {
+  const { resultsState, saveResults, clearResults } = useResults();
   const [file, setFile] = useState<File | null>(null);
   const [columnMappings, setColumnMappings] = useState<ColumnMapping[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -101,7 +103,20 @@ export default function IntelligentNormalization() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamingProcessorRef = useRef<StreamingCSVProcessor | null>(null);
   const chunkedNormalizerRef = useRef<ChunkedNormalizer | null>(null);
-
+  
+  // Restore results from context on mount (if available)
+  useEffect(() => {
+    if (resultsState.hasResults && !stats) {
+      // Restore state from context
+      setFile(resultsState.file);
+      setColumnMappings(resultsState.columnMappings);
+      setResults(resultsState.results);
+      setAllResults(resultsState.allResults);
+      setStats(resultsState.stats);
+      setOutputColumns(resultsState.outputColumns);
+    }
+  }, []); // Only run on mount
+  
   const handleFileSelect = async (selectedFile: File) => {
     setFile(selectedFile);
     setError(null);
@@ -110,6 +125,7 @@ export default function IntelligentNormalization() {
     setAllResults([]);
     setStats(null);
     setStreamingStats(null);
+    clearResults(); // Clear context when starting new file
 
     setIsAnalyzing(true);
     try {
@@ -352,11 +368,22 @@ headers.forEach(header => {
       }));
       setResults(preview);
 
-      setStats({
+      const statsData = {
         totalRows: flatResults.length,
         processedRows: flatResults.length,
         successfulRows: flatResults.length,
         failedRows: 0,
+      };
+      setStats(statsData);
+      
+      // Save results to context for preservation across navigation
+      saveResults({
+        file,
+        columnMappings,
+        results: preview,
+        allResults: flatResults,
+        stats: statsData,
+        outputColumns,
       });
 
       setProgress(100);
@@ -1126,6 +1153,21 @@ headers.forEach(header => {
                         <div className="text-green-500 mt-1 text-xl">✓</div>
                       </div>
                     );
+                  } else if (type === 'company') {
+                    transformation = (
+                      <div key={idx} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-gray-900">{mapping.columnName}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-indigo-600 font-medium">Company Name</span>
+                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">normalize</span>
+                          </div>
+                          <p className="text-sm text-gray-600">Normalize company name (title case, preserve abbreviations)</p>
+                        </div>
+                        <div className="text-green-500 mt-1 text-xl">✓</div>
+                      </div>
+                    );
                   } else if (type === 'location') {
                     transformation = (
                       <div key={idx} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
@@ -1267,6 +1309,7 @@ headers.forEach(header => {
                   setAllResults([]);
                   setStats(null);
                   setStreamingStats(null);
+                  clearResults(); // Clear context as well
                 }}
               >
                 Process Another File
