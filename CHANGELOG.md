@@ -2,6 +2,39 @@
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
+## [3.17.0] - 2025-11-14
+
+### Added
+- **Error Recovery Mechanisms**: Automatic retry with exponential backoff (1s, 2s, 4s, 8s, max 30s) for failed normalizations
+- **Memory Leak Prevention**: Worker recycling after 100 chunks with proper cleanup tracking
+- **Rate Limiting**: Redis-based sliding window algorithm (10 jobs/hour per user)
+- **Redis Installation**: Local Redis server for development environment
+- Retry tracking in processing stats (`retriedChunks` field)
+- Worker lifecycle logging for monitoring
+- Rate limit middleware for tRPC endpoints
+
+### Changed
+- ChunkedNormalizer now includes `maxRetries` and `retryDelayMs` configuration
+- Worker pool automatically recycles workers after processing 100 chunks
+- Job creation endpoint now enforces rate limiting
+- Rate limiting fails open gracefully when Redis is unavailable
+
+### Fixed
+- Transient errors no longer cause permanent data loss
+- Memory leaks from long-running workers prevented
+- System protected from abuse via unlimited job submissions
+
+### Technical Details
+- Added `processChunkWithRetry()` method to ChunkedNormalizer
+- Added `workerChunkCounts` Map for tracking worker usage
+- Created `server/_core/rateLimit.ts` with sliding window implementation
+- Enhanced `terminateWorkers()` with proper cleanup
+- Documentation: INFRASTRUCTURE_FIXES_v3.17.0.md, REDIS_FAILOPEN_ANALYSIS.md
+- Impact: Reduces data loss, prevents memory buildup, protects against abuse
+- Time to Fix: Issue #4 (45 min), Issue #5 (45 min), Issue #6 (1 hour)
+
+---
+
 ## [3.16.1] - 2025-11-13
 
 ### Fixed

@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.17.0 🚀
+
+**Infrastructure Improvements: Error Recovery, Memory Leaks, Rate Limiting** 🛡️  
+Implemented 3 critical production reliability improvements: (1) **Error Recovery** - Automatic retry with exponential backoff (1s→30s, max 3 retries) for failed normalizations, (2) **Memory Leak Prevention** - Worker recycling after 100 chunks with proper cleanup, (3) **Rate Limiting** - Redis-based sliding window (10 jobs/hour per user) with fail-open design. Reduces data loss from transient failures, prevents memory buildup, and protects against abuse. All fixes tested and production-ready.
+
 ### What's New in v3.16.1 🚀
 
 **CRITICAL DEPLOYMENT FIX + Infrastructure Improvements** 🔧  
