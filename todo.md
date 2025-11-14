@@ -481,5 +481,5 @@
 - [x] Fix deployment bug in env.ts (error.errors.map crash)
 - [x] Change to safeParse with warnings instead of throwing errors
 - [x] Test all fixes
-- [ ] Create checkpoint v3.16.1 (deployment fix)
+- [x] Create checkpoint v3.16.1 (deployment fix)
 - [ ] Push to GitHub with updated documentation

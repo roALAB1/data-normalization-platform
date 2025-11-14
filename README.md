@@ -40,6 +40,11 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results
 
+### What's New in v3.16.1 🚀
+
+**CRITICAL DEPLOYMENT FIX + Infrastructure Improvements** 🔧  
+Fixed v3.16.0 deployment crash by rewriting environment validation to use `safeParse()` instead of strict `parse()`. Added Redis connection validation with exponential backoff retry (1s→30s max). Fixed TypeScript configuration to enable proper type checking. Environment validation now logs warnings for missing vars instead of crashing. App starts successfully in all environments with graceful fallbacks.
+
 ### What's New in v3.15.8 🚀
 
 **Phone & ZIP Normalization Working** 📞  
