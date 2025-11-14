@@ -4,17 +4,21 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow:
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with real-time monitoring and results preservation (v3.19.2):
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
 - **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v2.1.0)
 - **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
+- **Real-Time Memory Monitoring** (v3.19.1): Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics
+- **Company Name Detection** (v3.19.2): Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation
+- **Results Preservation** (v3.19.2): Seamless navigation between results and monitoring dashboard without data loss
 - **Specialized Normalizers**:
   - **Names**: 750+ credentials, Asian name detection, context-aware parsing
   - **Phones**: 250+ countries, type detection, multiple formats
   - **Emails**: RFC 5322 validation, provider-specific rules, MX/SMTP verification
   - **Addresses**: Title Case, 27+ abbreviations, standardization
+  - **Company Names**: Title case with abbreviation preservation (IBM, LLC, Inc.)
 
 ### Key Features
 
