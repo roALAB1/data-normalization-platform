@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { jobRouter } from "./jobRouter";
 import { reportRouter } from "./reportRouter";
+import { metricsRouter } from "./metricsRouter";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -24,6 +25,9 @@ export const appRouter = router({
 
   // Bug report system (v3.9.0)
   reports: reportRouter,
+
+  // Memory metrics monitoring (v3.19.0)
+  metrics: metricsRouter,
 });
 
 export type AppRouter = typeof appRouter;

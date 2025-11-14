@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import JobDashboardEnhanced from "./pages/JobDashboardEnhanced";
 import IntelligentNormalization from "./pages/IntelligentNormalization";
 import TestCredentials from "./pages/TestCredentials";
+import MemoryMonitoringDashboard from "./pages/MemoryMonitoringDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -14,6 +15,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={IntelligentNormalization} />
       <Route path={"/jobs"} component={JobDashboardEnhanced} />
+      <Route path={"/monitoring"} component={MemoryMonitoringDashboard} />
       <Route path={"/test-credentials"} component={TestCredentials} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

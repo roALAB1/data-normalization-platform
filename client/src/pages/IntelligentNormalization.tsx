@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2, Trash2 } from "lucide-react";
+import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2, Trash2, Activity } from "lucide-react";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
 import { useState, useRef } from "react";
 import { Link } from "wouter";
@@ -443,7 +443,12 @@ headers.forEach(header => {
               <p className="text-sm text-gray-600">Enterprise-scale processing • 100k+ rows</p>
             </div>
           </div>
-          {/* Batch Jobs button temporarily removed - feature in development */}
+          <Link href="/monitoring">
+            <Button variant="outline" size="sm">
+              <Activity className="h-4 w-4 mr-2" />
+              Monitoring
+            </Button>
+          </Link>
         </div>
       </header>
 
