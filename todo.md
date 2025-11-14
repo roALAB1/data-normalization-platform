@@ -778,6 +778,6 @@
 
 ### Verification
 - [x] Verify GitHub repository updated
-- [ ] Check release is published (manual step)
+- [x] Check release is published (https://github.com/roALAB1/data-normalization-platform/releases/tag/v3.20.0)
 - [x] Validate documentation is visible
-- [ ] Create final checkpoint
+- [x] Create final checkpoint
