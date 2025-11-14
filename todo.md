@@ -482,4 +482,8 @@
 - [x] Change to safeParse with warnings instead of throwing errors
 - [x] Test all fixes
 - [x] Create checkpoint v3.16.1 (deployment fix)
-- [ ] Push to GitHub with updated documentation
+- [x] Push to GitHub with updated documentation
+- [x] Created Git tags v3.16.0 and v3.16.1
+- [x] Pushed tags to GitHub
+- [x] Created GitHub releases for both versions
+- [x] Updated master branch with latest documentation
