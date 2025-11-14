@@ -478,6 +478,8 @@
 - [x] Add connection retry logic with exponential backoff
 - [x] Create server/env.ts with Zod validation
 - [x] Validate all required environment variables on startup
-- [ ] Test all fixes
-- [ ] Create checkpoint v3.16.0
+- [x] Fix deployment bug in env.ts (error.errors.map crash)
+- [x] Change to safeParse with warnings instead of throwing errors
+- [x] Test all fixes
+- [ ] Create checkpoint v3.16.1 (deployment fix)
 - [ ] Push to GitHub with updated documentation
