@@ -679,5 +679,5 @@
   - [x] Download CSV button works with restored results
   - [x] "Process Another File" button clears context
   - [x] Flow verified: Results saved to context → Navigate away → Return → Results restored
-- [ ] Create checkpoint v3.19.2
+- [x] Create checkpoint v3.19.2 ✅
 - [x] Update VERSION_HISTORY.md with bug fix entry ✅
