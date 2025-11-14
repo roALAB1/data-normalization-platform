@@ -38,7 +38,20 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Multiple Export Formats**: CSV, JSON with detailed repair logs  
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
-✅ **S3 Storage**: Scalable file storage for uploads and results
+✅ **S3 Storage**: Scalable file storage for uploads and results  
+✅ **Real-Time Memory Monitoring** 📊: Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics (v3.19.1)  
+✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
+✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
+
+### What's New in v3.19.2 🚀
+
+**Company Name Detection Fix & Results Preservation** 🔧  
+Fixed critical bug where company name columns were incorrectly split into First/Last Name. Added company detection BEFORE generic name check with keywords: company, organization, business, corp, firm, enterprise. Company names now normalized with title case while preserving abbreviations (IBM, LLC, Inc.). Implemented ResultsContext for seamless navigation - process CSV → view results → check monitoring dashboard → return to results without data loss. Download CSV button remains functional after navigation.
+
+### What's New in v3.19.1 🚀
+
+**Real-Time Memory Monitoring Dashboard** 📊  
+Implemented MemoryMetricsCollector service tracking worker pool performance with 6 tRPC endpoints. New `/monitoring` route displays real-time charts (Active Workers, Memory Usage), event logs (Recycling, Retries), and system health indicator. Auto-refresh every 2-5 seconds with configurable time ranges (5min-1hr). 1-hour metric retention with automatic cleanup. Metrics automatically collected during CSV processing with periodic snapshots every 5 seconds. Home button for easy navigation back to results.
 
 ### What's New in v3.17.0 🚀
 
