@@ -92,7 +92,7 @@ export function ReportIssueDialog({
       issueType: issueType as any,
       severity: severity as any,
       description: description || undefined,
-      version: "v3.21.0", // Current version
+      version: "v3.22.0", // Current version
     });
   };
 
