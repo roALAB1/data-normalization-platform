@@ -81,3 +81,6 @@ export {
 } from './context-analysis';
 
 export type { NameContext, ContextAnalysis } from './context-analysis';
+
+// Export NameEnhanced (re-export from client since it's the canonical implementation)
+export { NameEnhanced } from '../../../client/src/lib/NameEnhanced';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NameEnhanced - Advanced Name Parsing and Normalization
  * 

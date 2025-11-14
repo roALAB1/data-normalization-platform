@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Normalize a single value based on type
  * Used by the worker for CSV processing

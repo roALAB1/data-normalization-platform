@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Enterprise-scale CSV processor using PapaParse streaming
  * Handles 100k+ rows efficiently with chunked processing

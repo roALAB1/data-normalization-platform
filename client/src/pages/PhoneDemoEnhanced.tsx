@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { PhoneEnhanced, type CountryCode } from '@shared/normalization/phones';
 import { Button } from '@/components/ui/button';

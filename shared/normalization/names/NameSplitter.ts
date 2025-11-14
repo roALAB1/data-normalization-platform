@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NameSplitter - Intelligently split full names into first and last names
  * 

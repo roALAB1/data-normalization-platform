@@ -108,11 +108,16 @@ export async function checkRateLimit(
 /**
  * Rate limit middleware for tRPC procedures
  * Throws TRPCError if rate limit exceeded
+ * Returns rate limit info for response headers
  */
 export async function rateLimitMiddleware(
   userId: string,
   config: RateLimitConfig
-): Promise<void> {
+): Promise<{
+  limit: number;
+  remaining: number;
+  reset: number;
+}> {
   const result = await checkRateLimit(userId, config);
 
   if (!result.allowed) {
@@ -120,8 +125,23 @@ export async function rateLimitMiddleware(
     throw new TRPCError({
       code: "TOO_MANY_REQUESTS",
       message: `Rate limit exceeded. Try again in ${resetIn} seconds.`,
+      // Include rate limit info in error metadata
+      cause: {
+        rateLimit: {
+          limit: config.maxRequests,
+          remaining: 0,
+          reset: Math.floor(result.resetAt.getTime() / 1000),
+        },
+      },
     });
   }
+
+  // Return rate limit info for successful requests
+  return {
+    limit: config.maxRequests,
+    remaining: result.remaining,
+    reset: Math.floor(result.resetAt.getTime() / 1000),
+  };
 }
 
 /**

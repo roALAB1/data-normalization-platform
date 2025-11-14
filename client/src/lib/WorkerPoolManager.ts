@@ -55,7 +55,15 @@ export class WorkerPoolManager<TMessage = any, TResponse = any> {
    * Create a new worker
    */
   private createWorker(): WorkerInfo {
-    const worker = new Worker(new URL(this.config.workerUrl, import.meta.url), {
+    // Add cache-busting version parameter to prevent aggressive browser caching
+    const workerUrl = new URL(this.config.workerUrl, import.meta.url);
+    // Use build timestamp as version (Vite replaces import.meta.env.MODE at build time)
+    const version = import.meta.env.MODE === 'production' 
+      ? import.meta.env.VITE_BUILD_TIME || '3.18.0'
+      : Date.now().toString();
+    workerUrl.searchParams.set('v', version);
+    
+    const worker = new Worker(workerUrl, {
       type: 'module',
     });
 

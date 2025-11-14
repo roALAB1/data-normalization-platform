@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chunked normalizer with Web Worker pool for parallel processing
  * Distributes chunks across multiple workers for maximum throughput

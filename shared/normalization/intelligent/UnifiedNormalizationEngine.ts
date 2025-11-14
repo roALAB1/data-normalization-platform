@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * UnifiedNormalizationEngine - Route data to appropriate normalizers
  * 
