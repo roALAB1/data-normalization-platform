@@ -7,6 +7,25 @@
 import type { NormalizationStrategy } from './UnifiedNormalizationEngine';
 import type { WorkerMessage, WorkerResponse } from '../../../client/src/workers/normalization.worker';
 
+// Helper to generate unique worker IDs
+function generateWorkerId(): string {
+  return `worker-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+}
+
+// Helper to report metrics to server (fire and forget)
+function reportMetrics(endpoint: string, data: any): void {
+  if (typeof window === 'undefined') return;
+  try {
+    fetch(`/api/trpc/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).catch(() => {}); // Ignore errors
+  } catch (e) {
+    // Ignore metrics errors
+  }
+}
+
 export interface ChunkedNormalizerConfig {
   workerPoolSize?: number;
   chunkSize?: number;
@@ -34,8 +53,10 @@ export class ChunkedNormalizer {
   private config: Required<ChunkedNormalizerConfig>;
   private workers: Worker[] = [];
   private workerChunkCounts: Map<Worker, number> = new Map();
+  private workerIds: Map<Worker, string> = new Map();
   private stats: ProcessingStats;
   private isCancelled: boolean = false;
+  private metricsInterval: number | null = null;
 
   constructor(config: ChunkedNormalizerConfig = {}) {
     this.config = {
@@ -74,9 +95,11 @@ export class ChunkedNormalizer {
           new URL('../../../client/src/workers/normalization.worker.ts', import.meta.url),
           { type: 'module' }
         );
+        const workerId = generateWorkerId();
         this.workers.push(worker);
         this.workerChunkCounts.set(worker, 0);
-        console.log(`[Worker ${i}] Initialized`);
+        this.workerIds.set(worker, workerId);
+        console.log(`[Worker ${i}] Initialized with ID: ${workerId}`);
       } catch (error) {
         console.error('Failed to create worker:', error);
       }
@@ -113,6 +136,9 @@ export class ChunkedNormalizer {
 
     // Initialize workers
     await this.initializeWorkers();
+    
+    // Start periodic metrics snapshot (every 5 seconds)
+    this.startMetricsReporting();
 
     if (this.workers.length === 0) {
       throw new Error('Failed to initialize workers');
@@ -168,7 +194,33 @@ export class ChunkedNormalizer {
       }
     }
 
+    // Stop metrics reporting
+    this.stopMetricsReporting();
+    
+    // Send final snapshot
+    reportMetrics('metrics.takeSnapshot', {});
+    
     return results;
+  }
+  
+  /**
+   * Start periodic metrics reporting
+   */
+  private startMetricsReporting(): void {
+    // Report active workers count every 5 seconds
+    this.metricsInterval = window.setInterval(() => {
+      reportMetrics('metrics.takeSnapshot', {});
+    }, 5000);
+  }
+  
+  /**
+   * Stop periodic metrics reporting
+   */
+  private stopMetricsReporting(): void {
+    if (this.metricsInterval !== null) {
+      clearInterval(this.metricsInterval);
+      this.metricsInterval = null;
+    }
   }
 
   /**
@@ -181,7 +233,17 @@ export class ChunkedNormalizer {
 
     // Recycle worker if it has processed too many chunks
     if (chunkCount >= this.config.workerRecycleAfterChunks) {
+      const oldWorkerId = this.workerIds.get(worker) || 'unknown';
       console.log(`[Worker ${workerIndex}] Recycling after ${chunkCount} chunks`);
+      
+      // Report recycling event
+      reportMetrics('metrics.reportRecycling', {
+        workerId: oldWorkerId,
+        reason: 'max_chunks',
+        chunksProcessed: chunkCount,
+        memoryUsedMB: 0, // Not available in browser
+      });
+      
       worker.terminate();
       
       // Create new worker
@@ -189,8 +251,11 @@ export class ChunkedNormalizer {
         new URL('../../../client/src/workers/normalization.worker.ts', import.meta.url),
         { type: 'module' }
       );
+      const newWorkerId = generateWorkerId();
       this.workers[workerIndex] = newWorker;
       this.workerChunkCounts.set(newWorker, 0);
+      this.workerIds.set(newWorker, newWorkerId);
+      console.log(`[Worker ${workerIndex}] Recycled with new ID: ${newWorkerId}`);
       worker = newWorker;
     }
 
@@ -291,6 +356,14 @@ export class ChunkedNormalizer {
       );
 
       this.stats.retriedChunks++;
+      
+      // Report retry event
+      reportMetrics('metrics.reportRetry', {
+        chunkId: chunkIndex,
+        attemptNumber: attempt + 1,
+        error: error instanceof Error ? error.message : String(error),
+        delayMs: delay,
+      });
 
       // Wait before retry
       await new Promise(resolve => setTimeout(resolve, delay));
@@ -319,6 +392,7 @@ export class ChunkedNormalizer {
    */
   cancel(): void {
     this.isCancelled = true;
+    this.stopMetricsReporting();
     this.terminateWorkers();
   }
 
@@ -331,6 +405,7 @@ export class ChunkedNormalizer {
     }
     this.workers = [];
     this.workerChunkCounts.clear();
+    this.workerIds.clear();
     console.log('[Workers] All workers terminated and cleaned up');
   }
 
@@ -345,6 +420,7 @@ export class ChunkedNormalizer {
    * Cleanup
    */
   destroy(): void {
+    this.stopMetricsReporting();
     this.terminateWorkers();
   }
 }

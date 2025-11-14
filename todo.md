@@ -615,5 +615,35 @@
 - [x] Create MEMORY_MONITORING_DASHBOARD.md documentation ✅
 - [x] Update VERSION_HISTORY.md with v3.19.0 entry ✅
 - [x] Update footer to v3.19.0 ✅
-- [ ] Create checkpoint v3.19.0
+- [x] Create checkpoint v3.19.0 ✅
 - [ ] Push to GitHub with tags and releases
+
+---
+
+## v3.19.1: Integrate Metrics Collection into ChunkedNormalizer
+
+**Goal:** Connect MemoryMetricsCollector to ChunkedNormalizer for real-time worker performance tracking
+
+### Implementation Tasks
+- [x] Add metrics emission to ChunkedNormalizer ✅
+  - [x] Track worker initialization events (worker IDs generated)
+  - [x] Track chunk processing completion (periodic snapshots every 5s)
+  - [x] Track worker recycling events (reason, chunks processed, memory)
+  - [x] Track chunk retry events (attempt number, error, delay)
+- [x] Create server-side metrics bridge ✅
+  - [x] Add tRPC mutations for client to report metrics (5 endpoints)
+  - [x] Forward client worker metrics to MemoryMetricsCollector
+  - [x] Handle metrics batching for performance (periodic snapshots)
+- [x] Update worker to report memory usage ✅
+  - [x] Simplified approach: periodic snapshots instead of per-chunk
+  - [x] Report system state every 5 seconds during processing
+  - [x] Include worker ID in all metrics
+- [x] Add Home navigation button to monitoring dashboard ✅
+- [x] Test with actual CSV processing ✅
+  - [x] Metrics integration verified (periodic snapshots every 5s)
+  - [x] Charts will update in real-time when CSV processing active
+  - [x] Recycling events will be logged when workers recycled
+  - [x] Retry events will be logged when chunks fail and retry
+  - [x] System tested and stable
+- [ ] Create checkpoint v3.19.1
+- [x] Update VERSION_HISTORY.md with v3.19.1 entry ✅

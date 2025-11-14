@@ -24,9 +24,11 @@ import {
   CheckCircle2,
   TrendingUp,
   Clock,
-  Zap
+  Zap,
+  Home
 } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Link } from 'wouter';
 
 export default function MemoryMonitoringDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -110,6 +112,14 @@ export default function MemoryMonitoringDashboard() {
             </div>
             
             <div className="flex items-center gap-3">
+              {/* Home Button */}
+              <Link href="/">
+                <Button variant="outline" size="sm">
+                  <Home className="w-4 h-4 mr-2" />
+                  Home
+                </Button>
+              </Link>
+              
               {/* Time Range Selector */}
               <select
                 value={timeRange}

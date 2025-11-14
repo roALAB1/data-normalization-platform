@@ -15,6 +15,88 @@ import { metricsCollector } from './services/MemoryMetricsCollector';
 
 export const metricsRouter = router({
   /**
+   * Report metrics from client-side workers
+   * Bridges client worker metrics to server-side MemoryMetricsCollector
+   */
+  reportWorkerMetrics: publicProcedure
+    .input(
+      z.object({
+        workerId: z.string(),
+        memoryUsage: z.object({
+          rss: z.number(),
+          heapUsed: z.number(),
+          heapTotal: z.number(),
+          external: z.number(),
+        }),
+      })
+    )
+    .mutation(({ input }) => {
+      metricsCollector.recordWorkerMemory(input.workerId, {
+        rss: input.memoryUsage.rss,
+        heapUsed: input.memoryUsage.heapUsed,
+        heapTotal: input.memoryUsage.heapTotal,
+        external: input.memoryUsage.external,
+        arrayBuffers: 0, // Not tracked in client
+      });
+      return { success: true };
+    }),
+
+  /**
+   * Report worker recycling event
+   */
+  reportRecycling: publicProcedure
+    .input(
+      z.object({
+        workerId: z.string(),
+        reason: z.enum(['max_chunks', 'memory_limit', 'error', 'manual']),
+        chunksProcessed: z.number(),
+        memoryUsedMB: z.number(),
+      })
+    )
+    .mutation(({ input }) => {
+      metricsCollector.recordRecycling(input);
+      return { success: true };
+    }),
+
+  /**
+   * Report chunk retry event
+   */
+  reportRetry: publicProcedure
+    .input(
+      z.object({
+        chunkId: z.number(),
+        attemptNumber: z.number(),
+        error: z.string(),
+        delayMs: z.number(),
+      })
+    )
+    .mutation(({ input }) => {
+      metricsCollector.recordRetry(input);
+      return { success: true };
+    }),
+
+  /**
+   * Report chunk processed (for tracking)
+   */
+  reportChunkProcessed: publicProcedure
+    .input(
+      z.object({
+        workerId: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      metricsCollector.recordChunkProcessed(input.workerId);
+      return { success: true };
+    }),
+
+  /**
+   * Take system snapshot
+   */
+  takeSnapshot: publicProcedure.mutation(() => {
+    return metricsCollector.takeSnapshot();
+  }),
+
+  /**
    * Get current metrics snapshot
    */
   getCurrentMetrics: publicProcedure.query(() => {
