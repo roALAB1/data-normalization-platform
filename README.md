@@ -4,14 +4,15 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with real-time monitoring, connection pooling, and results preservation (v3.20.0):
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with real-time monitoring, circuit breaker protection, connection pooling, and results preservation (v3.21.0):
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
 - **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v2.1.0)
 - **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
+- **Circuit Breaker Protection** (v3.21.0): Opossum circuit breakers prevent cascading failures across database, Redis, and external APIs with automatic fallback
 - **Connection Pool Infrastructure** (v3.20.0): MySQL2 native pooling with 20 persistent connections, SSL/TLS support, unlimited concurrency, 10-20x faster queries
-- **Real-Time Pool Monitoring** (v3.20.0): Health checks, statistics, Prometheus metrics for connection pool performance
+- **Real-Time Monitoring** (v3.21.0): Health checks, statistics, and circuit state tracking for all critical services
 - **Real-Time Memory Monitoring** (v3.19.1): Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics
 - **Company Name Detection** (v3.19.2): Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation
 - **Results Preservation** (v3.19.2): Seamless navigation between results and monitoring dashboard without data loss
@@ -45,11 +46,40 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results  
+✅ **Circuit Breaker Protection** 🛡️: Automatic failure detection and recovery for database, Redis, and external APIs with graceful degradation (v3.21.0)  
 ✅ **Connection Pool Infrastructure** ⚡: 20 persistent database connections with SSL/TLS, unlimited concurrency, 10-20x faster queries (v3.20.0)  
-✅ **Real-Time Pool Monitoring** 📊: Health checks, statistics, Prometheus metrics for connection pool performance (v3.20.0)  
+✅ **Real-Time Monitoring** 📊: Health checks, statistics, circuit state tracking, and Prometheus metrics (v3.21.0)  
 ✅ **Real-Time Memory Monitoring** 📊: Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics (v3.19.1)  
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
+
+### What's New in v3.21.0 🚀
+
+**Circuit Breaker Protection** - Prevent cascading failures with automatic failure detection and recovery:
+
+- **Opossum Circuit Breakers**: Industry-standard circuit breaker implementation for all critical services
+- **Database Protection**: 10-second timeout, 50% error threshold, 30-second recovery window
+- **Redis Protection**: 5-second timeout, 50% error threshold, 20-second recovery window  
+- **External API Protection**: 30-second timeout, 60% error threshold, 1-minute recovery window
+- **Automatic Fallbacks**: Graceful degradation maintains partial functionality during outages
+- **Real-Time Monitoring**: Circuit state tracking (CLOSED/OPEN/HALF_OPEN) via tRPC endpoints
+
+**Circuit States**:
+- **CLOSED**: Normal operation, requests pass through
+- **OPEN**: Service failing, immediate fallback (saves 10-30s per request)
+- **HALF_OPEN**: Testing recovery, limited requests allowed
+
+**Monitoring Endpoints**:
+- `monitoring.circuitBreakerHealth` - Health status for all circuits
+- `monitoring.circuitBreakerStats` - Detailed statistics and metrics
+
+**Benefits**:
+- Prevents cascading failures across services
+- 10-30s faster error responses (immediate fallback vs. timeout)
+- Self-healing with automatic recovery detection
+- Graceful degradation during outages
+
+---
 
 ### What's New in v3.20.0 🚀
 

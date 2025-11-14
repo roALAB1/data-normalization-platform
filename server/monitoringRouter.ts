@@ -6,6 +6,9 @@ import {
 } from './_core/dbMonitoring';
 import { getConnectionPoolMetricsText } from './_core/connectionPoolMetrics';
 import { checkPoolHealth, getPoolStats } from './_core/connectionPool';
+import { circuitBreakerRegistry, getCircuitBreakerStats } from './_core/circuitBreaker';
+import { checkDatabaseHealth, getDatabaseCircuitStatus } from './_core/dbCircuitBreaker';
+import { checkRedisHealth, getServiceCircuitStatuses } from './_core/serviceCircuitBreakers';
 
 /**
  * Monitoring Router
@@ -120,6 +123,46 @@ export const monitoringRouter = router({
     return {
       metrics,
       contentType: 'text/plain; version=0.0.4',
+    };
+  }),
+
+  /**
+   * Get all circuit breaker statuses
+   * 
+   * Returns state and statistics for all registered circuit breakers
+   */
+  circuitBreakerStats: publicProcedure.query(async () => {
+    const allStats = circuitBreakerRegistry.getAllStats();
+    return {
+      breakers: allStats,
+      count: allStats.length,
+    };
+  }),
+
+  /**
+   * Get circuit breaker health status
+   * 
+   * Returns health status for database and service circuit breakers
+   */
+  circuitBreakerHealth: publicProcedure.query(async () => {
+    const [dbHealthy, redisHealthy] = await Promise.all([
+      checkDatabaseHealth(),
+      checkRedisHealth(),
+    ]);
+
+    const dbStatus = getDatabaseCircuitStatus();
+    const serviceStatuses = getServiceCircuitStatuses();
+
+    return {
+      database: {
+        healthy: dbHealthy,
+        ...dbStatus,
+      },
+      redis: {
+        healthy: redisHealthy,
+        ...serviceStatuses.redis,
+      },
+      overall: dbHealthy && redisHealthy,
     };
   }),
 });

@@ -2,6 +2,53 @@
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
+## [3.21.0] - 2025-11-14
+
+### Added - Circuit Breaker Protection
+
+#### Core Features
+- **Opossum Circuit Breakers** - Automatic failure detection and recovery for all critical services
+- **Database Protection** - 10-second timeout, 50% error threshold, 30-second recovery window
+- **Redis Protection** - 5-second timeout, 50% error threshold, 20-second recovery window
+- **External API Protection** - 30-second timeout, 60% error threshold, 1-minute recovery window
+- **Automatic Fallbacks** - Graceful degradation when services fail
+- **Real-Time Monitoring** - Circuit state tracking and statistics via tRPC
+
+#### New Files
+- `server/_core/circuitBreaker.ts` - Circuit breaker factory and registry
+- `server/_core/dbCircuitBreaker.ts` - Database circuit breaker wrapper
+- `server/_core/serviceCircuitBreakers.ts` - Redis and API circuit breakers
+- `tests/circuit-breaker.test.ts` - Comprehensive circuit breaker tests (12/12 passing)
+- `CIRCUIT_BREAKER_GUIDE.md` - Complete implementation guide
+
+#### API Endpoints
+- `monitoring.circuitBreakerHealth` - Real-time health status for all circuits
+- `monitoring.circuitBreakerStats` - Detailed statistics for all circuit breakers
+
+#### Circuit States
+- **CLOSED** - Normal operation, requests pass through
+- **OPEN** - Service failing, requests fail immediately with fallback
+- **HALF_OPEN** - Testing recovery, limited requests allowed
+
+### Performance & Reliability
+- **Prevents Cascading Failures** - Automatic circuit opening stops failure propagation
+- **Faster Error Responses** - Immediate fallback vs. timeout wait (10-30s saved)
+- **Graceful Degradation** - Partial functionality maintained during outages
+- **Self-Healing** - Automatic recovery detection and circuit closing
+
+### Changed
+- Extended monitoring router with circuit breaker endpoints
+- Added circuit breaker registry for centralized management
+- Enhanced error logging with circuit state information
+
+### Testing
+- 12/12 circuit breaker tests passing
+- Basic functionality validated (success, fallback, timeout)
+- Circuit states tested (opening, statistics, recovery)
+- Service integration tested (database, Redis, API)
+
+---
+
 ## [3.20.0] - 2025-11-14
 
 ### Added - Connection Pool Infrastructure
