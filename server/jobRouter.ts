@@ -3,6 +3,7 @@ import { protectedProcedure, router } from "./_core/trpc";
 import { createJob, getUserJobs, getJobById, cancelJob, getJobResults } from "./jobDb";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
+import { rateLimitMiddleware, RateLimits } from "./_core/rateLimit";
 
 export const jobRouter = router({
   /**
@@ -21,6 +22,9 @@ export const jobRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Rate limiting: 10 jobs per hour
+      await rateLimitMiddleware(ctx.user.id, RateLimits.JOB_CREATE);
+
       // Upload input file to S3
       const inputFileKey = `jobs/${ctx.user.id}/${Date.now()}-${input.fileName}`;
       const { url: inputFileUrl } = await storagePut(

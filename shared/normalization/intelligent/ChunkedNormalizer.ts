@@ -10,6 +10,10 @@ export interface ChunkedNormalizerConfig {
   workerPoolSize?: number;
   chunkSize?: number;
   maxConcurrentChunks?: number;
+  maxRetries?: number;
+  retryDelayMs?: number;
+  maxWorkerMemoryMB?: number;
+  workerRecycleAfterChunks?: number;
 }
 
 export interface ProcessingStats {
@@ -18,6 +22,7 @@ export interface ProcessingStats {
   totalRows: number;
   processedRows: number;
   failedChunks: number;
+  retriedChunks: number;
   startTime: number;
   chunksPerSecond: number;
 }
@@ -27,6 +32,7 @@ export type ChunkProgressCallback = (stats: ProcessingStats) => void;
 export class ChunkedNormalizer {
   private config: Required<ChunkedNormalizerConfig>;
   private workers: Worker[] = [];
+  private workerChunkCounts: Map<Worker, number> = new Map();
   private stats: ProcessingStats;
   private isCancelled: boolean = false;
 
@@ -35,6 +41,10 @@ export class ChunkedNormalizer {
       workerPoolSize: config.workerPoolSize || navigator.hardwareConcurrency || 4,
       chunkSize: config.chunkSize || 2000,
       maxConcurrentChunks: config.maxConcurrentChunks || 8,
+      maxRetries: config.maxRetries || 3,
+      retryDelayMs: config.retryDelayMs || 1000,
+      maxWorkerMemoryMB: config.maxWorkerMemoryMB || 500,
+      workerRecycleAfterChunks: config.workerRecycleAfterChunks || 100,
     };
 
     this.stats = {
@@ -43,6 +53,7 @@ export class ChunkedNormalizer {
       totalRows: 0,
       processedRows: 0,
       failedChunks: 0,
+      retriedChunks: 0,
       startTime: Date.now(),
       chunksPerSecond: 0,
     };
@@ -63,6 +74,8 @@ export class ChunkedNormalizer {
           { type: 'module' }
         );
         this.workers.push(worker);
+        this.workerChunkCounts.set(worker, 0);
+        console.log(`[Worker ${i}] Initialized`);
       } catch (error) {
         console.error('Failed to create worker:', error);
       }
@@ -90,6 +103,7 @@ export class ChunkedNormalizer {
       totalRows: chunks.reduce((sum, chunk) => sum + chunk.length, 0),
       processedRows: 0,
       failedChunks: 0,
+      retriedChunks: 0,
       startTime: Date.now(),
       chunksPerSecond: 0,
     };
@@ -124,7 +138,7 @@ export class ChunkedNormalizer {
         const currentIndex = chunkIndex++;
         const chunk = chunks[currentIndex];
 
-        const promise = this.processChunk(chunk, strategy, currentIndex, outputColumns)
+        const promise = this.processChunkWithRetry(chunk, strategy, currentIndex, outputColumns)
           .then((result) => {
             results[currentIndex] = result;
             this.stats.processedChunks++;
@@ -136,7 +150,7 @@ export class ChunkedNormalizer {
             }
           })
           .catch((error) => {
-            console.error(`Failed to process chunk ${currentIndex}:`, error);
+            console.error(`Failed to process chunk ${currentIndex} after ${this.config.maxRetries} retries:`, error);
             this.stats.failedChunks++;
             results[currentIndex] = []; // Empty result for failed chunk
           })
@@ -157,6 +171,32 @@ export class ChunkedNormalizer {
   }
 
   /**
+   * Get or recycle worker for processing
+   */
+  private async getWorker(chunkIndex: number): Promise<Worker> {
+    const workerIndex = chunkIndex % this.workers.length;
+    let worker = this.workers[workerIndex];
+    const chunkCount = this.workerChunkCounts.get(worker) || 0;
+
+    // Recycle worker if it has processed too many chunks
+    if (chunkCount >= this.config.workerRecycleAfterChunks) {
+      console.log(`[Worker ${workerIndex}] Recycling after ${chunkCount} chunks`);
+      worker.terminate();
+      
+      // Create new worker
+      const newWorker = new Worker(
+        new URL('../../../client/src/workers/normalization.worker.ts', import.meta.url),
+        { type: 'module' }
+      );
+      this.workers[workerIndex] = newWorker;
+      this.workerChunkCounts.set(newWorker, 0);
+      worker = newWorker;
+    }
+
+    return worker;
+  }
+
+  /**
    * Process a single chunk
    */
   private async processChunk(
@@ -165,8 +205,8 @@ export class ChunkedNormalizer {
     chunkIndex: number,
     outputColumns?: string[]
   ): Promise<any[]> {
-    // Get available worker (round-robin)
-    const worker = this.workers[chunkIndex % this.workers.length];
+    // Get available worker (with recycling)
+    const worker = await this.getWorker(chunkIndex);
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
@@ -211,7 +251,58 @@ export class ChunkedNormalizer {
       };
 
       worker.postMessage(message);
+    }).finally(() => {
+      // Increment chunk count for this worker
+      const count = this.workerChunkCounts.get(worker) || 0;
+      this.workerChunkCounts.set(worker, count + 1);
     });
+  }
+
+  /**
+   * Process a chunk with automatic retry on failure
+   * Uses exponential backoff: 1s, 2s, 4s, 8s, max 30s
+   */
+  private async processChunkWithRetry(
+    chunk: any[],
+    strategy: NormalizationStrategy,
+    chunkIndex: number,
+    outputColumns?: string[],
+    attempt: number = 0
+  ): Promise<any[]> {
+    try {
+      return await this.processChunk(chunk, strategy, chunkIndex, outputColumns);
+    } catch (error) {
+      if (attempt >= this.config.maxRetries) {
+        // Max retries reached, throw error
+        throw error;
+      }
+
+      // Calculate exponential backoff delay (1s, 2s, 4s, 8s, max 30s)
+      const delay = Math.min(
+        this.config.retryDelayMs * Math.pow(2, attempt),
+        30000
+      );
+
+      console.warn(
+        `Chunk ${chunkIndex} failed (attempt ${attempt + 1}/${this.config.maxRetries}), ` +
+        `retrying in ${delay}ms...`,
+        error
+      );
+
+      this.stats.retriedChunks++;
+
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, delay));
+
+      // Retry with incremented attempt counter
+      return this.processChunkWithRetry(
+        chunk,
+        strategy,
+        chunkIndex,
+        outputColumns,
+        attempt + 1
+      );
+    }
   }
 
   /**
@@ -238,6 +329,8 @@ export class ChunkedNormalizer {
       worker.terminate();
     }
     this.workers = [];
+    this.workerChunkCounts.clear();
+    console.log('[Workers] All workers terminated and cleaned up');
   }
 
   /**

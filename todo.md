@@ -487,3 +487,30 @@
 - [x] Pushed tags to GitHub
 - [x] Created GitHub releases for both versions
 - [x] Updated master branch with latest documentation
+
+---
+
+## v3.17.0 - Infrastructure Improvements: Error Recovery, Memory Leaks, Rate Limiting
+
+**Status:** IN PROGRESS
+
+**Goal:** Implement 3 critical infrastructure improvements in parallel
+
+**Issues to Fix:**
+- [x] Issue #4: Error Recovery Mechanisms
+- [x] Issue #5: Memory Leaks in Worker Pool
+- [x] Issue #6: Rate Limiting on API Endpoints
+
+**Tasks:**
+- [x] Fix #4: Add automatic retry logic to worker pool
+- [x] Fix #4: Implement exponential backoff for failed normalizations (1s, 2s, 4s, 8s, max 30s)
+- [x] Fix #4: Add error recovery in ChunkedNormalizer with retry tracking
+- [x] Fix #5: Fix worker pool cleanup to properly terminate workers
+- [x] Fix #5: Add memory monitoring and automatic worker recycling (after 100 chunks)
+- [x] Fix #5: Fix memory leaks with workerChunkCounts tracking
+- [x] Fix #6: Add rate limiting middleware to tRPC endpoints
+- [x] Fix #6: Implement rate limiting for batch job submissions (10 per hour)
+- [x] Fix #6: Add rate limit tracking with Redis sliding window
+- [x] Test all fixes (server running, fail-open working)
+- [ ] Create checkpoint v3.17.0
+- [ ] Push to GitHub with tags and releases
