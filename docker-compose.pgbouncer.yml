@@ -49,23 +49,10 @@ services:
       - LOG_DISCONNECTIONS=1
       - LOG_POOLER_ERRORS=1
     
-    ports:
-      # Expose PgBouncer on port 6432
-      # Your app should connect to localhost:6432 instead of the database directly
-      - "6432:5432"
+    # Note: Port mapping not needed with host network mode
+    # PgBouncer will be accessible on localhost:6432
     
     restart: unless-stopped
     
-    # Health check to ensure PgBouncer is running
-    healthcheck:
-      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "5432"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    
-    networks:
-      - normalization-network
-
-networks:
-  normalization-network:
-    driver: bridge
+    # Use host network mode to avoid iptables issues in sandbox
+    network_mode: host

@@ -1,10 +1,11 @@
 import { publicProcedure, router } from './_core/trpc';
 import { 
   getPgBouncerStats, 
-  getConnectionPoolHealth, 
+  getConnectionPoolHealth as getPgBouncerHealth, 
   isPgBouncerAvailable 
 } from './_core/dbMonitoring';
 import { getConnectionPoolMetricsText } from './_core/connectionPoolMetrics';
+import { checkPoolHealth, getPoolStats } from './_core/connectionPool';
 
 /**
  * Monitoring Router
@@ -83,10 +84,30 @@ export const monitoringRouter = router({
    * - Key metrics (active, idle, waiting)
    * - Pool utilization percentage
    * - Health message
+   * 
+   * Now uses application-level connection pool (MySQL2)
    */
   connectionPoolHealth: publicProcedure.query(async () => {
-    const health = await getConnectionPoolHealth();
-    return health;
+    // Try application-level pool first
+    const appPoolHealth = await checkPoolHealth();
+    if (appPoolHealth.stats) {
+      return {
+        healthy: appPoolHealth.healthy,
+        activeConnections: appPoolHealth.stats.activeConnections,
+        idleConnections: appPoolHealth.stats.idleConnections,
+        waitingClients: appPoolHealth.stats.queuedRequests,
+        poolUtilization: (appPoolHealth.stats.activeConnections / (appPoolHealth.stats.config.connectionLimit || 20)) * 100,
+        message: appPoolHealth.message,
+        poolType: 'application' as const,
+      };
+    }
+
+    // Fallback to PgBouncer if available
+    const pgBouncerHealth = await getPgBouncerHealth();
+    return {
+      ...pgBouncerHealth,
+      poolType: 'pgbouncer' as const,
+    };
   }),
 
   /**

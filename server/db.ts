@@ -3,14 +3,24 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users } from "../drizzle/schema";
 import * as schema from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { getDbWithPool, getConnectionPool } from './_core/connectionPool';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
+// Now uses connection pooling for better performance
 export async function getDb() {
+  // Try to use connection pool first (better performance)
+  const pooledDb = getDbWithPool();
+  if (pooledDb) {
+    return pooledDb;
+  }
+
+  // Fallback to direct connection if pool is not available
   if (!_db && process.env.DATABASE_URL) {
     try {
       _db = drizzle(process.env.DATABASE_URL, { schema, mode: 'default' });
+      console.warn("[Database] Using direct connection (connection pool not available)");
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
