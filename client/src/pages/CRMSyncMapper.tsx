@@ -470,7 +470,7 @@ export default function CRMSyncMapper() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>v3.25.0 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
+          <p>v3.25.1 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
         </div>
       </footer>
     </div>
