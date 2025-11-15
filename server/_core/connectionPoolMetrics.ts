@@ -1,5 +1,4 @@
 import { Gauge, Counter, Histogram, Registry } from 'prom-client';
-import { getPgBouncerStats, getConnectionPoolHealth } from './dbMonitoring';
 
 // Create a separate registry for connection pool metrics
 export const connectionPoolRegistry = new Registry();
@@ -10,19 +9,19 @@ export const connectionPoolRegistry = new Registry();
  */
 export const connectionPoolActiveGauge = new Gauge({
   name: 'connection_pool_active_connections',
-  help: 'Number of active server connections in the pool',
+  help: 'Number of active connections in the pool',
   registers: [connectionPoolRegistry],
 });
 
 export const connectionPoolIdleGauge = new Gauge({
   name: 'connection_pool_idle_connections',
-  help: 'Number of idle server connections in the pool',
+  help: 'Number of idle connections in the pool',
   registers: [connectionPoolRegistry],
 });
 
 export const connectionPoolWaitingGauge = new Gauge({
   name: 'connection_pool_waiting_clients',
-  help: 'Number of clients waiting for a connection',
+  help: 'Number of requests waiting for a connection',
   registers: [connectionPoolRegistry],
 });
 
@@ -32,21 +31,8 @@ export const connectionPoolUtilizationGauge = new Gauge({
   registers: [connectionPoolRegistry],
 });
 
-export const connectionPoolClientConnectionsGauge = new Gauge({
-  name: 'connection_pool_client_connections_total',
-  help: 'Total number of client connections',
-  registers: [connectionPoolRegistry],
-});
-
-export const connectionPoolServerConnectionsGauge = new Gauge({
-  name: 'connection_pool_server_connections_total',
-  help: 'Total number of server connections',
-  registers: [connectionPoolRegistry],
-});
-
 /**
  * Connection Pool Counters
- * These track cumulative events over time
  */
 export const connectionPoolQueriesTotal = new Counter({
   name: 'connection_pool_queries_total',
@@ -64,15 +50,7 @@ export const connectionPoolErrorsTotal = new Counter({
 
 /**
  * Connection Pool Histograms
- * These track distributions of values over time
  */
-export const connectionPoolWaitTimeHistogram = new Histogram({
-  name: 'connection_pool_wait_time_seconds',
-  help: 'Time clients spend waiting for a connection',
-  buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5],
-  registers: [connectionPoolRegistry],
-});
-
 export const connectionPoolQueryDurationHistogram = new Histogram({
   name: 'connection_pool_query_duration_seconds',
   help: 'Duration of queries through the connection pool',
@@ -81,66 +59,34 @@ export const connectionPoolQueryDurationHistogram = new Histogram({
 });
 
 /**
- * Update connection pool metrics from PgBouncer stats
+ * Update connection pool metrics
  * 
- * This should be called periodically (e.g., every 15 seconds) to keep metrics up-to-date
+ * Note: PgBouncer monitoring has been removed. Metrics are now stub values.
  */
 export async function updateConnectionPoolMetrics(): Promise<void> {
-  try {
-    const stats = await getPgBouncerStats();
-    
-    if (!stats) {
-      console.warn('[Metrics] PgBouncer stats unavailable, skipping metric update');
-      return;
-    }
-
-    // Update gauges
-    connectionPoolActiveGauge.set(stats.activeConnections);
-    connectionPoolIdleGauge.set(stats.idleConnections);
-    connectionPoolWaitingGauge.set(stats.waitingClients);
-    connectionPoolClientConnectionsGauge.set(stats.totalClientConnections);
-    connectionPoolServerConnectionsGauge.set(stats.totalServerConnections);
-
-    // Calculate pool utilization
-    const poolSize = parseInt(process.env.DEFAULT_POOL_SIZE || '20');
-    const utilization = (stats.activeConnections / poolSize) * 100;
-    connectionPoolUtilizationGauge.set(utilization);
-
-    // Record wait times from pool stats
-    stats.pools.forEach(pool => {
-      if (pool.maxwait > 0) {
-        connectionPoolWaitTimeHistogram.observe(pool.maxwait);
-      }
-    });
-
-  } catch (error) {
-    console.error('[Metrics] Error updating connection pool metrics:', error);
-    connectionPoolErrorsTotal.inc({ error_type: 'metric_update_failed' });
-  }
+  // Stub implementation - metrics collection removed with PgBouncer
+  connectionPoolActiveGauge.set(0);
+  connectionPoolIdleGauge.set(0);
+  connectionPoolWaitingGauge.set(0);
+  connectionPoolUtilizationGauge.set(0);
 }
 
 /**
  * Start periodic metric collection
  * 
- * @param intervalMs - How often to collect metrics (default: 15 seconds)
+ * Note: This is now a no-op since PgBouncer monitoring was removed
  */
 export function startConnectionPoolMetricsCollection(intervalMs: number = 15000): NodeJS.Timeout {
-  console.info(`[Metrics] Starting connection pool metrics collection (every ${intervalMs}ms)`);
+  console.info(`[Metrics] Connection pool metrics collection disabled (PgBouncer removed)`);
   
-  // Update immediately on start
-  updateConnectionPoolMetrics();
-  
-  // Then update periodically
+  // Return a dummy interval that does nothing
   return setInterval(() => {
-    updateConnectionPoolMetrics();
+    // No-op
   }, intervalMs);
 }
 
 /**
  * Record a database query for metrics
- * 
- * @param duration - Query duration in milliseconds
- * @param success - Whether the query succeeded
  */
 export function recordDatabaseQuery(duration: number, success: boolean): void {
   const durationSeconds = duration / 1000;
@@ -157,8 +103,6 @@ export function recordDatabaseQuery(duration: number, success: boolean): void {
  * Get connection pool metrics in Prometheus format
  */
 export async function getConnectionPoolMetricsText(): Promise<string> {
-  // Update metrics before returning
   await updateConnectionPoolMetrics();
-  
   return connectionPoolRegistry.metrics();
 }
