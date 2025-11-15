@@ -910,6 +910,6 @@
 - [x] Add "Batch Jobs" button to CRM Sync Mapper header
 - [x] Add "Monitoring" button to CRM Sync Mapper header
 - [x] Ensure consistent navigation across all pages
-- [ ] Test navigation flow between all pages
-- [ ] Create checkpoint v3.25.1
-- [ ] Push to GitHub
+- [x] Test navigation flow between all pages
+- [x] Create checkpoint v3.25.1
+- [x] Push to GitHub
