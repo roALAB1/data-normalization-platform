@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Home, Upload, X, Plus, FileText, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Home, Upload, X, Plus, FileText, AlertCircle, CheckCircle2, ArrowRight, Activity } from "lucide-react";
 import Papa from "papaparse";
 import {
   autoDetectIdentifier,
@@ -151,6 +151,20 @@ export default function CRMSyncMapper() {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               CRM Sync Mapper
             </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href="/batch-jobs">
+              <Button variant="outline" size="sm">
+                <FileText className="w-4 h-4 mr-2" />
+                Batch Jobs
+              </Button>
+            </Link>
+            <Link href="/monitoring">
+              <Button variant="outline" size="sm">
+                <Activity className="w-4 h-4 mr-2" />
+                Monitoring
+              </Button>
+            </Link>
           </div>
         </div>
       </header>

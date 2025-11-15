@@ -900,3 +900,16 @@
 - ✅ Auto-detect best matching identifier
 - ✅ Resolve conflicts intelligently
 - ✅ Preserve original CRM structure for seamless re-import
+
+
+---
+
+## v3.25.1 - Navigation Fix
+
+### CRM Sync Mapper Navigation
+- [x] Add "Batch Jobs" button to CRM Sync Mapper header
+- [x] Add "Monitoring" button to CRM Sync Mapper header
+- [x] Ensure consistent navigation across all pages
+- [ ] Test navigation flow between all pages
+- [ ] Create checkpoint v3.25.1
+- [ ] Push to GitHub
