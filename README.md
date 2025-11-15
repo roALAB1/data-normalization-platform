@@ -47,6 +47,24 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
 
+### What's New in v3.25.0 🚀
+
+**CRM Sync Mapper - Intelligent Multi-File Merge** 🔄  
+Built complete 5-step CRM Sync Mapper at `/crm-sync` for merging multiple enriched files back to original CRM export. Workflow: Upload → Matching → Conflicts → Columns → Output. Auto-detects best identifier (Email > Phone > ID) with quality scoring. Conflict resolution with 3 strategies (keep original, replace, create alternates like Email_Alt). Flexible column ordering (append at end, insert next to related). Real-time match statistics, preview, and CSV export. Handles millions of rows while preserving original structure for seamless CRM re-import. Perfect for users who enrich with multiple match strategies (name+phone, name+email) and need to merge results back.
+
+**Key Features:**
+- 🎯 **Intelligent Matching**: Auto-detect identifier with quality scores (uniqueness + type bonus)
+- 📊 **Match Statistics**: Per-file match rates, unmatched rows viewer, duplicate detection
+- ⚔️ **Conflict Resolution**: Keep original, replace, or create alternate fields (Email_Alt)
+- 📋 **Column Selection**: Choose enriched fields to include with flexible ordering
+- 💾 **CSV Export**: Merged output ready for CRM import with preserved row order
+
+**Technical Implementation:**
+- Created `matchingEngine.ts` for intelligent row matching
+- Created `conflictResolver.ts` for conflict detection and resolution
+- Built 4 modular components: MatchingStep, ConflictResolutionStep, ColumnSelectionStep, OutputStep
+- Added `/crm-sync` route with navigation from main page
+
 ### What's New in v3.24.0 🚀
 
 **Batch Processing API & UI Restoration** 🚀  
