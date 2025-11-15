@@ -4,7 +4,7 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with real-time monitoring, Redis caching, and infrastructure stability (v3.23.0):
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with batch processing API, real-time monitoring, and Redis caching (v3.24.0):
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
@@ -46,6 +46,19 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Real-Time Memory Monitoring** 📊: Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics (v3.19.1)  
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
+
+### What's New in v3.24.0 🚀
+
+**Batch Processing API & UI Restoration** 🚀  
+Restored full batch processing system with enterprise-scale capabilities. New `/batch-jobs` page allows users to submit CSV files (up to 1M rows), track progress in real-time with auto-refresh, and download results. Added comprehensive REST API (`/api/v1/*`) with SHA-256 API key authentication for CRM integrations. Complete documentation in `API_DOCUMENTATION.md` with cURL, Python, and JavaScript examples. Job queue processor handles 1,000-5,000 rows/sec with constant memory usage. S3-backed storage for uploads/results. WebSocket support for real-time progress updates. Rate limiting: 10 jobs/hour per user.
+
+**REST API Endpoints:**
+- `POST /api/v1/normalize/batch` - Submit batch job (CSV string or URL)
+- `GET /api/v1/jobs/:id` - Get job status and progress
+- `GET /api/v1/jobs` - List all jobs with filtering
+- `DELETE /api/v1/jobs/:id` - Cancel pending/processing job
+
+**Future Enhancements:** Webhook support for job completion, OpenAPI/Swagger spec, CRM integrations page.
 
 ### What's New in v3.23.0 🚀
 
