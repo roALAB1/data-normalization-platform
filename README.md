@@ -4,15 +4,12 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with real-time monitoring, circuit breaker protection, connection pooling, and results preservation (v3.21.0):
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with real-time monitoring and results preservation (v3.19.2):
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
 - **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v2.1.0)
 - **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
-- **Circuit Breaker Protection** (v3.21.0): Opossum circuit breakers prevent cascading failures across database, Redis, and external APIs with automatic fallback
-- **Connection Pool Infrastructure** (v3.20.0): MySQL2 native pooling with 20 persistent connections, SSL/TLS support, unlimited concurrency, 10-20x faster queries
-- **Real-Time Monitoring** (v3.21.0): Health checks, statistics, and circuit state tracking for all critical services
 - **Real-Time Memory Monitoring** (v3.19.1): Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics
 - **Company Name Detection** (v3.19.2): Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation
 - **Results Preservation** (v3.19.2): Seamless navigation between results and monitoring dashboard without data loss
@@ -46,96 +43,9 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results  
-✅ **Circuit Breaker Protection** 🛡️: Automatic failure detection and recovery for database, Redis, and external APIs with graceful degradation (v3.21.0)  
-✅ **Connection Pool Infrastructure** ⚡: 20 persistent database connections with SSL/TLS, unlimited concurrency, 10-20x faster queries (v3.20.0)  
-✅ **Real-Time Monitoring** 📊: Health checks, statistics, circuit state tracking, and Prometheus metrics (v3.21.0)  
 ✅ **Real-Time Memory Monitoring** 📊: Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics (v3.19.1)  
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
-
-### What's New in v3.22.0 🚀
-
-**Redis Caching Layer** - 10x throughput improvement with intelligent caching:
-
-- **Cache-Aside Pattern**: Lazy loading with automatic fallback to database on cache miss
-- **10x Throughput**: From 20-30 req/s to 1,000+ req/s for cached data
-- **<1ms Latency**: Cache hits return in <1ms vs. 50-100ms database queries
-- **Configurable TTL**: Users (1 hour), Jobs (5 minutes), Job Results (10 minutes), Sessions (24 hours)
-- **Cache Warming**: Pre-load 100 recent users and 200 recent jobs on startup
-- **Hit Rate Tracking**: Real-time cache performance metrics (80-90% expected for users)
-- **Circuit Breaker Protection**: Graceful degradation when Redis fails
-
-**Cache Functions**:
-- `cacheGetOrSet(key, ttl, fallback)` - Cache-aside pattern with automatic fallback
-- `getCachedUser(userId)` - Get user with 1-hour caching
-- `getCachedJob(jobId)` - Get job with 5-minute caching
-- `warmCache()` - Pre-load frequently accessed data
-
-**Monitoring Endpoints**:
-- `monitoring.cacheStats` - Real-time hit rate and statistics
-- `monitoring.cacheClear` - Clear all cache entries (admin)
-- `monitoring.cacheClearPattern` - Clear cache by pattern
-
-**Benefits**:
-- 10x throughput improvement for frequently accessed data
-- Sub-millisecond response times for cache hits
-- 80-90% hit rate for stable data (users, settings)
-- Automatic cache invalidation on updates
-
----
-
-### What's New in v3.21.0 🚀
-
-**Circuit Breaker Protection** - Prevent cascading failures with automatic failure detection and recovery:
-
-- **Opossum Circuit Breakers**: Industry-standard circuit breaker implementation for all critical services
-- **Database Protection**: 10-second timeout, 50% error threshold, 30-second recovery window
-- **Redis Protection**: 5-second timeout, 50% error threshold, 20-second recovery window  
-- **External API Protection**: 30-second timeout, 60% error threshold, 1-minute recovery window
-- **Automatic Fallbacks**: Graceful degradation maintains partial functionality during outages
-- **Real-Time Monitoring**: Circuit state tracking (CLOSED/OPEN/HALF_OPEN) via tRPC endpoints
-
-**Circuit States**:
-- **CLOSED**: Normal operation, requests pass through
-- **OPEN**: Service failing, immediate fallback (saves 10-30s per request)
-- **HALF_OPEN**: Testing recovery, limited requests allowed
-
-**Monitoring Endpoints**:
-- `monitoring.circuitBreakerHealth` - Health status for all circuits
-- `monitoring.circuitBreakerStats` - Detailed statistics and metrics
-
-**Benefits**:
-- Prevents cascading failures across services
-- 10-30s faster error responses (immediate fallback vs. timeout)
-- Self-healing with automatic recovery detection
-- Graceful degradation during outages
-
----
-
-### What's New in v3.20.0 🚀
-
-**Connection Pool Infrastructure** - Production-ready database connection pooling for enterprise-scale performance:
-
-- **20 Persistent Connections**: MySQL2 native connection pool with automatic lifecycle management
-- **SSL/TLS Security**: Encrypted database connections for TiDB Cloud compatibility
-- **Unlimited Concurrency**: Queue-based request handling without connection limits
-- **10-20x Performance**: Validated with 200 concurrent queries in 154ms
-- **Real-Time Monitoring**: Health checks, statistics, and Prometheus metrics via tRPC
-- **Zero Configuration**: Automatically enabled, backward compatible with existing code
-
-**Performance Benchmarks**:
-- 10 concurrent queries: 142ms
-- 100 concurrent queries: 64ms
-- 200 concurrent queries: 154ms
-- Pool utilization: 0% under normal load
-- Connection reuse: 5ms → 4.5ms average
-
-**Monitoring Endpoints**:
-- `monitoring.connectionPoolHealth` - Real-time health status
-- `monitoring.connectionPoolStats` - Detailed pool statistics
-- `monitoring.connectionPoolMetrics` - Prometheus metrics export
-
----
 
 ### What's New in v3.19.2 🚀
 

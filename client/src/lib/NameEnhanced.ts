@@ -882,6 +882,7 @@ export const ALL_CREDENTIALS = [
   "PMHNP-BC",
   "Pmhnp-Bc",
   "PMHA",
+  "PMH-C",
   "PMI-ACP",
   "PMI-RMP",
   "PMI-SP",

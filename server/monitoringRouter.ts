@@ -1,16 +1,10 @@
 import { publicProcedure, router } from './_core/trpc';
-import { z } from 'zod';
 import { 
   getPgBouncerStats, 
-  getConnectionPoolHealth as getPgBouncerHealth, 
+  getConnectionPoolHealth, 
   isPgBouncerAvailable 
 } from './_core/dbMonitoring';
 import { getConnectionPoolMetricsText } from './_core/connectionPoolMetrics';
-import { checkPoolHealth, getPoolStats } from './_core/connectionPool';
-import { circuitBreakerRegistry, getCircuitBreakerStats } from './_core/circuitBreaker';
-import { checkDatabaseHealth, getDatabaseCircuitStatus } from './_core/dbCircuitBreaker';
-import { checkRedisHealth, getServiceCircuitStatuses } from './_core/serviceCircuitBreakers';
-import { cacheStats, cacheClear, cacheDeletePattern } from './_core/cache';
 
 /**
  * Monitoring Router
@@ -89,30 +83,10 @@ export const monitoringRouter = router({
    * - Key metrics (active, idle, waiting)
    * - Pool utilization percentage
    * - Health message
-   * 
-   * Now uses application-level connection pool (MySQL2)
    */
   connectionPoolHealth: publicProcedure.query(async () => {
-    // Try application-level pool first
-    const appPoolHealth = await checkPoolHealth();
-    if (appPoolHealth.stats) {
-      return {
-        healthy: appPoolHealth.healthy,
-        activeConnections: appPoolHealth.stats.activeConnections,
-        idleConnections: appPoolHealth.stats.idleConnections,
-        waitingClients: appPoolHealth.stats.queuedRequests,
-        poolUtilization: (appPoolHealth.stats.activeConnections / (appPoolHealth.stats.config.connectionLimit || 20)) * 100,
-        message: appPoolHealth.message,
-        poolType: 'application' as const,
-      };
-    }
-
-    // Fallback to PgBouncer if available
-    const pgBouncerHealth = await getPgBouncerHealth();
-    return {
-      ...pgBouncerHealth,
-      poolType: 'pgbouncer' as const,
-    };
+    const health = await getConnectionPoolHealth();
+    return health;
   }),
 
   /**
@@ -127,89 +101,4 @@ export const monitoringRouter = router({
       contentType: 'text/plain; version=0.0.4',
     };
   }),
-
-  /**
-   * Get all circuit breaker statuses
-   * 
-   * Returns state and statistics for all registered circuit breakers
-   */
-  circuitBreakerStats: publicProcedure.query(async () => {
-    const allStats = circuitBreakerRegistry.getAllStats();
-    return {
-      breakers: allStats,
-      count: allStats.length,
-    };
-  }),
-
-  /**
-   * Get circuit breaker health status
-   * 
-   * Returns health status for database and service circuit breakers
-   */
-  circuitBreakerHealth: publicProcedure.query(async () => {
-    const [dbHealthy, redisHealthy] = await Promise.all([
-      checkDatabaseHealth(),
-      checkRedisHealth(),
-    ]);
-
-    const dbStatus = getDatabaseCircuitStatus();
-    const serviceStatuses = getServiceCircuitStatuses();
-
-    return {
-      database: {
-        healthy: dbHealthy,
-        ...dbStatus,
-      },
-      redis: {
-        healthy: redisHealthy,
-        ...serviceStatuses.redis,
-      },
-      overall: dbHealthy && redisHealthy,
-    };
-  }),
-
-  /**
-   * Get cache statistics
-   * 
-   * Returns cache hit rate, hits, misses, and other metrics
-   */
-  cacheStats: publicProcedure.query(async () => {
-    const stats = cacheStats.getStats();
-    return {
-      ...stats,
-      hitRateFormatted: `${stats.hitRate.toFixed(2)}%`,
-    };
-  }),
-
-  /**
-   * Clear all cache (admin only)
-   * 
-   * Clears all cached data - use with caution
-   */
-  cacheClear: publicProcedure.mutation(async () => {
-    await cacheClear();
-    cacheStats.reset();
-    return {
-      success: true,
-      message: 'Cache cleared successfully',
-    };
-  }),
-
-  /**
-   * Clear cache by pattern
-   * 
-   * Clears cache entries matching a pattern (e.g., "user:*")
-   */
-  cacheClearPattern: publicProcedure
-    .input(z.object({
-      pattern: z.string(),
-    }))
-    .mutation(async ({ input }) => {
-      const deleted = await cacheDeletePattern(input.pattern);
-      return {
-        success: true,
-        deleted,
-        message: `Cleared ${deleted} cache entries matching pattern: ${input.pattern}`,
-      };
-    }),
 });

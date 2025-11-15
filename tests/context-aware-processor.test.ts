@@ -94,9 +94,15 @@ describe('Context-Aware CSV Processor', () => {
       const headers = ['Address', 'City', 'State', 'Zip'];
       const schema = analyzeSchema(headers);
       
-      // All should be detected as address type
-      const addressCols = schema.filter(s => s.type === 'address');
-      expect(addressCols.length).toBeGreaterThanOrEqual(4);
+      // All should be detected as location-related types
+      const locationCols = schema.filter(s => ['address', 'city', 'state', 'zip'].includes(s.type));
+      expect(locationCols.length).toBeGreaterThanOrEqual(4);
+      
+      // Verify each specific type is detected
+      expect(schema.some(s => s.type === 'address')).toBe(true);
+      expect(schema.some(s => s.type === 'city')).toBe(true);
+      expect(schema.some(s => s.type === 'state')).toBe(true);
+      expect(schema.some(s => s.type === 'zip')).toBe(true);
     });
   });
 

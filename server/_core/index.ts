@@ -97,15 +97,6 @@ async function startServer() {
     } catch (error) {
       console.warn("[Monitoring] Failed to start connection pool metrics:", error);
     }
-
-    // Warm cache on startup
-    try {
-      const { warmCache } = await import("./cachedDataAccess.js");
-      await warmCache();
-      console.log("[Cache] Cache warming completed");
-    } catch (error) {
-      console.warn("[Cache] Failed to warm cache:", error);
-    }
   });
 }
 

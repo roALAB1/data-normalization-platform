@@ -97,7 +97,8 @@ export function analyzeSchema(headers: string[], sampleData?: any[]): ColumnSche
     // Skip if already processed
     if (schemas.some(s => s.name === header)) return;
     
-    if (/company|organization|employer|business/i.test(normalized)) {
+    // Don't match if it's clearly a phone column
+    if (/company|organization|employer/i.test(normalized) && !/phone|mobile|cell|landline|tel/i.test(normalized)) {
       schemas.push({
         name: header,
         type: 'company',

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { NameEnhanced } from '../NameEnhanced';
+import { NameEnhanced } from '../client/src/lib/NameEnhanced';
 
 describe('Row 888 Test', () => {
   it('should handle row 888 correctly', () => {
