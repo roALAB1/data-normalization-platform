@@ -793,3 +793,110 @@
 - ✅ REST API for programmatic access
 - ✅ Webhook support for async workflows
 - ✅ API authentication and rate limiting
+
+
+---
+
+## v3.25.0 - CRM Sync Mapper (Intelligent Multi-File Merge)
+
+**Goal:** Create `/crm-sync` page for merging multiple enriched files back to original CRM export with intelligent matching, conflict resolution, and flexible column ordering.
+
+**Use Case:** Users export from CRM → normalize → enrich with multiple match strategies (name+phone, name+email) → get multiple enriched files → need to merge back to original CRM structure for re-import.
+
+### Phase 1: Architecture & Data Flow Design
+- [ ] Document data flow: Original CRM → Multiple Enriched Files → Merged Output
+- [ ] Design matching algorithm (auto-detect identifier: email > phone > ID > name+zip)
+- [ ] Design conflict resolution strategy (keep original, keep enriched, create alternate fields)
+- [ ] Design multi-file merge logic (handle overlapping columns, missing rows)
+- [ ] Create data structures for tracking match metadata
+
+### Phase 2: File Upload & Parsing
+- [x] Create `/crm-sync` route and CRMSyncMapper.tsx page
+- [x] Build drag-and-drop upload for original CRM export
+- [x] Build multi-file upload for enriched files (with "Add Another File" button)
+- [x] Parse CSV files and detect columns
+- [x] Display file statistics (row count, column count, sample data)
+- [x] Track enrichment match fields per file (optional metadata: "This file was enriched using: First Name, Last Name, Phone")
+- [x] Store parsed data in React state for processing
+
+### Phase 3: Intelligent Matching Algorithm
+- [x] Auto-detect best identifier column (priority: email > phone > ID > name+zip)
+- [x] Allow user to override identifier selection (dropdown with quality scores)
+- [x] Implement fuzzy matching for names (handle typos, case differences via normalization)
+- [x] Match enriched rows to original CRM rows using identifier
+- [x] Calculate match statistics (matched %, unmatched count)
+- [x] Display match preview with confidence scores
+- [x] Generate unmatched rows report (viewable in UI)
+
+### Phase 4: Conflict Resolution UI
+- [x] Detect conflicts (same field exists in original + enriched with different values)
+- [x] Display conflict summary (e.g., "15 email conflicts, 8 phone conflicts")
+- [x] Provide resolution options:
+  - [x] "Keep Original" - Ignore enriched value
+  - [x] "Replace with Enriched" - Overwrite original value
+  - [x] "Create Alternate Field" - Add as Email_Alt, Phone_Alt, etc.
+  - [x] "User Review" - Show conflicts table for manual selection
+- [x] Handle multi-value fields (via mergeMultipleValues function)
+- [x] Support secondary/alternate fields (Phone_Alt, Email_Alt)
+
+### Phase 5: Column Ordering & Selection
+- [x] Display all available columns (original + enriched)
+- [x] Checkboxes to select which enriched columns to include
+- [x] Column ordering options:
+  - [x] "Append at End" (default)
+  - [x] "Insert Next to Related" (Email_Verified next to Email)
+  - [ ] "Custom Order" (drag-and-drop reordering) - marked as future enhancement
+- [x] Live preview of output structure (first 5 rows in OutputStep)
+- [x] Show final column count and row count
+
+### Phase 6: Output Generation & Download
+- [x] Merge all selected enriched columns into original structure
+- [x] Preserve original row order
+- [x] Apply conflict resolution rules
+- [x] Generate output CSV
+- [x] Provide download button
+- [x] Show merge summary statistics (rows processed, columns added, conflicts resolved)
+
+### Phase 7: Advanced Features
+- [ ] Save mapping template for recurring imports (JSON config)
+- [ ] Load saved template
+- [ ] Batch processing for large files (100k+ rows)
+- [ ] Export unmatched rows as separate CSV
+- [ ] Add navigation to Batch Jobs and Home pages
+
+### Phase 8: Testing & Deployment
+- [ ] Test with single enriched file
+- [ ] Test with multiple enriched files (2-3 files)
+- [ ] Test conflict resolution (keep original, replace, alternate)
+- [ ] Test column ordering (append, insert, custom)
+- [ ] Test with large files (10k+ rows)
+- [ ] Update footer to v3.25.0
+- [ ] Create checkpoint v3.25.0
+- [ ] Update README and create GitHub release
+
+**Key Technical Decisions:**
+
+1. **Track Enrichment Match Fields?** 
+   - YES - Store as metadata per file
+   - Helps with debugging and understanding match quality
+   - Display in UI: "File 1 enriched using: First Name, Last Name, Phone"
+   - Could improve future auto-detection logic
+
+2. **Conflict Resolution Default:**
+   - Default: "Create Alternate Field" (safest, preserves all data)
+   - User can change to "Replace" or "Keep Original"
+
+3. **Multi-Value Field Format:**
+   - Comma-separated: "john@old.com, john@new.com"
+   - Or separate columns: Email_Primary, Email_Secondary
+
+4. **Unmatched Rows:**
+   - Default: Keep in output with empty enriched fields
+   - User can toggle to exclude
+
+**Expected Capabilities:**
+- ✅ Merge 2-5 enriched files into single output
+- ✅ Handle 100k+ rows efficiently
+- ✅ Auto-detect best matching identifier
+- ✅ Resolve conflicts intelligently
+- ✅ Preserve original CRM structure for seamless re-import

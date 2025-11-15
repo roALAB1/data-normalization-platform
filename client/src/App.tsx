@@ -10,6 +10,7 @@ import IntelligentNormalization from "./pages/IntelligentNormalization";
 import TestCredentials from "./pages/TestCredentials";
 import MemoryMonitoringDashboard from "./pages/MemoryMonitoringDashboard";
 import BatchJobs from "./pages/BatchJobs";
+import CRMSyncMapper from "./pages/CRMSyncMapper";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -18,6 +19,7 @@ function Router() {
       <Route path={"/"} component={IntelligentNormalization} />
       <Route path={"/jobs"} component={JobDashboardEnhanced} />
       <Route path={"/batch-jobs"} component={BatchJobs} />
+      <Route path={"/crm-sync"} component={CRMSyncMapper} />
       <Route path={"/monitoring"} component={MemoryMonitoringDashboard} />
       <Route path={"/test-credentials"} component={TestCredentials} />
       <Route path={"/404"} component={NotFound} />

@@ -473,8 +473,14 @@ headers.forEach(header => {
           <div className="flex gap-2">
             <Link href="/batch-jobs">
               <Button variant="outline" size="sm">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="w-4 h-4 mr-2" />
                 Batch Jobs
+              </Button>
+            </Link>
+            <Link href="/crm-sync">
+              <Button variant="outline" size="sm">
+                <FileText className="w-4 h-4 mr-2" />
+                CRM Sync
               </Button>
             </Link>
             <Link href="/monitoring">
