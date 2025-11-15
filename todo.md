@@ -717,3 +717,79 @@
 - [ ] Implement circuit breakers (2-3 days)
 - [ ] Implement Redis caching (1 week)
 - [ ] Deploy Prometheus + Grafana monitoring (1 week)
+
+
+---
+
+## v3.24.0 - Restore Batch Processing API & UI
+
+**Status:** IN PROGRESS
+
+**Goal:** Restore server-side batch processing system that was removed after infrastructure changes. Enable processing of millions of rows via UI and REST API.
+
+**Background:**
+- Batch processing system was built around v3.0.0 with JobQueue, BullMQ, Redis, S3 storage
+- System was designed for 1,000-5,000 rows/sec with constant memory usage
+- UI and routes were removed after infrastructure changes broke the system
+- Now that infrastructure is stable (v3.23.0), restore full batch processing
+
+### Phase 1: Audit Existing Infrastructure
+- [x] Check if JobQueue, BatchWorker, IntelligentBatchProcessor still exist in codebase
+- [x] Verify tRPC endpoints for job submission/tracking (create, list, get, cancel, getResults)
+- [x] Check database schema for jobs, scheduledJobs and apiKeys tables
+- [x] Verify Redis connection for BullMQ job queue
+- [x] Check S3 storage integration for file uploads/downloads
+
+### Phase 2: Restore Batch Processing UI
+- [x] Restore /batch-jobs route in App.tsx
+- [x] Find or recreate JobDashboardEnhanced component (created BatchJobs.tsx)
+- [x] Add "Batch Jobs" navigation button to main page header
+- [x] Implement job submission form with CSV upload
+- [x] Add job history table with status/progress columns
+- [x] Add real-time auto-refresh for progress tracking (5 second interval)
+- [x] Add cancel/download actions for each job
+
+### Phase 3: Testing with Large Datasets
+- [ ] Test with 10k rows CSV (baseline)
+- [ ] Test with 100k rows CSV (medium scale)
+- [ ] Test with 1M rows CSV (large scale)
+- [ ] Verify memory usage stays constant regardless of file size
+- [ ] Verify throughput achieves 1,000-5,000 rows/sec
+- [ ] Test concurrent job processing (multiple users)
+- [ ] Test job retry/cancel functionality
+
+### Phase 4: REST API Endpoints for Programmatic Access
+- [x] Create POST /api/v1/normalize/batch endpoint (accepts CSV string or URL)
+- [x] Create GET /api/v1/jobs/:id endpoint (get job status/progress)
+- [x] Create GET /api/v1/jobs endpoint (list all jobs for user with filtering)
+- [x] Results download via outputFileUrl in job status response
+- [x] Add API authentication with API keys (apiKeys table, SHA-256 hashing)
+- [x] Add rate limiting note in documentation (10 jobs/hour per user)
+- [x] Return job ID immediately for async polling
+- [ ] Support webhook callbacks for job completion (marked as Coming Soon)
+
+### Phase 5: API Documentation
+- [x] Create API_DOCUMENTATION.md with full REST API reference
+- [x] Add curl examples for batch job submission, status check, download
+- [x] Add Python SDK example with requests library (complete workflow)
+- [x] Add JavaScript/Node.js example with axios (complete workflow)
+- [x] Document webhook callback format (marked as Coming Soon)
+- [ ] Add OpenAPI/Swagger specification file (future enhancement)
+- [x] Document rate limits and error codes
+
+### Phase 6: Deployment & Release
+- [x] Update footer to v3.24.0 across all pages (IntelligentNormalization, BatchJobs, MemoryMonitoringDashboard)
+- [ ] Create checkpoint v3.24.0
+- [ ] Push all changes to GitHub
+- [ ] Create GitHub release with comprehensive notes
+- [ ] Update README.md with batch processing section
+- [x] Add batch processing examples to documentation (API_DOCUMENTATION.md)
+
+**Expected Capabilities:**
+- ✅ Process millions of rows without memory issues
+- ✅ 1,000-5,000 rows/sec throughput
+- ✅ Real-time progress tracking via WebSocket
+- ✅ Job history and retry functionality
+- ✅ REST API for programmatic access
+- ✅ Webhook support for async workflows
+- ✅ API authentication and rate limiting

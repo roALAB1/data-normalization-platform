@@ -470,12 +470,20 @@ headers.forEach(header => {
               <p className="text-sm text-gray-600">Enterprise-scale processing • 100k+ rows</p>
             </div>
           </div>
-          <Link href="/monitoring">
-            <Button variant="outline" size="sm">
-              <Activity className="h-4 w-4 mr-2" />
-              Monitoring
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/batch-jobs">
+              <Button variant="outline" size="sm">
+                <FileText className="h-4 w-4 mr-2" />
+                Batch Jobs
+              </Button>
+            </Link>
+            <Link href="/monitoring">
+              <Button variant="outline" size="sm">
+                <Activity className="h-4 w-4 mr-2" />
+                Monitoring
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -1334,7 +1342,7 @@ headers.forEach(header => {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.23.0</span>
+          <span>v3.24.0</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"
