@@ -46,6 +46,8 @@ interface MatchingStepProps {
   onBack: () => void;
   onContinue: (data: {
     identifier: string;
+    selectedIdentifiers?: string[];
+    inputMappings?: Array<{ originalColumn: string; enrichedColumn: string; enrichedFileId: string }>;
     matchResults: Map<string, MatchResult[]>;
     matchStats: Map<string, MatchStats>;
     unmatchedRows: Map<string, UnmatchedRow[]>;
@@ -137,8 +139,22 @@ export default function MatchingStep({
   }, [selectedIdentifiers, originalFile, enrichedFiles, appliedInputMappings]);
 
   const handleContinue = () => {
+    // Convert inputMappings object to array format
+    const inputMappingsArray = Object.entries(appliedInputMappings).flatMap(([enrichedFileId, mappings]) => {
+      if (typeof mappings === 'object' && mappings !== null) {
+        return Object.entries(mappings as Record<string, string>).map(([originalColumn, enrichedColumn]) => ({
+          originalColumn,
+          enrichedColumn,
+          enrichedFileId,
+        }));
+      }
+      return [];
+    });
+
     onContinue({
       identifier: selectedIdentifiers.join(', '), // Pass comma-separated list
+      selectedIdentifiers,
+      inputMappings: inputMappingsArray,
       matchResults,
       matchStats,
       unmatchedRows,

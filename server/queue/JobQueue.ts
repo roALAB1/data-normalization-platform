@@ -2,6 +2,7 @@
 import { Queue, QueueEvents, Worker } from 'bullmq';
 import Redis from 'ioredis';
 import { updateJobStatus, updateJobProgress } from '../jobDb';
+import type { CRMMergeJobData } from '../../shared/crmMergeTypes';
 
 /**
  * Redis connection configuration
@@ -66,7 +67,9 @@ export interface NormalizationJobData {
  */
 export class JobQueue {
   private queue: Queue<NormalizationJobData>;
+  private crmMergeQueue: Queue<CRMMergeJobData>;
   private queueEvents: QueueEvents;
+  private crmMergeQueueEvents: QueueEvents;
   private static instance: JobQueue;
 
   private constructor() {
@@ -97,6 +100,30 @@ export class JobQueue {
 
     // Queue events for monitoring
     this.queueEvents = new QueueEvents('normalization-jobs', {
+      connection: redisConnection,
+    });
+
+    // Create CRM merge queue
+    this.crmMergeQueue = new Queue<CRMMergeJobData>('crm-merge-jobs', {
+      connection: redisConnection,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: {
+          age: 24 * 3600,
+          count: 1000,
+        },
+        removeOnFail: {
+          age: 7 * 24 * 3600,
+        },
+      },
+    });
+
+    // CRM merge queue events
+    this.crmMergeQueueEvents = new QueueEvents('crm-merge-jobs', {
       connection: redisConnection,
     });
 
@@ -154,7 +181,34 @@ export class JobQueue {
       console.log(`[JobQueue] Added job ${data.jobId} to queue`);
       return job;
     } catch (error) {
-      console.error(`[JobQueue] Error adding job ${data.jobId}:`, error);
+        console.log(`[JobQueue] Error adding job ${data.jobId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a CRM merge job to the queue
+   * @param data CRM merge job data
+   * @returns Bull Job instance
+   */
+  public async addCRMMergeJob(data: CRMMergeJobData) {
+    try {
+      const job = await this.crmMergeQueue.add(
+        `crm-merge-${data.jobId}`,
+        data,
+        {
+          jobId: `crm-merge-${data.jobId}`,
+          priority: 1,
+        }
+      );
+
+      // Update database status to 'pending'
+      await updateJobStatus(data.jobId, 'pending');
+
+      console.log(`[JobQueue] Added CRM merge job ${data.jobId} to queue`);
+      return job;
+    } catch (error) {
+      console.error(`[JobQueue] Error adding CRM merge job ${data.jobId}:`, error);
       throw error;
     }
   }

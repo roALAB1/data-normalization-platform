@@ -1350,3 +1350,149 @@ RangeError: Invalid string length
 - [ ] User testing: Test with 219k row dataset
 - [ ] User testing: Verify no crash in Step 4
 - [ ] Create checkpoint v3.34.2
+
+
+---
+
+## v3.35.0 - Server-Side Batch Processing for CRM Sync Mapper
+
+**Status:** IN PROGRESS
+
+**Critical Issue:** Browser-based processing fails with 219k+ row datasets
+- RangeError: Invalid string length when merging data in Step 5 (Output)
+- Page becomes unresponsive during column selection and output generation
+- Browser memory limits prevent processing large datasets
+- Client-side approach fundamentally flawed for enterprise-scale data
+
+**Solution:** Move ALL heavy processing to server-side batch jobs
+- Upload files to S3 (not browser memory)
+- Process merge in background worker (no browser involvement)
+- Real-time progress updates via WebSocket
+- Download link when complete
+- Same architecture as existing batch normalization feature
+
+**Architecture Design:**
+
+1. **Backend Components:**
+   - New tRPC endpoint: `crmSync.submitMergeJob`
+   - New job type: `CRM_MERGE` in JobQueue
+   - New processor: `CRMMergeProcessor` (similar to IntelligentBatchProcessor)
+   - Reuse existing S3 storage, WebSocket, and job queue infrastructure
+
+2. **Job Input:**
+   - Original file S3 URL
+   - Enriched files S3 URLs (array)
+   - Selected identifiers (array)
+   - Input mappings (column mappings)
+   - Array strategies (Map<string, ArrayHandlingStrategy>)
+   - Resolution config (conflict resolution settings)
+   - Column configs (selected columns + ordering)
+
+3. **Processing Steps:**
+   - Download files from S3
+   - Parse CSVs with streaming (PapaParse)
+   - Run matching engine (same logic as current client-side)
+   - Apply conflict resolution
+   - Merge data with selected columns
+   - Write output CSV to S3
+   - Send completion notification
+
+4. **UI Changes:**
+   - Step 5: Replace client-side merge with "Submit Job" button
+   - Show job submission confirmation
+   - Redirect to job status page (or show inline progress)
+   - Real-time progress updates (rows processed, ETA)
+   - Download button when complete
+
+**Tasks:**
+
+**Phase 1: Backend Implementation**
+- [ ] Create `CRMMergeJobInput` interface in shared/types.ts
+- [ ] Add `CRM_MERGE` job type to JobQueue
+- [ ] Create `server/services/CRMMergeProcessor.ts`
+  - [ ] Implement file download from S3
+  - [ ] Implement streaming CSV parsing
+  - [ ] Port matching engine logic (matchRows, calculateMatchStats)
+  - [ ] Port conflict resolution logic
+  - [ ] Port column selection and merging logic
+  - [ ] Implement output CSV generation
+  - [ ] Upload result to S3
+- [ ] Add tRPC endpoint: `crmSync.submitMergeJob`
+- [ ] Add tRPC endpoint: `crmSync.getJobStatus`
+- [ ] Register CRM_MERGE processor in BatchWorker
+
+**Phase 2: UI Implementation**
+- [ ] Update OutputStep.tsx to show "Submit Job" instead of client-side merge
+- [ ] Add job submission logic (upload files to S3 first)
+- [ ] Add job status polling or WebSocket subscription
+- [ ] Add progress display (rows processed, percentage, ETA)
+- [ ] Add download button when job completes
+- [ ] Add error handling and retry logic
+
+**Phase 3: Testing**
+- [ ] Test with user's 219k row dataset
+- [ ] Verify no browser memory issues
+- [ ] Verify accurate match rates and statistics
+- [ ] Verify output CSV correctness
+- [ ] Test with multiple enriched files
+- [ ] Test with different array strategies
+- [ ] Test with different conflict resolution configs
+
+**Phase 4: Cleanup**
+- [ ] Remove old client-side merge logic from OutputStep
+- [ ] Update documentation
+- [ ] Create checkpoint v3.35.0
+
+**Benefits:**
+- ✅ Handles unlimited dataset sizes (millions of rows)
+- ✅ No browser memory issues
+- ✅ No page freezing or unresponsiveness
+- ✅ Background processing (user can close browser)
+- ✅ Real-time progress updates
+- ✅ Reuses existing infrastructure (S3, JobQueue, WebSocket)
+- ✅ Consistent with existing batch normalization feature
+
+
+---
+
+## v3.35.0 - Server-Side Batch Processing for CRM Sync Mapper
+
+**Status:** IN PROGRESS
+
+**Problem:** Browser-based CRM merge crashes with large datasets (219k rows):
+- RangeError: Invalid string length when processing/displaying large data
+- Browser memory limits prevent handling 219k × 74 columns
+- Page becomes unresponsive and freezes
+
+**Solution:** Move all processing to server-side batch jobs (same architecture as main normalization feature)
+
+**Backend Implementation:**
+- [x] Design CRM merge job data structure (`shared/crmMergeTypes.ts`)
+- [x] Create CRMMergeProcessor service (`server/services/CRMMergeProcessor.ts`)
+- [x] Add CRM merge queue to JobQueue (`server/queue/JobQueue.ts`)
+- [x] Create CRM merge tRPC router with endpoints (`server/crmSyncRouter.ts`):
+  - [x] submitMergeJob - Submit merge job with all configuration
+  - [x] getJobStatus - Poll job status and progress
+  - [x] cancelJob - Cancel running job
+- [x] Create CRMMergeWorker for background processing (`server/queue/CRMMergeWorker.ts`)
+- [x] Register worker in server startup (`server/_core/index.ts`)
+
+**Frontend Implementation:**
+- [x] Update OutputStep to submit jobs instead of client-side merge
+- [x] Add progress tracking UI with real-time updates
+- [x] Update MatchingStep to pass selectedIdentifiers and inputMappings
+- [x] Fix ResolutionStrategy type mismatch (replace → use_enriched)
+- [x] Implement file upload to S3 before job submission
+  - [x] Create S3 upload utility with parallel processing (`client/src/lib/crmS3Upload.ts`)
+  - [x] Create upload tRPC router (`server/uploadRouter.ts`)
+  - [x] Update OutputStep to upload files in parallel before submitting job
+  - [x] Add upload progress tracking (30% of total progress)
+- [ ] Test complete workflow with sample dataset
+- [ ] Test with 219k row dataset
+- [ ] Create checkpoint v3.35.0
+
+**Benefits:**
+- No browser memory limits - handle datasets of any size
+- Background processing - close browser and come back later
+- Real-time progress updates via WebSocket
+- Automatic retry on temporary failures

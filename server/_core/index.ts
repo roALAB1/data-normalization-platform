@@ -93,6 +93,14 @@ async function startServer() {
     startJobQueue();
     console.log("[JobQueue] Background job processor started");
 
+    // Start CRM merge worker
+    try {
+      const { crmMergeWorker } = await import("../queue/CRMMergeWorker.js");
+      console.log("[CRMMergeWorker] CRM merge worker started");
+    } catch (error) {
+      console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
+    }
+
     // Start connection pool metrics collection
     try {
       const { startConnectionPoolMetricsCollection } = await import("./connectionPoolMetrics.js");

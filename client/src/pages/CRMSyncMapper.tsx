@@ -48,6 +48,8 @@ export default function CRMSyncMapper() {
 
   // Matching state
   const [selectedIdentifier, setSelectedIdentifier] = useState<string>("");
+  const [selectedIdentifiers, setSelectedIdentifiers] = useState<string[]>([]);
+  const [inputMappings, setInputMappings] = useState<Array<{ originalColumn: string; enrichedColumn: string; enrichedFileId: string }>>([]);
   const [matchResults, setMatchResults] = useState<Map<string, MatchResult[]>>(new Map());
   const [matchStats, setMatchStats] = useState<Map<string, MatchStats>>(new Map());
   const [unmatchedRows, setUnmatchedRows] = useState<Map<string, UnmatchedRow[]>>(new Map());
@@ -513,6 +515,8 @@ export default function CRMSyncMapper() {
             onBack={() => setCurrentStep("upload")}
             onContinue={(data) => {
               setSelectedIdentifier(data.identifier);
+              setSelectedIdentifiers(data.selectedIdentifiers || [data.identifier]);
+              setInputMappings(data.inputMappings || []);
               setMatchResults(data.matchResults);
               setMatchStats(data.matchStats);
               setUnmatchedRows(data.unmatchedRows);
@@ -574,6 +578,8 @@ export default function CRMSyncMapper() {
             orderingMode={orderingMode}
             columnConfigs={columnConfigs}
             arrayStrategies={arrayStrategies}
+            selectedIdentifiers={selectedIdentifiers}
+            inputMappings={inputMappings}
             onBack={() => setCurrentStep("columns")}
             onStartNew={() => {
               setOriginalFile(null);

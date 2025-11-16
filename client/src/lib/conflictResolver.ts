@@ -16,7 +16,7 @@ export interface Conflict {
 
 export type ResolutionStrategy =
   | "keep_original" // Ignore enriched value
-  | "replace" // Overwrite with enriched value
+  | "use_enriched" // Overwrite with enriched value (was "replace")
   | "create_alternate"; // Add as Column_Alt
 
 export interface ResolutionConfig {
@@ -180,7 +180,7 @@ function applyResolutionStrategy(
       // Do nothing - keep original value
       break;
 
-    case "replace":
+    case "use_enriched":
       // Overwrite with enriched value
       row[column] = enrichedValue;
       break;

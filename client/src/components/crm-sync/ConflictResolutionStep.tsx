@@ -96,7 +96,7 @@ export default function ConflictResolutionStep({
     switch (strategy) {
       case "keep_original":
         return "Keep Original";
-      case "replace":
+      case "use_enriched":
         return "Replace with Enriched";
       case "create_alternate":
         return "Create Alternate Field";
@@ -107,7 +107,7 @@ export default function ConflictResolutionStep({
     switch (strategy) {
       case "keep_original":
         return "Ignore enriched values, keep original data unchanged";
-      case "replace":
+      case "use_enriched":
         return "Overwrite original values with enriched data";
       case "create_alternate":
         return "Add enriched values as new columns (e.g., Email_Alt)";
@@ -181,7 +181,7 @@ export default function ConflictResolutionStep({
             <Label className="text-base font-medium mb-3 block">Default Strategy</Label>
             <RadioGroup value={defaultStrategy} onValueChange={(v) => setDefaultStrategy(v as ResolutionStrategy)}>
               <div className="space-y-3">
-                {(["keep_original", "replace", "create_alternate"] as ResolutionStrategy[]).map((strategy) => (
+                {(["keep_original", "use_enriched", "create_alternate"] as ResolutionStrategy[]).map((strategy) => (
                   <div key={strategy} className="flex items-start space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                     <RadioGroupItem value={strategy} id={strategy} className="mt-1" />
                     <div className="flex-1">
@@ -230,7 +230,7 @@ export default function ConflictResolutionStep({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="keep_original">Keep Original</SelectItem>
-                          <SelectItem value="replace">Replace</SelectItem>
+                          <SelectItem value="use_enriched">Replace</SelectItem>
                           <SelectItem value="create_alternate">Create Alternate</SelectItem>
                         </SelectContent>
                       </Select>
@@ -254,7 +254,7 @@ export default function ConflictResolutionStep({
             </Alert>
           )}
 
-          {defaultStrategy === "replace" && (
+          {defaultStrategy === "use_enriched" && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
