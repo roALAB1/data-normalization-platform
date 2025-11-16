@@ -1496,3 +1496,24 @@ RangeError: Invalid string length
 - Background processing - close browser and come back later
 - Real-time progress updates via WebSocket
 - Automatic retry on temporary failures
+
+
+---
+
+## v3.35.0 - Release Process
+
+**Status:** IN PROGRESS
+
+**Tasks:**
+- [ ] Create/update CHANGELOG.md with v3.35.0 release notes
+- [ ] Update README.md with v3.35.0 features and architecture overview
+- [ ] Commit all changes with descriptive message
+- [ ] Create Git tag v3.35.0
+- [ ] Push commits and tags to GitHub
+- [ ] Create GitHub release with changelog
+- [ ] Update footer version on Homepage
+- [ ] Update footer version on CRM Sync page
+- [ ] Update footer version on Batch Jobs page
+- [ ] Update footer version on Monitoring page
+- [ ] Verify all pages show v3.35.0
+- [ ] Final checkpoint
