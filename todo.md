@@ -993,5 +993,5 @@
 - [x] Support both Input and Output mapping tabs
 - [x] Test with various naming patterns (snake_case, camelCase, spaces)
 - [x] Update footer to v3.28.0
-- [ ] Create checkpoint v3.28.0
+- [x] Create checkpoint v3.28.0
 - [ ] Push to GitHub
