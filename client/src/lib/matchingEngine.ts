@@ -27,55 +27,45 @@ export interface UnmatchedRow {
 }
 
 /**
- * Auto-detect the best identifier column from the data
+ * Auto-detect the best identifier column from the original data
  * Priority: Email > Phone > ID > Name+ZIP
  */
 export function autoDetectIdentifier(
   originalData: Record<string, any>[],
   enrichedData: Record<string, any>[]
 ): string | null {
-  if (originalData.length === 0 || enrichedData.length === 0) {
+  if (originalData.length === 0) {
     return null;
   }
 
   const originalColumns = Object.keys(originalData[0]);
-  const enrichedColumns = Object.keys(enrichedData[0]);
-  
-  // Find common columns
-  const commonColumns = originalColumns.filter(col => 
-    enrichedColumns.includes(col)
-  );
-
-  if (commonColumns.length === 0) {
-    return null;
-  }
 
   // Priority 1: Email (highest priority - unique, reliable)
-  const emailCol = commonColumns.find(col => 
-    /email/i.test(col) && hasUniqueValues(originalData, col) && hasUniqueValues(enrichedData, col)
+  const emailCol = originalColumns.find(col => 
+    /email/i.test(col) && hasUniqueValues(originalData, col)
   );
   if (emailCol) return emailCol;
 
   // Priority 2: Phone
-  const phoneCol = commonColumns.find(col => 
-    /phone/i.test(col) && hasUniqueValues(originalData, col) && hasUniqueValues(enrichedData, col)
+  const phoneCol = originalColumns.find(col => 
+    /phone/i.test(col) && hasUniqueValues(originalData, col)
   );
   if (phoneCol) return phoneCol;
 
   // Priority 3: ID/Customer ID
-  const idCol = commonColumns.find(col => 
+  const idCol = originalColumns.find(col => 
     /^id$|customer.*id|contact.*id/i.test(col) && hasUniqueValues(originalData, col)
   );
   if (idCol) return idCol;
 
-  // Priority 4: First common column with unique values
-  const uniqueCol = commonColumns.find(col => 
-    hasUniqueValues(originalData, col) && hasUniqueValues(enrichedData, col)
+  // Priority 4: First column with unique values
+  const uniqueCol = originalColumns.find(col => 
+    hasUniqueValues(originalData, col)
   );
   if (uniqueCol) return uniqueCol;
 
-  // Fallback: First common column
-  return commonColumns[0];
+  // Fallback: First column
+  return originalColumns[0];
 }
 
 /**
@@ -197,20 +187,22 @@ export function getUnmatchedRows(
 }
 
 /**
- * Get available identifier columns (common columns between original and enriched)
+ * Get available identifier columns from original file
+ * Returns all columns from original file that could be used for matching
  */
 export function getAvailableIdentifiers(
   originalData: Record<string, any>[],
   enrichedData: Record<string, any>[]
 ): string[] {
-  if (originalData.length === 0 || enrichedData.length === 0) {
+  if (originalData.length === 0) {
     return [];
   }
 
+  // Return all columns from original file
+  // User can choose any column to use as identifier for matching
   const originalColumns = Object.keys(originalData[0]);
-  const enrichedColumns = Object.keys(enrichedData[0]);
   
-  return originalColumns.filter(col => enrichedColumns.includes(col));
+  return originalColumns;
 }
 
 /**

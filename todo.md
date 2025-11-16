@@ -913,3 +913,18 @@
 - [x] Test navigation flow between all pages
 - [x] Create checkpoint v3.25.1
 - [x] Push to GitHub
+
+
+---
+
+## v3.25.2 - CRM Sync Step 2 Bug Fix
+
+### Issue: Identifier Column Dropdown Empty
+- [x] Investigate why dropdown shows no options in Step 2
+- [x] Check if original file columns are being parsed correctly
+- [x] Verify column detection logic in MatchingStep component
+- [x] Fix dropdown population to show available identifier columns
+- [ ] Test with sample CSV files
+- [ ] Verify all 5 steps work end-to-end
+- [ ] Create checkpoint v3.25.2
+- [ ] Push to GitHub
