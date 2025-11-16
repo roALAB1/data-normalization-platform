@@ -994,4 +994,21 @@
 - [x] Test with various naming patterns (snake_case, camelCase, spaces)
 - [x] Update footer to v3.28.0
 - [x] Create checkpoint v3.28.0
+- [x] Push to GitHub
+
+
+---
+
+## v3.29.0 - Critical Matching Bug Fix
+
+### Issue: Column Mappings Not Applied During Matching
+- [x] Investigate current matchRows function logic
+- [x] Identified that inputMappings were created but not used
+- [x] Add columnMappings parameter to matchRows function
+- [x] Apply column mapping to find enriched identifier column
+- [x] Pass inputMappings from MatchingStep to matchRows
+- [x] Update useEffect dependencies to include inputMappings
+- [x] Test with files that have different column names
+- [x] Update footer to v3.29.0
+- [ ] Create checkpoint v3.29.0
 - [ ] Push to GitHub

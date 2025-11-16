@@ -98,14 +98,20 @@ function normalizeIdentifier(value: any): string {
 export function matchRows(
   originalData: Record<string, any>[],
   enrichedData: Record<string, any>[],
-  identifierColumn: string
+  identifierColumn: string,
+  columnMappings?: Record<string, string> // enriched column -> original column
 ): MatchResult[] {
   const matches: MatchResult[] = [];
   const enrichedMap = new Map<string, number[]>(); // key -> array of indices (for duplicates)
 
   // Build lookup map from enriched data
+  // If column mappings exist, use the mapped enriched column name
+  const enrichedIdentifierColumn = columnMappings 
+    ? Object.keys(columnMappings).find(enrichedCol => columnMappings[enrichedCol] === identifierColumn) || identifierColumn
+    : identifierColumn;
+
   enrichedData.forEach((row, index) => {
-    const key = normalizeIdentifier(row[identifierColumn]);
+    const key = normalizeIdentifier(row[enrichedIdentifierColumn]);
     if (key) {
       if (!enrichedMap.has(key)) {
         enrichedMap.set(key, []);

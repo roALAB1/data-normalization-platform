@@ -96,7 +96,7 @@ export default function MatchingStep({
     const newUnmatchedRows = new Map<string, UnmatchedRow[]>();
 
     enrichedFiles.forEach(file => {
-      const matches = matchRows(originalFile.data, file.data, selectedIdentifier);
+      const matches = matchRows(originalFile.data, file.data, selectedIdentifier, inputMappings);
       const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifier);
       const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifier);
 
@@ -109,7 +109,7 @@ export default function MatchingStep({
     setMatchStats(newMatchStats);
     setUnmatchedRows(newUnmatchedRows);
     setIsProcessing(false);
-  }, [selectedIdentifier, originalFile, enrichedFiles]);
+  }, [selectedIdentifier, originalFile, enrichedFiles, inputMappings]);
 
   const handleContinue = () => {
     onContinue({
