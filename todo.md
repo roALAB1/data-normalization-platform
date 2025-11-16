@@ -959,6 +959,6 @@
 - [x] Integrate all three features into MatchingStep
 - [x] Test end-to-end workflow
 - [x] Update footer to v3.26.0
-- [ ] Create checkpoint v3.26.0
+- [x] Create checkpoint v3.26.0
 - [ ] Push to GitHub with tags
 - [ ] Create GitHub release
