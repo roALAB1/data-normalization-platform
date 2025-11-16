@@ -425,9 +425,14 @@ export default function CRMSyncMapper() {
                         <div>
                           <p className="font-medium">{originalFile.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {originalFile.rowCount.toLocaleString()} rows •{" "}
+                            {originalFile.rowCount.toLocaleString()} total rows •{" "}
                             {originalFile.columns.length} columns
                           </p>
+                          {originalFile.data.length < originalFile.rowCount && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              📊 Preview uses {originalFile.data.length.toLocaleString()} sample rows • Final job processes all {originalFile.rowCount.toLocaleString()} rows
+                            </p>
+                          )}
                         </div>
                       </div>
                       <Button
@@ -733,8 +738,13 @@ function EnrichedFileCard({ file, index, onRemove, onToggleMatchField }: Enriche
               File {index + 1}: {file.name}
             </p>
             <p className="text-sm text-muted-foreground">
-              {file.rowCount.toLocaleString()} rows • {file.columns.length} columns
+              {file.rowCount.toLocaleString()} total rows • {file.columns.length} columns
             </p>
+            {file.data.length < file.rowCount && (
+              <p className="text-xs text-blue-600 mt-1">
+                📊 Preview uses {file.data.length.toLocaleString()} sample rows • Final job processes all {file.rowCount.toLocaleString()} rows
+              </p>
+            )}
           </div>
         </div>
         <Button variant="ghost" size="sm" onClick={onRemove}>

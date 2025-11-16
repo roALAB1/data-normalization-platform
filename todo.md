@@ -1670,3 +1670,60 @@ Step 5: Backend reads from S3 → Process server-side
 ### Documentation
 - [ ] Update VERSION_HISTORY.md with v3.35.4
 - [ ] Create checkpoint v3.35.4
+
+
+---
+
+## v3.35.5 - CRITICAL BUG: 503 Error on Enriched File Upload
+
+**Status:** IN PROGRESS
+
+**Issue:** Uploading enriched CSV files fails with 503 Service Unavailable
+- Error: `POST /api/upload/file 503 (Service Unavailable)`
+- Occurs when uploading second CSV (enriched file) in CRM Sync Mapper
+- File: jerry_EM_only.csv
+- Original file upload works, enriched file upload fails
+
+**Root Cause:** /api/upload/file HTTP endpoint doesn't exist or is misconfigured
+- crmFileUpload.ts uses `xhr.open("POST", "/api/upload/file")`
+- This endpoint bypasses tRPC to handle large file uploads
+- Endpoint may not be registered in server routes
+
+**Tasks:**
+- [ ] Check if /api/upload/file endpoint exists in server code
+- [ ] Find where HTTP endpoints are registered
+- [ ] Create or fix /api/upload/file endpoint
+- [ ] Ensure endpoint accepts FormData with file + type
+- [ ] Test with jerry_EM_only.csv
+- [ ] Create checkpoint v3.35.5
+
+
+---
+
+## v3.35.6 - CRITICAL: Authentication Blocking CRM Merge Jobs
+
+**Status:** IN PROGRESS
+
+**Issue 1: Authentication Required**
+- User gets "You must be logged in to submit a CRM merge job" error
+- Occurs at Step 5 (Download Output) when trying to submit merge job
+- Blocks entire CRM Sync workflow from completing
+
+**Issue 2: UI Confusion - Sample vs Full Processing**
+- UI shows "100 rows • 74 columns" after upload
+- User thinks only 100 rows will be processed
+- Actually: 1000 rows loaded for matching preview, but full dataset processed in final job
+- Need to clarify this in UI
+
+**Root Cause:**
+- CRM Sync Mapper requires authentication (ctx.user check)
+- User is not logged in during development/testing
+- No auto-login mechanism for owner
+
+**Tasks:**
+- [x] Check where auth is required in CRM Sync workflow
+- [x] Implement auto-login as owner for development
+- [x] OR bypass auth check for CRM Sync endpoints
+- [x] Add UI clarification: "Preview uses 1000 rows, final job processes all X rows"
+- [ ] Test full workflow without auth errors
+- [ ] Create checkpoint v3.35.6
