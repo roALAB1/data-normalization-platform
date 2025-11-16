@@ -59,7 +59,9 @@ export default function MatchingStep({
   const [isProcessing, setIsProcessing] = useState(false);
   const [showUnmatched, setShowUnmatched] = useState<string | null>(null);
   const [showColumnMapper, setShowColumnMapper] = useState(false);
-  const [columnMappings, setColumnMappings] = useState<Record<string, string>>({});
+  const [columnMappingTab, setColumnMappingTab] = useState<"input" | "output">("input");
+  const [inputMappings, setInputMappings] = useState<Record<string, string>>({});
+  const [outputMappings, setOutputMappings] = useState<Record<string, string>>({});
   const [showMatchPreview, setShowMatchPreview] = useState(false);
   const [showBulkTest, setShowBulkTest] = useState(false);
   const [bulkTestResults, setBulkTestResults] = useState<Array<{identifier: string, matchRate: number, matchedCount: number}>>([]);
@@ -213,32 +215,97 @@ export default function MatchingStep({
 
           {/* Column Mapper */}
           {showColumnMapper && enrichedFiles.length > 0 && (
-            <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
-              <h4 className="font-medium text-sm">Column Mapping</h4>
-              <p className="text-xs text-muted-foreground">
-                Map enriched file columns to original file columns when names don't match
-              </p>
-              <div className="space-y-2">
-                {enrichedFiles[0].columns.slice(0, 5).map(enrichedCol => (
-                  <div key={enrichedCol} className="flex items-center gap-2 text-sm">
-                    <span className="w-1/3 truncate">{enrichedCol}</span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                    <Select
-                      value={columnMappings[enrichedCol] || ""}
-                      onValueChange={(val) => setColumnMappings(prev => ({...prev, [enrichedCol]: val}))}
-                    >
-                      <SelectTrigger className="w-1/2">
-                        <SelectValue placeholder="Select original column" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {originalFile.columns.map(origCol => (
-                          <SelectItem key={origCol} value={origCol}>{origCol}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/50">
+              <div>
+                <h4 className="font-medium text-sm">Column Mapping</h4>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Configure how columns are mapped between files
+                </p>
               </div>
+
+              {/* Tabs */}
+              <div className="flex gap-2 border-b">
+                <button
+                  onClick={() => setColumnMappingTab("input")}
+                  className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    columnMappingTab === "input"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Input Mapping
+                </button>
+                <button
+                  onClick={() => setColumnMappingTab("output")}
+                  className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    columnMappingTab === "output"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Output Mapping
+                </button>
+              </div>
+
+              {/* Input Mapping Tab */}
+              {columnMappingTab === "input" && (
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Map enriched file columns → original file columns (for finding matching identifier)
+                  </p>
+                  <div className="space-y-2">
+                    {enrichedFiles[0].columns.map(enrichedCol => (
+                      <div key={enrichedCol} className="flex items-center gap-2 text-sm">
+                        <span className="w-1/3 truncate font-medium">{enrichedCol}</span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        <Select
+                          value={inputMappings[enrichedCol] || ""}
+                          onValueChange={(val) => setInputMappings(prev => ({...prev, [enrichedCol]: val}))}
+                        >
+                          <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="Select original column" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {originalFile.columns.map(origCol => (
+                              <SelectItem key={origCol} value={origCol}>{origCol}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Output Mapping Tab */}
+              {columnMappingTab === "output" && (
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Map original file columns → enriched file columns (for merging enriched data back)
+                  </p>
+                  <div className="space-y-2">
+                    {originalFile.columns.map(origCol => (
+                      <div key={origCol} className="flex items-center gap-2 text-sm">
+                        <span className="w-1/3 truncate font-medium">{origCol}</span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        <Select
+                          value={outputMappings[origCol] || ""}
+                          onValueChange={(val) => setOutputMappings(prev => ({...prev, [origCol]: val}))}
+                        >
+                          <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="Select enriched column" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {enrichedFiles[0].columns.map(enrichedCol => (
+                              <SelectItem key={enrichedCol} value={enrichedCol}>{enrichedCol}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
