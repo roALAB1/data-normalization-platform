@@ -23,6 +23,8 @@ import {
   type UnmatchedRow
 } from "@/lib/matchingEngine";
 import { autoMapColumns, matchesToMappings, type ColumnMatch } from "@/lib/columnMatcher";
+import { type ArrayHandlingStrategy } from "@/lib/arrayParser";
+import ArrayStrategySelector from "./ArrayStrategySelector";
 
 interface UploadedFile {
   id: string;
@@ -43,6 +45,7 @@ interface MatchingStepProps {
     matchResults: Map<string, MatchResult[]>;
     matchStats: Map<string, MatchStats>;
     unmatchedRows: Map<string, UnmatchedRow[]>;
+    arrayStrategies?: Map<string, ArrayHandlingStrategy>;
   }) => void;
 }
 
@@ -68,6 +71,7 @@ export default function MatchingStep({
   const [bulkTestResults, setBulkTestResults] = useState<Array<{identifier: string, matchRate: number, matchedCount: number}>>([]);
   const [autoMapSuggestions, setAutoMapSuggestions] = useState<ColumnMatch[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [arrayStrategies, setArrayStrategies] = useState<Map<string, ArrayHandlingStrategy>>(new Map());
 
   // Auto-detect identifier on mount
   useEffect(() => {
@@ -116,7 +120,8 @@ export default function MatchingStep({
       identifier: selectedIdentifiers.join(', '), // Pass comma-separated list
       matchResults,
       matchStats,
-      unmatchedRows
+      unmatchedRows,
+      arrayStrategies
     });
   };
 
@@ -649,6 +654,21 @@ export default function MatchingStep({
             })}
           </CardContent>
         </Card>
+      )}
+
+      {/* Array Handling Configuration */}
+      {matchResults.size > 0 && (
+        <ArrayStrategySelector
+          enrichedFiles={enrichedFiles}
+          arrayStrategies={arrayStrategies}
+          onStrategyChange={(column, strategy) => {
+            setArrayStrategies((prev) => {
+              const newMap = new Map(prev);
+              newMap.set(column, strategy);
+              return newMap;
+            });
+          }}
+        />
       )}
 
       {/* Navigation Buttons */}

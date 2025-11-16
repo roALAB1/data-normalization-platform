@@ -18,6 +18,7 @@ import {
   type MatchStats,
   type UnmatchedRow
 } from "@/lib/matchingEngine";
+import { type ArrayHandlingStrategy } from "@/lib/arrayParser";
 import MatchingStep from "@/components/crm-sync/MatchingStep";
 import ConflictResolutionStep from "@/components/crm-sync/ConflictResolutionStep";
 import ColumnSelectionStep from "@/components/crm-sync/ColumnSelectionStep";
@@ -50,6 +51,7 @@ export default function CRMSyncMapper() {
   const [matchResults, setMatchResults] = useState<Map<string, MatchResult[]>>(new Map());
   const [matchStats, setMatchStats] = useState<Map<string, MatchStats>>(new Map());
   const [unmatchedRows, setUnmatchedRows] = useState<Map<string, UnmatchedRow[]>>(new Map());
+  const [arrayStrategies, setArrayStrategies] = useState<Map<string, ArrayHandlingStrategy>>(new Map());
 
   // Conflict resolution state
   const [resolutionConfig, setResolutionConfig] = useState<ResolutionConfig | null>(null);
@@ -514,6 +516,9 @@ export default function CRMSyncMapper() {
               setMatchResults(data.matchResults);
               setMatchStats(data.matchStats);
               setUnmatchedRows(data.unmatchedRows);
+              if (data.arrayStrategies) {
+                setArrayStrategies(data.arrayStrategies);
+              }
               setCurrentStep("conflicts");
             }}
           />
@@ -562,6 +567,7 @@ export default function CRMSyncMapper() {
             selectedColumns={selectedColumns}
             orderingMode={orderingMode}
             columnConfigs={columnConfigs}
+            arrayStrategies={arrayStrategies}
             onBack={() => setCurrentStep("columns")}
             onStartNew={() => {
               setOriginalFile(null);
@@ -595,7 +601,7 @@ export default function CRMSyncMapper() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>v3.31.0 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
+          <p>v3.32.0 • CRM Sync Mapper - Multi-Value Array Handling</p>
         </div>
       </footer>
     </div>

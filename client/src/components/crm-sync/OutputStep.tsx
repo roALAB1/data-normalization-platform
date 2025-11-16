@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import { resolveConflicts, type Conflict, type ResolutionConfig } from "@/lib/conflictResolver";
 import type { MatchResult, MatchStats } from "@/lib/matchingEngine";
 import type { ColumnConfig, ColumnOrderingMode } from "./ColumnSelectionStep";
+import { parseArrayValue, applyArrayStrategy, type ArrayHandlingStrategy } from "@/lib/arrayParser";
 
 interface UploadedFile {
   id: string;
@@ -30,6 +31,7 @@ interface OutputStepProps {
   selectedColumns: string[];
   orderingMode: ColumnOrderingMode;
   columnConfigs: ColumnConfig[];
+  arrayStrategies: Map<string, ArrayHandlingStrategy>;
   onBack: () => void;
   onStartNew: () => void;
 }
@@ -44,6 +46,7 @@ export default function OutputStep({
   selectedColumns,
   orderingMode,
   columnConfigs,
+  arrayStrategies,
   onBack,
   onStartNew,
 }: OutputStepProps) {
@@ -82,11 +85,24 @@ export default function OutputStep({
       );
     });
 
-    // Filter columns based on selection
+    // Filter columns based on selection and apply array strategies
     const filteredResult = result.map((row) => {
       const filteredRow: Record<string, any> = {};
       selectedColumns.forEach((col) => {
-        filteredRow[col] = row[col];
+        let value = row[col];
+        
+        // Apply array handling strategy if configured for this column
+        if (arrayStrategies.has(col)) {
+          const strategy = arrayStrategies.get(col)!;
+          const parseResult = parseArrayValue(value);
+          
+          // Only apply strategy if value is actually an array
+          if (parseResult.values.length > 1 || parseResult.originalFormat !== 'single') {
+            value = applyArrayStrategy(parseResult, strategy);
+          }
+        }
+        
+        filteredRow[col] = value;
       });
       return filteredRow;
     });

@@ -1,7 +1,10 @@
 /**
  * Matching Engine for CRM Sync Mapper
  * Intelligently matches enriched data rows back to original CRM rows
+ * Supports multi-value arrays in enriched data columns
  */
+
+import { parseArrayValue, findMatchInArray, getColumnType } from './arrayParser';
 
 export interface MatchResult {
   originalRowIndex: number;
@@ -9,6 +12,7 @@ export interface MatchResult {
   confidence: number; // 0-100
   identifier: string; // value used for matching
   matchedBy?: string; // which identifier column was used (for multi-identifier matching)
+  arrayIndex?: number; // which array index matched (for array values)
 }
 
 export interface MatchStats {
@@ -117,13 +121,22 @@ export function matchRows(
       : identifierColumn;
 
     enrichedData.forEach((row, index) => {
-      const key = normalizeIdentifier(row[enrichedIdentifierColumn]);
-      if (key) {
-        if (!enrichedMap.has(key)) {
-          enrichedMap.set(key, []);
+      const rawValue = row[enrichedIdentifierColumn];
+      
+      // Parse array values (handles quoted CSV, JSON arrays, single values)
+      const parseResult = parseArrayValue(rawValue);
+      const columnType = getColumnType(enrichedIdentifierColumn);
+      
+      // Add each array value to the map
+      parseResult.values.forEach((value, arrayIndex) => {
+        const key = normalizeIdentifier(value);
+        if (key) {
+          if (!enrichedMap.has(key)) {
+            enrichedMap.set(key, []);
+          }
+          enrichedMap.get(key)!.push(index);
         }
-        enrichedMap.get(key)!.push(index);
-      }
+      });
     });
 
     // Match original rows to enriched rows (skip already matched rows)
@@ -131,7 +144,9 @@ export function matchRows(
       // Skip if this row was already matched by a higher-priority identifier
       if (matchedOriginalIndices.has(originalIndex)) return;
 
-      const key = normalizeIdentifier(row[identifierColumn]);
+      const originalValue = row[identifierColumn];
+      const key = normalizeIdentifier(originalValue);
+      
       if (key && enrichedMap.has(key)) {
         const enrichedIndices = enrichedMap.get(key)!;
         

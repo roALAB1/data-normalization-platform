@@ -1061,4 +1061,48 @@
 - [x] Test with files using different identifier combinations
 - [x] Update footer to v3.31.0
 - [x] Create checkpoint v3.31.0
+- [x] Push to GitHub
+
+## v3.32.0 - Multi-Value Array Handling in CRM Sync Mapper
+
+### Issue Analysis
+- [x] Analyze enriched CSV structure (74 columns with array data)
+- [x] Identify all columns containing comma-separated arrays
+- [x] Document array patterns (phones, emails, job titles, companies)
+- [x] Identify duplicate values within arrays
+- [x] Create test cases for array parsing
+
+### Array Parsing Implementation
+- [x] Create arrayParser utility for comma-separated values
+- [x] Handle quoted arrays (e.g., "+19512309663, +19515755715")
+- [x] Implement deduplication logic for array values
+- [x] Add phone number normalization for array matching
+- [x] Add email normalization for array matching
+
+### Value Selection Strategies
+- [x] Strategy 1: First value (default, fastest)
+- [x] Strategy 2: All values (comma-separated output)
+- [x] Strategy 3: Best match (highest confidence/quality)
+- [x] Strategy 4: Deduplicated all values
+- [x] Add UI dropdown for strategy selection per column type
+
+### Matching Engine Updates
+- [x] Update matchRows to handle array identifiers
+- [x] Try matching against each value in array until match found
+- [x] Track which specific value matched (e.g., "Email[2]")
+- [x] Update match preview to show array value used
+
+### UI Enhancements
+- [x] Add "Array Handling" section to Step 2
+- [x] Show array value count in column detection
+- [x] Add strategy selector dropdown per column
+- [x] Show preview of selected strategy output
+- [x] Add tooltip explaining each strategy
+
+### Testing & Documentation
+- [x] Test with user's jerry_FN_LN_PH_EM_AND.csv
+- [x] Verify deduplication works correctly
+- [x] Test all 4 selection strategies
+- [x] Update footer to v3.32.0
+- [ ] Create checkpoint v3.32.0
 - [ ] Push to GitHub
