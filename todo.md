@@ -928,3 +928,37 @@
 - [ ] Verify all 5 steps work end-to-end
 - [ ] Create checkpoint v3.25.2
 - [ ] Push to GitHub
+
+
+---
+
+## v3.26.0 - CRM Sync Step 2 Enhancements
+
+### Feature 1: Column Mapping Interface
+- [x] Design column mapper UI for mismatched schemas
+- [x] Add dropdown to map enriched file columns to original columns
+- [x] Show visual mapping connections
+- [x] Update matching engine to use column mappings
+- [x] Test with files that have different column names
+
+### Feature 2: Match Preview
+- [x] Create MatchPreview component
+- [x] Show first 10 matched rows side-by-side
+- [x] Display original data + enriched data in table
+- [x] Add "Preview Matches" button to MatchingStep
+- [x] Test preview with sample data
+
+### Feature 3: Bulk Identifier Testing
+- [x] Create identifier comparison logic
+- [x] Test all available identifiers automatically
+- [x] Show match rates in comparison table
+- [x] Add "Test All Identifiers" button
+- [x] Display results with best identifier highlighted
+
+### Integration & Deployment
+- [x] Integrate all three features into MatchingStep
+- [x] Test end-to-end workflow
+- [x] Update footer to v3.26.0
+- [ ] Create checkpoint v3.26.0
+- [ ] Push to GitHub with tags
+- [ ] Create GitHub release

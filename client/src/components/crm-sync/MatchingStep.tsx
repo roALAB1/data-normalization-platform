@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -58,6 +58,11 @@ export default function MatchingStep({
   const [unmatchedRows, setUnmatchedRows] = useState<Map<string, UnmatchedRow[]>>(new Map());
   const [isProcessing, setIsProcessing] = useState(false);
   const [showUnmatched, setShowUnmatched] = useState<string | null>(null);
+  const [showColumnMapper, setShowColumnMapper] = useState(false);
+  const [columnMappings, setColumnMappings] = useState<Record<string, string>>({});
+  const [showMatchPreview, setShowMatchPreview] = useState(false);
+  const [showBulkTest, setShowBulkTest] = useState(false);
+  const [bulkTestResults, setBulkTestResults] = useState<Array<{identifier: string, matchRate: number, matchedCount: number}>>([]);
 
   // Auto-detect identifier on mount
   useEffect(() => {
@@ -163,6 +168,157 @@ export default function MatchingStep({
               Higher quality scores indicate better matching reliability (uniqueness + type bonus)
             </p>
           </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowColumnMapper(!showColumnMapper)}
+            >
+              {showColumnMapper ? "Hide" : "Show"} Column Mapper
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (!selectedIdentifier) return;
+                setShowMatchPreview(!showMatchPreview);
+              }}
+              disabled={!selectedIdentifier}
+            >
+              {showMatchPreview ? "Hide" : "Show"} Match Preview
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setShowBulkTest(true);
+                // Test all identifiers
+                const results = availableIdentifiers.map(id => {
+                  const matches = matchRows(originalFile.data, enrichedFiles[0].data, id);
+                  const stats = calculateMatchStats(originalFile.data, enrichedFiles[0].data, matches, id);
+                  return {
+                    identifier: id,
+                    matchRate: stats.matchRate,
+                    matchedCount: stats.matchedCount
+                  };
+                }).sort((a, b) => b.matchRate - a.matchRate);
+                setBulkTestResults(results);
+              }}
+            >
+              Test All Identifiers
+            </Button>
+          </div>
+
+          {/* Column Mapper */}
+          {showColumnMapper && enrichedFiles.length > 0 && (
+            <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
+              <h4 className="font-medium text-sm">Column Mapping</h4>
+              <p className="text-xs text-muted-foreground">
+                Map enriched file columns to original file columns when names don't match
+              </p>
+              <div className="space-y-2">
+                {enrichedFiles[0].columns.slice(0, 5).map(enrichedCol => (
+                  <div key={enrichedCol} className="flex items-center gap-2 text-sm">
+                    <span className="w-1/3 truncate">{enrichedCol}</span>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                    <Select
+                      value={columnMappings[enrichedCol] || ""}
+                      onValueChange={(val) => setColumnMappings(prev => ({...prev, [enrichedCol]: val}))}
+                    >
+                      <SelectTrigger className="w-1/2">
+                        <SelectValue placeholder="Select original column" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {originalFile.columns.map(origCol => (
+                          <SelectItem key={origCol} value={origCol}>{origCol}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Match Preview */}
+          {showMatchPreview && selectedIdentifier && matchResults.size > 0 && (
+            <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
+              <h4 className="font-medium text-sm">Match Preview (First 10 Rows)</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-2 py-1 text-left">#</th>
+                      <th className="px-2 py-1 text-left">Original {selectedIdentifier}</th>
+                      <th className="px-2 py-1 text-left">Enriched {selectedIdentifier}</th>
+                      <th className="px-2 py-1 text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from(matchResults.values())[0]?.slice(0, 10).map((match, idx) => {
+                      const origRow = originalFile.data[match.originalRowIndex];
+                      const enrichedRow = enrichedFiles[0].data[match.enrichedRowIndex];
+                      return (
+                        <tr key={idx} className="border-t">
+                          <td className="px-2 py-1">{idx + 1}</td>
+                          <td className="px-2 py-1 truncate max-w-[150px]">
+                            {String(origRow[selectedIdentifier] || '').substring(0, 30)}
+                          </td>
+                          <td className="px-2 py-1 truncate max-w-[150px]">
+                            {String(enrichedRow[selectedIdentifier] || '').substring(0, 30)}
+                          </td>
+                          <td className="px-2 py-1">
+                            <Badge variant="default" className="text-xs">Matched</Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Bulk Test Results */}
+          {showBulkTest && bulkTestResults.length > 0 && (
+            <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium text-sm">Identifier Comparison</h4>
+                <Button variant="ghost" size="sm" onClick={() => setShowBulkTest(false)}>Close</Button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Identifier</th>
+                      <th className="px-3 py-2 text-left">Match Rate</th>
+                      <th className="px-3 py-2 text-left">Matched Rows</th>
+                      <th className="px-3 py-2 text-left">Recommendation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bulkTestResults.map((result, idx) => (
+                      <tr key={result.identifier} className="border-t">
+                        <td className="px-3 py-2 font-medium">{result.identifier}</td>
+                        <td className="px-3 py-2">
+                          <Badge variant={result.matchRate >= 90 ? "default" : result.matchRate >= 70 ? "secondary" : "outline"}>
+                            {result.matchRate.toFixed(1)}%
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2">{result.matchedCount.toLocaleString()}</td>
+                        <td className="px-3 py-2">
+                          {idx === 0 && <Badge variant="default">Best Match</Badge>}
+                          {idx > 0 && result.matchRate >= 90 && <Badge variant="secondary">Good</Badge>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Identifier Info */}
           {selectedIdentifier && (
