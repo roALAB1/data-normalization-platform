@@ -1010,5 +1010,24 @@
 - [x] Update useEffect dependencies to include inputMappings
 - [x] Test with files that have different column names
 - [x] Update footer to v3.29.0
-- [ ] Create checkpoint v3.29.0
+- [x] Create checkpoint v3.29.0
+- [ ] Push to GitHub
+
+
+---
+
+## v3.30.0 - How It Works Guide
+
+### Feature: Add "How It Works" Section to CRM Sync Mapper
+- [x] Design aesthetically pleasing guide section
+- [x] Add collapsible/expandable guide component
+- [x] Explain Step 1: Upload Files
+- [x] Explain Step 2: Configure Matching (identifier, column mapping, preview)
+- [x] Explain Step 3: Resolve Conflicts
+- [x] Explain Step 4: Select Columns
+- [x] Explain Step 5: Download Output
+- [x] Add icons and visual styling
+- [x] Position guide prominently on page
+- [x] Update footer to v3.30.0
+- [ ] Create checkpoint v3.30.0
 - [ ] Push to GitHub

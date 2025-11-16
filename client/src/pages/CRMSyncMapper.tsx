@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Home, Upload, X, Plus, FileText, AlertCircle, CheckCircle2, ArrowRight, Activity } from "lucide-react";
+import { Home, Upload, X, Plus, FileText, AlertCircle, CheckCircle2, ArrowRight, Activity, Info, HelpCircle } from "lucide-react";
 import Papa from "papaparse";
 import {
   autoDetectIdentifier,
@@ -59,6 +59,7 @@ export default function CRMSyncMapper() {
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [orderingMode, setOrderingMode] = useState<ColumnOrderingMode>("append");
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig[]>([]);
+  const [showGuide, setShowGuide] = useState(true);
 
   // File upload handler
   const handleFileUpload = useCallback(
@@ -196,6 +197,130 @@ export default function CRMSyncMapper() {
             </div>
           ))}
         </div>
+
+        {/* How It Works Guide */}
+        {showGuide && (
+          <div className="max-w-5xl mx-auto mb-8">
+            <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-600 rounded-lg">
+                      <Info className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">How CRM Sync Mapper Works</CardTitle>
+                      <CardDescription className="mt-1">
+                        Follow these 5 simple steps to merge enriched data back into your CRM
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowGuide(false)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-5 gap-4">
+                  {/* Step 1 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                        1
+                      </div>
+                      <h4 className="font-semibold text-sm">Upload Files</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Upload your original CRM export and one or more enriched data files (e.g., from Apollo, ZoomInfo)
+                    </p>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                        2
+                      </div>
+                      <h4 className="font-semibold text-sm">Configure Matching</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Choose identifier column (Email/Phone), map columns if names differ, preview matches, and test identifiers
+                    </p>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                        3
+                      </div>
+                      <h4 className="font-semibold text-sm">Resolve Conflicts</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      When enriched data differs from original, choose which value to keep (original, enriched, or merge)
+                    </p>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                        4
+                      </div>
+                      <h4 className="font-semibold text-sm">Select Columns</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Choose which columns to include in final output and how to order them (original, enriched, or custom)
+                    </p>
+                  </div>
+
+                  {/* Step 5 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                        5
+                      </div>
+                      <h4 className="font-semibold text-sm">Download Output</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Download your merged CSV file with enriched data matched back to original CRM row order
+                    </p>
+                  </div>
+                </div>
+
+                {/* Key Features */}
+                <div className="mt-6 pt-6 border-t">
+                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <HelpCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <p>
+                      <strong className="text-foreground">Pro Tips:</strong> Use Smart Auto-Map to automatically suggest column mappings • 
+                      Preview matches before proceeding • Test all identifiers to find the best match rate • 
+                      Files can be in any order - matching is done by identifier value, not row position
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {!showGuide && (
+          <div className="max-w-5xl mx-auto mb-6 flex justify-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowGuide(true)}
+              className="gap-2"
+            >
+              <Info className="w-4 h-4" />
+              Show Guide
+            </Button>
+          </div>
+        )}
 
         {/* Step 1: Upload Files */}
         {currentStep === "upload" && (
@@ -470,7 +595,7 @@ export default function CRMSyncMapper() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>v3.29.0 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
+          <p>v3.30.0 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
         </div>
       </footer>
     </div>
