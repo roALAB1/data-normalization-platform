@@ -1041,4 +1041,24 @@
 - [x] Update Step 1 text from "Apollo, ZoomInfo" to "AudienceLab"
 - [x] Update footer to v3.30.1
 - [x] Create checkpoint v3.30.1
+- [x] Push to GitHub
+
+
+---
+
+## v3.31.0 - Multi-Identifier Matching
+
+### Feature: Support Multiple Identifier Columns with Fallback Logic
+- [x] Update UI to allow selecting multiple identifier columns
+- [x] Add priority ordering (Primary, Secondary, Tertiary)
+- [x] Show "Add Identifier" button to add more identifiers
+- [x] Update matchRows to try identifiers in order until match found
+- [x] Add match statistics showing which identifier was used for each match
+- [x] Update Match Preview to show which identifier matched
+- [x] Update Test All Identifiers to test combinations
+- [x] Add visual indicators for primary/secondary/tertiary identifiers
+- [x] Update auto-detection to suggest multiple identifiers
+- [x] Test with files using different identifier combinations
+- [x] Update footer to v3.31.0
+- [ ] Create checkpoint v3.31.0
 - [ ] Push to GitHub

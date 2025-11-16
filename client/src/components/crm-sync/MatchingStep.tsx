@@ -52,7 +52,7 @@ export default function MatchingStep({
   onBack,
   onContinue
 }: MatchingStepProps) {
-  const [selectedIdentifier, setSelectedIdentifier] = useState<string>("");
+  const [selectedIdentifiers, setSelectedIdentifiers] = useState<string[]>([]);
   const [availableIdentifiers, setAvailableIdentifiers] = useState<string[]>([]);
   const [matchResults, setMatchResults] = useState<Map<string, MatchResult[]>>(new Map());
   const [matchStats, setMatchStats] = useState<Map<string, MatchStats>>(new Map());
@@ -80,13 +80,13 @@ export default function MatchingStep({
     // Auto-detect best identifier
     const detected = autoDetectIdentifier(originalFile.data, enrichedFiles[0].data);
     if (detected) {
-      setSelectedIdentifier(detected);
+      setSelectedIdentifiers([detected]); // Start with single auto-detected identifier
     }
   }, [originalFile, enrichedFiles]);
 
-  // Perform matching when identifier changes
+  // Perform matching when identifiers change
   useEffect(() => {
-    if (!selectedIdentifier) return;
+    if (selectedIdentifiers.length === 0) return;
 
     setIsProcessing(true);
 
@@ -96,9 +96,9 @@ export default function MatchingStep({
     const newUnmatchedRows = new Map<string, UnmatchedRow[]>();
 
     enrichedFiles.forEach(file => {
-      const matches = matchRows(originalFile.data, file.data, selectedIdentifier, inputMappings);
-      const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifier);
-      const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifier);
+      const matches = matchRows(originalFile.data, file.data, selectedIdentifiers, inputMappings);
+      const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifiers[0]); // Use primary for stats
+      const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifiers[0]);
 
       newMatchResults.set(file.id, matches);
       newMatchStats.set(file.id, stats);
@@ -109,18 +109,18 @@ export default function MatchingStep({
     setMatchStats(newMatchStats);
     setUnmatchedRows(newUnmatchedRows);
     setIsProcessing(false);
-  }, [selectedIdentifier, originalFile, enrichedFiles, inputMappings]);
+  }, [selectedIdentifiers, originalFile, enrichedFiles, inputMappings]);
 
   const handleContinue = () => {
     onContinue({
-      identifier: selectedIdentifier,
+      identifier: selectedIdentifiers.join(', '), // Pass comma-separated list
       matchResults,
       matchStats,
       unmatchedRows
     });
   };
 
-  const canContinue = selectedIdentifier && matchResults.size > 0;
+  const canContinue = selectedIdentifiers.length > 0 && matchResults.size > 0;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -135,42 +135,85 @@ export default function MatchingStep({
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block">
-              Identifier Column
-              {selectedIdentifier && (
+              Identifier Columns
+              {selectedIdentifiers.length > 0 && (
                 <Badge variant="secondary" className="ml-2">
-                  Auto-detected
+                  {selectedIdentifiers.length} selected
                 </Badge>
               )}
             </label>
-            <Select value={selectedIdentifier} onValueChange={setSelectedIdentifier}>
+            
+            {/* Display selected identifiers with priority */}
+            <div className="space-y-2 mb-3">
+              {selectedIdentifiers.map((identifier, index) => {
+                const quality = calculateIdentifierQuality(
+                  originalFile.data,
+                  enrichedFiles[0].data,
+                  identifier
+                );
+                const priorityLabel = index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary";
+                return (
+                  <div key={identifier} className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                    <Badge variant="default" className="text-xs">
+                      {priorityLabel}
+                    </Badge>
+                    <span className="flex-1 font-medium">{identifier}</span>
+                    <Badge variant={quality >= 80 ? "default" : quality >= 60 ? "secondary" : "outline"}>
+                      {quality}% quality
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedIdentifiers(prev => prev.filter((_, i) => i !== index));
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Add identifier dropdown */}
+            <Select
+              value=""
+              onValueChange={(value) => {
+                if (value && !selectedIdentifiers.includes(value)) {
+                  setSelectedIdentifiers(prev => [...prev, value]);
+                }
+              }}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Select identifier column" />
+                <SelectValue placeholder="Add identifier column" />
               </SelectTrigger>
               <SelectContent>
-                {availableIdentifiers.map(col => {
-                  const quality = calculateIdentifierQuality(
-                    originalFile.data,
-                    enrichedFiles[0].data,
-                    col
-                  );
-                  return (
-                    <SelectItem key={col} value={col}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{col}</span>
-                        <Badge
-                          variant={quality >= 80 ? "default" : quality >= 60 ? "secondary" : "outline"}
-                          className="ml-2"
-                        >
-                          {quality}% quality
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  );
-                })}
+                {availableIdentifiers
+                  .filter(col => !selectedIdentifiers.includes(col))
+                  .map(col => {
+                    const quality = calculateIdentifierQuality(
+                      originalFile.data,
+                      enrichedFiles[0].data,
+                      col
+                    );
+                    return (
+                      <SelectItem key={col} value={col}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{col}</span>
+                          <Badge
+                            variant={quality >= 80 ? "default" : quality >= 60 ? "secondary" : "outline"}
+                            className="ml-2"
+                          >
+                            {quality}% quality
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground mt-2">
-              Higher quality scores indicate better matching reliability (uniqueness + type bonus)
+              Add multiple identifiers for fallback matching. Higher priority identifiers are tried first.
             </p>
           </div>
 
@@ -187,10 +230,10 @@ export default function MatchingStep({
               variant="outline"
               size="sm"
               onClick={() => {
-                if (!selectedIdentifier) return;
+                if (selectedIdentifiers.length === 0) return;
                 setShowMatchPreview(!showMatchPreview);
               }}
-              disabled={!selectedIdentifier}
+              disabled={selectedIdentifiers.length === 0}
             >
               {showMatchPreview ? "Hide" : "Show"} Match Preview
             </Button>
@@ -391,7 +434,7 @@ export default function MatchingStep({
           )}
 
           {/* Match Preview */}
-          {showMatchPreview && selectedIdentifier && matchResults.size > 0 && (
+          {showMatchPreview && selectedIdentifiers.length > 0 && matchResults.size > 0 && (
             <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
               <h4 className="font-medium text-sm">Match Preview (First 10 Rows)</h4>
               <div className="overflow-x-auto">
@@ -399,8 +442,9 @@ export default function MatchingStep({
                   <thead className="bg-muted">
                     <tr>
                       <th className="px-2 py-1 text-left">#</th>
-                      <th className="px-2 py-1 text-left">Original {selectedIdentifier}</th>
-                      <th className="px-2 py-1 text-left">Enriched {selectedIdentifier}</th>
+                      <th className="px-2 py-1 text-left">Matched By</th>
+                      <th className="px-2 py-1 text-left">Original Value</th>
+                      <th className="px-2 py-1 text-left">Enriched Value</th>
                       <th className="px-2 py-1 text-left">Status</th>
                     </tr>
                   </thead>
@@ -408,14 +452,18 @@ export default function MatchingStep({
                     {Array.from(matchResults.values())[0]?.slice(0, 10).map((match, idx) => {
                       const origRow = originalFile.data[match.originalRowIndex];
                       const enrichedRow = enrichedFiles[0].data[match.enrichedRowIndex];
+                      const matchedByCol = match.matchedBy || selectedIdentifiers[0];
                       return (
                         <tr key={idx} className="border-t">
                           <td className="px-2 py-1">{idx + 1}</td>
-                          <td className="px-2 py-1 truncate max-w-[150px]">
-                            {String(origRow[selectedIdentifier] || '').substring(0, 30)}
+                          <td className="px-2 py-1">
+                            <Badge variant="secondary" className="text-xs">{matchedByCol}</Badge>
                           </td>
                           <td className="px-2 py-1 truncate max-w-[150px]">
-                            {String(enrichedRow[selectedIdentifier] || '').substring(0, 30)}
+                            {String(origRow[matchedByCol] || '').substring(0, 30)}
+                          </td>
+                          <td className="px-2 py-1 truncate max-w-[150px]">
+                            {String(enrichedRow[matchedByCol] || '').substring(0, 30)}
                           </td>
                           <td className="px-2 py-1">
                             <Badge variant="default" className="text-xs">Matched</Badge>
@@ -469,14 +517,15 @@ export default function MatchingStep({
           )}
 
           {/* Identifier Info */}
-          {selectedIdentifier && (
+          {selectedIdentifiers.length > 0 && (
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
-                Using <strong>{selectedIdentifier}</strong> as the matching identifier.
-                {/email/i.test(selectedIdentifier) && " Email is highly reliable for matching."}
-                {/phone/i.test(selectedIdentifier) && " Phone numbers work well if normalized."}
-                {/^id$|customer.*id/i.test(selectedIdentifier) && " IDs provide perfect matching."}
+                Using <strong>{selectedIdentifiers.join(', ')}</strong> as matching identifier(s).
+                {selectedIdentifiers.length > 1 && " Multiple identifiers provide fallback matching for better coverage."}
+                {selectedIdentifiers.length === 1 && /email/i.test(selectedIdentifiers[0]) && " Email is highly reliable for matching."}
+                {selectedIdentifiers.length === 1 && /phone/i.test(selectedIdentifiers[0]) && " Phone numbers work well if normalized."}
+                {selectedIdentifiers.length === 1 && /^id$|customer.*id/i.test(selectedIdentifiers[0]) && " IDs provide perfect matching."}
               </AlertDescription>
             </Alert>
           )}
@@ -484,7 +533,7 @@ export default function MatchingStep({
       </Card>
 
       {/* Match Results */}
-      {selectedIdentifier && !isProcessing && (
+      {selectedIdentifiers.length > 0 && !isProcessing && (
         <Card>
           <CardHeader>
             <CardTitle>Match Results</CardTitle>
@@ -571,7 +620,7 @@ export default function MatchingStep({
                           <thead className="bg-muted sticky top-0">
                             <tr>
                               <th className="px-3 py-2 text-left font-medium">Row #</th>
-                              <th className="px-3 py-2 text-left font-medium">{selectedIdentifier}</th>
+                              <th className="px-3 py-2 text-left font-medium">Identifier Value</th>
                               <th className="px-3 py-2 text-left font-medium">Reason</th>
                             </tr>
                           </thead>
@@ -580,7 +629,7 @@ export default function MatchingStep({
                               <tr key={row.rowIndex} className="border-t">
                                 <td className="px-3 py-2">{row.rowIndex + 1}</td>
                                 <td className="px-3 py-2">
-                                  {String(row.data[selectedIdentifier] || "").substring(0, 40)}
+                                  {String(row.data[selectedIdentifiers[0]] || "").substring(0, 40)}
                                 </td>
                                 <td className="px-3 py-2 text-muted-foreground">{row.reason}</td>
                               </tr>

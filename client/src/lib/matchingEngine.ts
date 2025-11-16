@@ -8,6 +8,7 @@ export interface MatchResult {
   enrichedRowIndex: number;
   confidence: number; // 0-100
   identifier: string; // value used for matching
+  matchedBy?: string; // which identifier column was used (for multi-identifier matching)
 }
 
 export interface MatchStats {
@@ -93,48 +94,59 @@ function normalizeIdentifier(value: any): string {
 }
 
 /**
- * Match enriched rows to original rows using the identifier column
+ * Match enriched rows to original rows using multiple identifier columns with fallback
  */
 export function matchRows(
   originalData: Record<string, any>[],
   enrichedData: Record<string, any>[],
-  identifierColumn: string,
+  identifierColumns: string | string[], // Support both single and multiple identifiers
   columnMappings?: Record<string, string> // enriched column -> original column
 ): MatchResult[] {
   const matches: MatchResult[] = [];
-  const enrichedMap = new Map<string, number[]>(); // key -> array of indices (for duplicates)
+  const identifierArray = Array.isArray(identifierColumns) ? identifierColumns : [identifierColumns];
+  const matchedOriginalIndices = new Set<number>(); // Track which original rows have been matched
 
-  // Build lookup map from enriched data
-  // If column mappings exist, use the mapped enriched column name
-  const enrichedIdentifierColumn = columnMappings 
-    ? Object.keys(columnMappings).find(enrichedCol => columnMappings[enrichedCol] === identifierColumn) || identifierColumn
-    : identifierColumn;
+  // Try each identifier in priority order
+  for (const identifierColumn of identifierArray) {
+    const enrichedMap = new Map<string, number[]>(); // key -> array of indices (for duplicates)
 
-  enrichedData.forEach((row, index) => {
-    const key = normalizeIdentifier(row[enrichedIdentifierColumn]);
-    if (key) {
-      if (!enrichedMap.has(key)) {
-        enrichedMap.set(key, []);
+    // Build lookup map from enriched data
+    // If column mappings exist, use the mapped enriched column name
+    const enrichedIdentifierColumn = columnMappings 
+      ? Object.keys(columnMappings).find(enrichedCol => columnMappings[enrichedCol] === identifierColumn) || identifierColumn
+      : identifierColumn;
+
+    enrichedData.forEach((row, index) => {
+      const key = normalizeIdentifier(row[enrichedIdentifierColumn]);
+      if (key) {
+        if (!enrichedMap.has(key)) {
+          enrichedMap.set(key, []);
+        }
+        enrichedMap.get(key)!.push(index);
       }
-      enrichedMap.get(key)!.push(index);
-    }
-  });
+    });
 
-  // Match original rows to enriched rows
-  originalData.forEach((row, originalIndex) => {
-    const key = normalizeIdentifier(row[identifierColumn]);
-    if (key && enrichedMap.has(key)) {
-      const enrichedIndices = enrichedMap.get(key)!;
-      
-      // Use first match (handle duplicates by taking first occurrence)
-      matches.push({
-        originalRowIndex: originalIndex,
-        enrichedRowIndex: enrichedIndices[0],
-        confidence: 100,
-        identifier: key
-      });
-    }
-  });
+    // Match original rows to enriched rows (skip already matched rows)
+    originalData.forEach((row, originalIndex) => {
+      // Skip if this row was already matched by a higher-priority identifier
+      if (matchedOriginalIndices.has(originalIndex)) return;
+
+      const key = normalizeIdentifier(row[identifierColumn]);
+      if (key && enrichedMap.has(key)) {
+        const enrichedIndices = enrichedMap.get(key)!;
+        
+        // Use first match (handle duplicates by taking first occurrence)
+        matches.push({
+          originalRowIndex: originalIndex,
+          enrichedRowIndex: enrichedIndices[0],
+          confidence: 100,
+          identifier: key,
+          matchedBy: identifierColumn // Track which identifier was used
+        });
+        matchedOriginalIndices.add(originalIndex);
+      }
+    });
+  }
 
   return matches;
 }
