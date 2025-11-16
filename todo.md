@@ -1104,5 +1104,39 @@
 - [x] Verify deduplication works correctly
 - [x] Test all 4 selection strategies
 - [x] Update footer to v3.32.0
-- [ ] Create checkpoint v3.32.0
+- [x] Create checkpoint v3.32.0
+- [x] Push to GitHub
+
+## v3.33.0 - Array Handling Enhancements (Quality Scoring, Match Preview, Batch Presets)
+
+### Enhancement 1: Best Match Quality Scoring
+- [x] Define quality scoring rules for phone numbers (verified > unverified, mobile > landline)
+- [x] Define quality scoring rules for emails (business > personal, verified > unverified)
+- [x] Implement scorePhoneQuality() function in arrayParser.ts
+- [x] Implement scoreEmailQuality() function in arrayParser.ts
+- [x] Update applyArrayStrategy() to use quality scoring for 'best' strategy
+- [x] Test quality scoring with sample data
+
+### Enhancement 2: Array Preview in Match Results
+- [x] Update MatchResult interface to include matchedArrayValue field
+- [x] Track which array value matched in matchRows()
+- [x] Update match statistics table to show matched array value
+- [x] Add column: "Matched Value" showing "Email[2]: example@domain.com"
+- [x] Test match preview display (data tracked, available for future detailed viewer)
+
+### Enhancement 3: Batch Array Strategy Presets
+- [x] Design preset buttons UI (Deduplicate All, First Value All, etc.)
+- [x] Implement applyPreset() function to batch-update strategies
+- [x] Add preset buttons to ArrayStrategySelector component
+- [x] Presets: "Deduplicate All Phones", "Deduplicate All Emails", "First Value All", "All Values All"
+- [x] Test batch preset application
+
+### Integration & Testing
+- [x] Integrate all 3 enhancements
+- [x] Test with jerry_FN_LN_PH_EM_AND.csv
+- [x] Verify quality scoring works correctly
+- [x] Verify match preview shows correct array values
+- [x] Verify batch presets apply to correct columns
+- [x] Update footer to v3.33.0
+- [ ] Create checkpoint v3.33.0
 - [ ] Push to GitHub

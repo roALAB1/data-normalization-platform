@@ -13,6 +13,7 @@ export interface MatchResult {
   identifier: string; // value used for matching
   matchedBy?: string; // which identifier column was used (for multi-identifier matching)
   arrayIndex?: number; // which array index matched (for array values)
+  matchedArrayValue?: string; // formatted string showing which array value matched (e.g., "Email[2]: john@company.com")
 }
 
 export interface MatchStats {
@@ -120,12 +121,18 @@ export function matchRows(
       ? Object.keys(columnMappings).find(enrichedCol => columnMappings[enrichedCol] === identifierColumn) || identifierColumn
       : identifierColumn;
 
+    // Build lookup map from enriched data, tracking array indices
+    const enrichedArrayInfo = new Map<number, { rawValue: string, parseResult: any }>();
+    
     enrichedData.forEach((row, index) => {
       const rawValue = row[enrichedIdentifierColumn];
       
       // Parse array values (handles quoted CSV, JSON arrays, single values)
       const parseResult = parseArrayValue(rawValue);
       const columnType = getColumnType(enrichedIdentifierColumn);
+      
+      // Store array info for later reference
+      enrichedArrayInfo.set(index, { rawValue, parseResult });
       
       // Add each array value to the map
       parseResult.values.forEach((value, arrayIndex) => {
@@ -149,14 +156,30 @@ export function matchRows(
       
       if (key && enrichedMap.has(key)) {
         const enrichedIndices = enrichedMap.get(key)!;
+        const enrichedIndex = enrichedIndices[0];
+        
+        // Find which array value matched
+        let matchedArrayValue: string | undefined;
+        const arrayInfo = enrichedArrayInfo.get(enrichedIndex);
+        if (arrayInfo && arrayInfo.parseResult.values.length > 1) {
+          // Find which value in the array matched
+          const matchedValue = arrayInfo.parseResult.values.find((v: string) => 
+            normalizeIdentifier(v) === key
+          );
+          if (matchedValue) {
+            const arrayIndex = arrayInfo.parseResult.values.indexOf(matchedValue);
+            matchedArrayValue = `${enrichedIdentifierColumn}[${arrayIndex}]: ${matchedValue.substring(0, 40)}`;
+          }
+        }
         
         // Use first match (handle duplicates by taking first occurrence)
         matches.push({
           originalRowIndex: originalIndex,
-          enrichedRowIndex: enrichedIndices[0],
+          enrichedRowIndex: enrichedIndex,
           confidence: 100,
           identifier: key,
-          matchedBy: identifierColumn // Track which identifier was used
+          matchedBy: identifierColumn, // Track which identifier was used
+          matchedArrayValue // Track which array value matched
         });
         matchedOriginalIndices.add(originalIndex);
       }

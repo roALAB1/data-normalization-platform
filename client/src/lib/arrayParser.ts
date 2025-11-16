@@ -82,11 +82,107 @@ export function deduplicateArray(values: string[]): string[] {
 }
 
 /**
+ * Score phone number quality (0-100)
+ * Higher score = better quality
+ */
+export function scorePhoneQuality(phone: string, columnName?: string): number {
+  let score = 0;
+  const normalized = normalizePhoneForMatching(phone);
+  
+  // E.164 format (+1...): +20 points
+  if (phone.trim().startsWith('+')) {
+    score += 20;
+  }
+  
+  // Length check (10 digits for US): +10 points
+  const digitsOnly = normalized.replace(/\D/g, '');
+  if (digitsOnly.length === 10 || digitsOnly.length === 11) {
+    score += 10;
+  }
+  
+  // Column name hints
+  if (columnName) {
+    const lower = columnName.toLowerCase();
+    
+    // Mobile/Wireless: +30 points
+    if (lower.includes('mobile') || lower.includes('wireless') || lower.includes('cell')) {
+      score += 30;
+    }
+    // Direct number: +20 points
+    else if (lower.includes('direct')) {
+      score += 20;
+    }
+    // Landline: +10 points
+    else if (lower.includes('landline') || lower.includes('home')) {
+      score += 10;
+    }
+    
+    // Verified/DNC=N: +40 points (if column has "verified" or DNC indicator)
+    if (lower.includes('verified') || lower.includes('valid')) {
+      score += 40;
+    }
+  }
+  
+  return Math.min(score, 100);
+}
+
+/**
+ * Score email quality (0-100)
+ * Higher score = better quality
+ */
+export function scoreEmailQuality(email: string, columnName?: string): number {
+  let score = 0;
+  const normalized = normalizeEmailForMatching(email);
+  
+  // Basic format check
+  if (!normalized.includes('@') || !normalized.includes('.')) {
+    return 0;
+  }
+  
+  const [localPart, domain] = normalized.split('@');
+  
+  // Business domain (not free providers): +30 points
+  const freeProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'mail.com', 'protonmail.com'];
+  if (!freeProviders.includes(domain)) {
+    score += 30;
+  }
+  
+  // Contains name pattern (letters, not random): +10 points
+  if (/^[a-z]+[a-z.]*[a-z]+$/.test(localPart)) {
+    score += 10;
+  }
+  
+  // Not disposable domain: +10 points
+  const disposableDomains = ['tempmail.com', '10minutemail.com', 'guerrillamail.com', 'mailinator.com'];
+  if (!disposableDomains.includes(domain)) {
+    score += 10;
+  }
+  
+  // Column name hints
+  if (columnName) {
+    const lower = columnName.toLowerCase();
+    
+    // Business email: +30 points
+    if (lower.includes('business') || lower.includes('work') || lower.includes('company')) {
+      score += 30;
+    }
+    
+    // Verified: +50 points
+    if (lower.includes('verified') || lower.includes('valid')) {
+      score += 50;
+    }
+  }
+  
+  return Math.min(score, 100);
+}
+
+/**
  * Apply array handling strategy to parsed array
  */
 export function applyArrayStrategy(
   parseResult: ArrayParseResult,
-  strategy: ArrayHandlingStrategy
+  strategy: ArrayHandlingStrategy,
+  columnName?: string
 ): string {
   const { values } = parseResult;
 
@@ -104,10 +200,29 @@ export function applyArrayStrategy(
       return values.join(', ');
 
     case 'best':
-      // TODO: Implement quality scoring for phones/emails
-      // For now, return first value (same as 'first' strategy)
-      // Future: Score based on verified status, type (mobile > landline), etc.
-      return values[0];
+      // Score each value and return highest quality
+      const columnType = columnName ? getColumnType(columnName) : 'other';
+      
+      if (columnType === 'phone') {
+        // Score phone numbers
+        const scored = values.map(v => ({
+          value: v,
+          score: scorePhoneQuality(v, columnName)
+        }));
+        scored.sort((a, b) => b.score - a.score);
+        return scored[0].value;
+      } else if (columnType === 'email') {
+        // Score emails
+        const scored = values.map(v => ({
+          value: v,
+          score: scoreEmailQuality(v, columnName)
+        }));
+        scored.sort((a, b) => b.score - a.score);
+        return scored[0].value;
+      } else {
+        // For other types, return first value
+        return values[0];
+      }
 
     case 'deduplicated':
       // Remove duplicates and return comma-separated

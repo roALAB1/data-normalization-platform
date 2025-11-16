@@ -98,7 +98,7 @@ export default function OutputStep({
           
           // Only apply strategy if value is actually an array
           if (parseResult.values.length > 1 || parseResult.originalFormat !== 'single') {
-            value = applyArrayStrategy(parseResult, strategy);
+            value = applyArrayStrategy(parseResult, strategy, col);
           }
         }
         

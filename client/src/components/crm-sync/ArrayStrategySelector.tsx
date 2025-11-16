@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -103,6 +104,47 @@ export default function ArrayStrategySelector({
     return null; // No array columns detected
   }
 
+  // Helper to detect column type
+  const getColumnType = (columnName: string): 'phone' | 'email' | 'other' => {
+    const lower = columnName.toLowerCase();
+    if (lower.includes('phone') || lower.includes('mobile') || lower.includes('cell') || lower.includes('landline')) {
+      return 'phone';
+    }
+    if (lower.includes('email') || lower.includes('mail')) {
+      return 'email';
+    }
+    return 'other';
+  };
+
+  // Apply preset to all matching columns
+  const applyPreset = (preset: 'deduplicate_all' | 'first_all' | 'deduplicate_phones' | 'deduplicate_emails' | 'all_values') => {
+    arrayColumns.forEach((col) => {
+      const colType = getColumnType(col.name);
+      
+      switch (preset) {
+        case 'deduplicate_all':
+          onStrategyChange(col.name, 'deduplicated');
+          break;
+        case 'first_all':
+          onStrategyChange(col.name, 'first');
+          break;
+        case 'deduplicate_phones':
+          if (colType === 'phone') {
+            onStrategyChange(col.name, 'deduplicated');
+          }
+          break;
+        case 'deduplicate_emails':
+          if (colType === 'email') {
+            onStrategyChange(col.name, 'deduplicated');
+          }
+          break;
+        case 'all_values':
+          onStrategyChange(col.name, 'all');
+          break;
+      }
+    });
+  };
+
   const strategyDescriptions: Record<ArrayHandlingStrategy, string> = {
     first: "Use only the first value from the array (fastest, simplest)",
     all: "Keep all values comma-separated (preserves complete data)",
@@ -122,6 +164,100 @@ export default function ArrayStrategySelector({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Preset Buttons */}
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Quick Presets:</p>
+          <div className="flex flex-wrap gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset('deduplicate_all')}
+                  >
+                    Deduplicate All
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Remove duplicates from all array columns</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset('first_all')}
+                  >
+                    First Value All
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Use only first value for all array columns</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset('deduplicate_phones')}
+                  >
+                    Deduplicate Phones
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Remove duplicates from phone columns only</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset('deduplicate_emails')}
+                  >
+                    Deduplicate Emails
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Remove duplicates from email columns only</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset('all_values')}
+                  >
+                    Keep All Values
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Keep all values comma-separated for all columns</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+
+        <div className="border-t pt-4" />
+
+        {/* Per-Column Strategy Selection */}
         {arrayColumns.map((col) => (
           <div key={`${col.fileId}-${col.name}`} className="space-y-2">
             <div className="flex items-center justify-between">
