@@ -1040,5 +1040,5 @@
 ### Change: Reference AudienceLab in How It Works Guide
 - [x] Update Step 1 text from "Apollo, ZoomInfo" to "AudienceLab"
 - [x] Update footer to v3.30.1
-- [ ] Create checkpoint v3.30.1
+- [x] Create checkpoint v3.30.1
 - [ ] Push to GitHub
