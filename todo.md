@@ -1216,3 +1216,64 @@
 - [x] Verify GitHub shows v3.33.0 tag
 - [x] Verify GitHub shows v3.33.0 release
 - [x] Create final checkpoint
+
+
+---
+
+## v3.34.0 - CRM Sync Mapper Critical Bug Fixes
+
+**Status:** IN PROGRESS
+
+### Phase 1: Core Matching Logic Fix
+- [x] Update matchRows() to track unique original row indices using Set
+- [x] Add match instance tracking with column/identifier/value metadata
+- [x] Store matchDetails Map with per-row instance breakdown
+- [x] Update MatchResult interface to include matchInstances array
+- [ ] Test with user's 219k row dataset
+
+### Phase 2: Quality Calculation Fix
+- [x] Replace sample-based quality calculation with full scan
+- [x] Implement COUNTA(column) / totalRows * 100 formula
+- [x] Update MatchingStep.tsx to show accurate percentages
+- [ ] Verify: First Name 99.45%, Email 97.59%, Last Name 81.2%, Phone 61.3%
+
+### Phase 3: Enhanced Statistics Display
+- [x] Add "Unique Rows Matched" as primary metric
+- [x] Add "Total Match Instances" counter
+- [x] Create "Match Breakdown by Identifier" table
+- [x] Add expandable "Match Details" section showing which columns matched
+- [x] Update UI to display all new statistics
+
+### Phase 4: Cross-Column Duplicate Detection
+- [x] Detect same email in multiple columns (PERSONAL_EMAILS, WORK_EMAILS, etc.)
+- [x] Detect same phone in multiple columns (MOBILE_PHONE, DIRECT_NUMBER, etc.)
+- [x] Track column names where duplicates occur
+- [x] Display in match instance breakdown
+- [x] Show "Average instances per matched row" metric
+
+### Phase 5: Array Detection After Column Mapping
+- [x] Move array detection to run AFTER column mapping (not before)
+- [x] Scan only mapped columns for arrays
+- [x] Detect comma-separated arrays: "value1, value2, value3"
+- [x] Detect semicolon-separated arrays: "value1; value2; value3"
+- [x] Detect JSON arrays: ["value1", "value2"]
+- [x] Lower detection threshold from 50% to 10% of rows
+- [ ] Add "Mark Column as Array" manual override button (deferred)
+- [x] Update ArrayStrategySelector to show all phone/email array columns
+
+### Testing & Verification
+- [ ] Test with jerry_LN_PH_EM_AND.csv (29,723 rows, 74 columns)
+- [ ] Test with jerry_EM_only.csv (94,513 rows, 74 columns)
+- [ ] Verify match rate shows ~13.2% for file 1 (not 89.6%)
+- [ ] Verify match rate shows ~43% for file 2 (not 94.3%)
+- [ ] Verify quality shows 99.45% for First Name (not 5%)
+- [ ] Verify array detection shows phone/email columns (not just company/job)
+- [ ] Verify match instance breakdown shows column-level details
+- [ ] Verify data preservation (no deletion, only stats deduplication)
+
+### Documentation
+- [ ] Update VERSION_HISTORY.md with v3.34.0 entry
+- [ ] Update CHANGELOG.md with bug fixes
+- [ ] Update all page footers to v3.34.0
+- [ ] Create git commit and tag v3.34.0
+- [ ] Push to GitHub and create release

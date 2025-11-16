@@ -15,11 +15,15 @@ import {
   autoDetectIdentifier,
   matchRows,
   calculateMatchStats,
+  calculateEnhancedMatchStats,
+  calculateMatchInstances,
   getUnmatchedRows,
   getAvailableIdentifiers,
   calculateIdentifierQuality,
   type MatchResult,
   type MatchStats,
+  type EnhancedMatchStats,
+  type MatchInstance,
   type UnmatchedRow
 } from "@/lib/matchingEngine";
 import { autoMapColumns, matchesToMappings, type ColumnMatch } from "@/lib/columnMatcher";
@@ -59,6 +63,8 @@ export default function MatchingStep({
   const [availableIdentifiers, setAvailableIdentifiers] = useState<string[]>([]);
   const [matchResults, setMatchResults] = useState<Map<string, MatchResult[]>>(new Map());
   const [matchStats, setMatchStats] = useState<Map<string, MatchStats>>(new Map());
+  const [enhancedMatchStats, setEnhancedMatchStats] = useState<Map<string, EnhancedMatchStats>>(new Map());
+  const [matchInstances, setMatchInstances] = useState<Map<string, Map<number, MatchInstance[]>>>(new Map());
   const [unmatchedRows, setUnmatchedRows] = useState<Map<string, UnmatchedRow[]>>(new Map());
   const [isProcessing, setIsProcessing] = useState(false);
   const [showUnmatched, setShowUnmatched] = useState<string | null>(null);
@@ -99,18 +105,27 @@ export default function MatchingStep({
     const newMatchStats = new Map<string, MatchStats>();
     const newUnmatchedRows = new Map<string, UnmatchedRow[]>();
 
+    const newEnhancedMatchStats = new Map<string, EnhancedMatchStats>();
+    const newMatchInstances = new Map<string, Map<number, MatchInstance[]>>();
+
     enrichedFiles.forEach(file => {
       const matches = matchRows(originalFile.data, file.data, selectedIdentifiers, inputMappings);
       const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifiers[0]); // Use primary for stats
+      const instances = calculateMatchInstances(originalFile.data, file.data, matches, inputMappings);
+      const enhancedStats = calculateEnhancedMatchStats(originalFile.data, file.data, matches, instances, selectedIdentifiers[0]);
       const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifiers[0]);
 
       newMatchResults.set(file.id, matches);
       newMatchStats.set(file.id, stats);
+      newEnhancedMatchStats.set(file.id, enhancedStats);
+      newMatchInstances.set(file.id, instances);
       newUnmatchedRows.set(file.id, unmatched);
     });
 
     setMatchResults(newMatchResults);
     setMatchStats(newMatchStats);
+    setEnhancedMatchStats(newEnhancedMatchStats);
+    setMatchInstances(newMatchInstances);
     setUnmatchedRows(newUnmatchedRows);
     setIsProcessing(false);
   }, [selectedIdentifiers, originalFile, enrichedFiles, inputMappings]);
@@ -549,9 +564,11 @@ export default function MatchingStep({
           <CardContent className="space-y-4">
             {enrichedFiles.map(file => {
               const stats = matchStats.get(file.id);
+              const enhancedStats = enhancedMatchStats.get(file.id);
+              const instances = matchInstances.get(file.id);
               const unmatched = unmatchedRows.get(file.id) || [];
 
-              if (!stats) return null;
+              if (!stats || !enhancedStats) return null;
 
               return (
                 <div key={file.id} className="border rounded-lg p-4 space-y-3">
@@ -563,44 +580,78 @@ export default function MatchingStep({
                       </p>
                     </div>
                     <Badge
-                      variant={stats.matchRate >= 90 ? "default" : stats.matchRate >= 70 ? "secondary" : "destructive"}
+                      variant={enhancedStats.matchRate >= 90 ? "default" : enhancedStats.matchRate >= 70 ? "secondary" : "destructive"}
                     >
-                      {stats.matchRate.toFixed(1)}% match rate
+                      {enhancedStats.matchRate.toFixed(1)}% match rate
                     </Badge>
                   </div>
 
-                  {/* Statistics */}
-                  <div className="grid grid-cols-3 gap-4 text-sm">
+                  {/* Enhanced Statistics */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="col-span-2 border-b pb-2">
+                      <p className="text-xs text-muted-foreground mb-1">Primary Metric</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-green-600">
+                          {enhancedStats.uniqueRowsMatched.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">/ {enhancedStats.totalOriginalRows.toLocaleString()} unique rows matched</p>
+                      </div>
+                    </div>
                     <div>
-                      <p className="text-muted-foreground">Matched</p>
-                      <p className="text-lg font-semibold text-green-600">
-                        {stats.matchedCount.toLocaleString()}
+                      <p className="text-muted-foreground">Total Match Instances</p>
+                      <p className="text-lg font-semibold text-blue-600">
+                        {enhancedStats.totalMatchInstances.toLocaleString()}
                       </p>
+                      <p className="text-xs text-muted-foreground">Includes cross-column duplicates</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Avg Instances/Row</p>
+                      <p className="text-lg font-semibold text-purple-600">
+                        {enhancedStats.averageInstancesPerRow?.toFixed(1) || '0'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Match efficiency</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Unmatched</p>
                       <p className="text-lg font-semibold text-orange-600">
-                        {stats.unmatchedCount.toLocaleString()}
+                        {enhancedStats.unmatchedCount.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Duplicates</p>
-                      <p className="text-lg font-semibold text-blue-600">
-                        {stats.duplicateMatches}
+                      <p className="text-muted-foreground">Duplicates in File</p>
+                      <p className="text-lg font-semibold text-gray-600">
+                        {enhancedStats.duplicateMatches}
                       </p>
                     </div>
                   </div>
+
+                  {/* Match Breakdown by Identifier */}
+                  {enhancedStats.matchInstancesByIdentifier && enhancedStats.matchInstancesByIdentifier.size > 0 && (
+                    <div className="border-t pt-3">
+                      <p className="text-sm font-medium mb-2">Match Instances by Identifier Type</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {Array.from(enhancedStats.matchInstancesByIdentifier.entries()).map(([type, count]) => (
+                          <div key={type} className="flex justify-between items-center p-2 bg-muted rounded">
+                            <span className="font-medium">{type}</span>
+                            <Badge variant="secondary" className="text-xs">
+                              {count.toLocaleString()} instances
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Progress Bar */}
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Match Progress</span>
-                      <span>{stats.matchedCount} / {stats.totalOriginalRows}</span>
+                      <span>{enhancedStats.uniqueRowsMatched} / {enhancedStats.totalOriginalRows}</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-green-500 transition-all"
-                        style={{ width: `${stats.matchRate}%` }}
+                        style={{ width: `${enhancedStats.matchRate}%` }}
                       />
                     </div>
                   </div>

@@ -16,6 +16,27 @@ export interface MatchResult {
   matchedArrayValue?: string; // formatted string showing which array value matched (e.g., "Email[2]: john@company.com")
 }
 
+export interface MatchInstance {
+  enrichedColumn: string; // which enriched column matched
+  originalColumn: string; // which original column was used
+  matchedValue: string; // the actual value that matched
+  arrayIndex?: number; // if from array, which index
+}
+
+export interface EnhancedMatchStats {
+  totalOriginalRows: number;
+  totalEnrichedRows: number;
+  uniqueRowsMatched: number; // NEW: unique original rows matched (deduplicated)
+  totalMatchInstances: number; // NEW: total match instances (includes duplicates)
+  unmatchedCount: number;
+  matchRate: number; // percentage based on unique rows
+  duplicateMatches: number;
+  identifierColumn: string;
+  matchInstancesByIdentifier?: Map<string, number>; // NEW: breakdown by identifier type
+  matchInstancesByColumn?: Map<string, number>; // NEW: breakdown by enriched column
+  averageInstancesPerRow?: number; // NEW: average match instances per matched row
+}
+
 export interface MatchStats {
   totalOriginalRows: number;
   totalEnrichedRows: number;
@@ -100,6 +121,7 @@ function normalizeIdentifier(value: any): string {
 
 /**
  * Match enriched rows to original rows using multiple identifier columns with fallback
+ * Returns both matches and detailed instance tracking
  */
 export function matchRows(
   originalData: Record<string, any>[],
@@ -190,7 +212,63 @@ export function matchRows(
 }
 
 /**
- * Calculate match statistics
+ * Calculate detailed match instances for cross-column duplicate detection
+ * Scans ALL enriched columns to find where the same value appears
+ */
+export function calculateMatchInstances(
+  originalData: Record<string, any>[],
+  enrichedData: Record<string, any>[],
+  matches: MatchResult[],
+  columnMappings?: Record<string, string>
+): Map<number, MatchInstance[]> {
+  const instanceMap = new Map<number, MatchInstance[]>();
+
+  matches.forEach(match => {
+    const instances: MatchInstance[] = [];
+    const originalRow = originalData[match.originalRowIndex];
+    const enrichedRow = enrichedData[match.enrichedRowIndex];
+
+    // Scan all enriched columns to find matches
+    Object.keys(enrichedRow).forEach(enrichedColumn => {
+      const enrichedValue = enrichedRow[enrichedColumn];
+      if (!enrichedValue) return;
+
+      // Parse array values
+      const parseResult = parseArrayValue(enrichedValue);
+
+      // Check if any value in this enriched column matches the original identifier
+      parseResult.values.forEach((value, arrayIndex) => {
+        const normalizedEnriched = normalizeIdentifier(value);
+        
+        // Check against all original columns
+        Object.keys(originalRow).forEach(originalColumn => {
+          const originalValue = originalRow[originalColumn];
+          if (!originalValue) return;
+
+          const normalizedOriginal = normalizeIdentifier(originalValue);
+          
+          if (normalizedEnriched === normalizedOriginal) {
+            instances.push({
+              enrichedColumn,
+              originalColumn,
+              matchedValue: value,
+              arrayIndex: parseResult.values.length > 1 ? arrayIndex : undefined
+            });
+          }
+        });
+      });
+    });
+
+    if (instances.length > 0) {
+      instanceMap.set(match.originalRowIndex, instances);
+    }
+  });
+
+  return instanceMap;
+}
+
+/**
+ * Calculate match statistics (legacy - for backward compatibility)
  */
 export function calculateMatchStats(
   originalData: Record<string, any>[],
@@ -211,6 +289,86 @@ export function calculateMatchStats(
     duplicateMatches,
     identifierColumn
   };
+}
+
+/**
+ * Calculate enhanced match statistics with unique row tracking and instance details
+ */
+export function calculateEnhancedMatchStats(
+  originalData: Record<string, any>[],
+  enrichedData: Record<string, any>[],
+  matches: MatchResult[],
+  matchInstances: Map<number, MatchInstance[]>,
+  identifierColumn: string
+): EnhancedMatchStats {
+  // Count unique original rows matched (deduplicated)
+  const uniqueOriginalIndices = new Set(matches.map(m => m.originalRowIndex));
+  const uniqueRowsMatched = uniqueOriginalIndices.size;
+
+  // Count total match instances (includes cross-column duplicates)
+  let totalMatchInstances = 0;
+  matchInstances.forEach(instances => {
+    totalMatchInstances += instances.length;
+  });
+
+  // Breakdown by identifier type (email, phone, name)
+  const matchInstancesByIdentifier = new Map<string, number>();
+  matchInstances.forEach(instances => {
+    instances.forEach(instance => {
+      const identifierType = getIdentifierType(instance.enrichedColumn);
+      matchInstancesByIdentifier.set(
+        identifierType,
+        (matchInstancesByIdentifier.get(identifierType) || 0) + 1
+      );
+    });
+  });
+
+  // Breakdown by enriched column
+  const matchInstancesByColumn = new Map<string, number>();
+  matchInstances.forEach(instances => {
+    instances.forEach(instance => {
+      matchInstancesByColumn.set(
+        instance.enrichedColumn,
+        (matchInstancesByColumn.get(instance.enrichedColumn) || 0) + 1
+      );
+    });
+  });
+
+  // Calculate average instances per matched row
+  const averageInstancesPerRow = uniqueRowsMatched > 0 
+    ? totalMatchInstances / uniqueRowsMatched 
+    : 0;
+
+  // Detect duplicate matches in enriched data
+  const matchedEnrichedIndices = new Set(matches.map(m => m.enrichedRowIndex));
+  const duplicateMatches = enrichedData.length - matchedEnrichedIndices.size;
+
+  return {
+    totalOriginalRows: originalData.length,
+    totalEnrichedRows: enrichedData.length,
+    uniqueRowsMatched, // NEW: Deduplicated count
+    totalMatchInstances, // NEW: Total instances (includes duplicates)
+    unmatchedCount: originalData.length - uniqueRowsMatched,
+    matchRate: originalData.length > 0 ? (uniqueRowsMatched / originalData.length) * 100 : 0,
+    duplicateMatches,
+    identifierColumn,
+    matchInstancesByIdentifier,
+    matchInstancesByColumn,
+    averageInstancesPerRow
+  };
+}
+
+/**
+ * Determine identifier type from column name
+ */
+function getIdentifierType(columnName: string): string {
+  const lower = columnName.toLowerCase();
+  if (lower.includes('email')) return 'Email';
+  if (lower.includes('phone') || lower.includes('mobile') || lower.includes('direct')) return 'Phone';
+  if (lower.includes('first') && lower.includes('name')) return 'First Name';
+  if (lower.includes('last') && lower.includes('name')) return 'Last Name';
+  if (lower.includes('name')) return 'Name';
+  return 'Other';
 }
 
 /**
@@ -264,32 +422,26 @@ export function getAvailableIdentifiers(
 /**
  * Calculate match quality score for an identifier column
  * Higher score = better identifier
+ * NOW SCANS ALL ROWS (not just sample)
  */
 export function calculateIdentifierQuality(
   originalData: Record<string, any>[],
   enrichedData: Record<string, any>[],
   column: string
 ): number {
-  let score = 0;
+  // Calculate completeness percentage (0-100)
+  // This is the ACTUAL quality metric users care about
+  const totalRows = originalData.length;
+  if (totalRows === 0) return 0;
 
-  // Check uniqueness in original data (40 points)
-  const originalValues = originalData.map(row => row[column]).filter(Boolean);
-  const originalUniqueness = originalValues.length > 0 
-    ? new Set(originalValues).size / originalValues.length 
-    : 0;
-  score += originalUniqueness * 40;
+  // Count non-empty values in the column
+  const nonEmptyValues = originalData.filter(row => {
+    const value = row[column];
+    return value !== null && value !== undefined && value !== '';
+  }).length;
 
-  // Check uniqueness in enriched data (40 points)
-  const enrichedValues = enrichedData.map(row => row[column]).filter(Boolean);
-  const enrichedUniqueness = enrichedValues.length > 0 
-    ? new Set(enrichedValues).size / enrichedValues.length 
-    : 0;
-  score += enrichedUniqueness * 40;
+  // Calculate percentage: (non-empty / total) * 100
+  const completeness = (nonEmptyValues / totalRows) * 100;
 
-  // Bonus for common identifier types (20 points)
-  if (/email/i.test(column)) score += 20;
-  else if (/phone/i.test(column)) score += 15;
-  else if (/^id$|customer.*id/i.test(column)) score += 18;
-
-  return Math.round(score);
+  return Math.round(completeness);
 }

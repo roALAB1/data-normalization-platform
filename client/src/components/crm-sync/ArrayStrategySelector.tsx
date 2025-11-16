@@ -50,8 +50,8 @@ export default function ArrayStrategySelector({
     const detected: ArrayColumn[] = [];
 
     enrichedFiles.forEach((file) => {
-      // Sample first 10 rows to detect arrays
-      const sampleSize = Math.min(10, file.data.length);
+      // Sample more rows for better detection (100 rows or 10% of file, whichever is larger)
+      const sampleSize = Math.max(100, Math.min(Math.floor(file.data.length * 0.1), file.data.length));
       const sampleRows = file.data.slice(0, sampleSize);
 
       file.columns.forEach((column) => {
@@ -77,8 +77,9 @@ export default function ArrayStrategySelector({
           }
         });
 
-        // If >50% of sampled rows have arrays, consider it an array column
-        if (rowsWithArrays / sampleSize > 0.5) {
+        // LOWERED THRESHOLD: If >10% of sampled rows have arrays, consider it an array column
+        // This catches phone/email columns that don't always have arrays
+        if (rowsWithArrays > 0 && rowsWithArrays / sampleSize > 0.1) {
           const avgValueCount = Math.round(totalValues / rowsWithArrays);
           detected.push({
             name: column,
@@ -89,9 +90,11 @@ export default function ArrayStrategySelector({
             sampleValue: sampleValue.length > 100 ? sampleValue.slice(0, 100) + "..." : sampleValue,
           });
 
-          // Set default strategy if not already set
+          // Set default strategy based on column type
           if (!arrayStrategies.has(column)) {
-            onStrategyChange(column, "first");
+            const colType = getColumnType(column);
+            // Default to 'deduplicated' for phone/email, 'first' for others
+            onStrategyChange(column, colType === 'phone' || colType === 'email' ? 'deduplicated' : 'first');
           }
         }
       });
@@ -100,14 +103,10 @@ export default function ArrayStrategySelector({
     setArrayColumns(detected);
   }, [enrichedFiles]);
 
-  if (arrayColumns.length === 0) {
-    return null; // No array columns detected
-  }
-
-  // Helper to detect column type
+  // Helper to detect column type (moved up for use in useEffect)
   const getColumnType = (columnName: string): 'phone' | 'email' | 'other' => {
     const lower = columnName.toLowerCase();
-    if (lower.includes('phone') || lower.includes('mobile') || lower.includes('cell') || lower.includes('landline')) {
+    if (lower.includes('phone') || lower.includes('mobile') || lower.includes('cell') || lower.includes('landline') || lower.includes('direct')) {
       return 'phone';
     }
     if (lower.includes('email') || lower.includes('mail')) {
@@ -115,6 +114,10 @@ export default function ArrayStrategySelector({
     }
     return 'other';
   };
+
+  if (arrayColumns.length === 0) {
+    return null; // No array columns detected
+  }
 
   // Apply preset to all matching columns
   const applyPreset = (preset: 'deduplicate_all' | 'first_all' | 'deduplicate_phones' | 'deduplicate_emails' | 'all_values') => {
