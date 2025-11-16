@@ -542,8 +542,14 @@ export default function CRMSyncMapper() {
         {/* Step 4: Column Selection */}
         {currentStep === "columns" && originalFile && enrichedFiles.length > 0 && resolutionConfig && (
           <ColumnSelectionStep
-            originalFile={originalFile}
-            enrichedFiles={enrichedFiles}
+            originalFile={{
+              ...originalFile,
+              data: [] // Don't pass full data array to avoid memory issues
+            }}
+            enrichedFiles={enrichedFiles.map(file => ({
+              ...file,
+              data: [] // Don't pass full data array to avoid memory issues
+            }))}
             resolutionConfig={resolutionConfig}
             onBack={() => setCurrentStep("conflicts")}
             onContinue={(data) => {

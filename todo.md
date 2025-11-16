@@ -1301,3 +1301,52 @@
 - [ ] Test with user's 219k row dataset
 - [ ] Verify no lag when adding mappings
 - [ ] Create checkpoint v3.34.1
+
+
+---
+
+## v3.34.2 - CRITICAL: RangeError in Column Selection Step
+
+**Status:** IN PROGRESS
+
+**Issue:** Page crashes with "RangeError: Invalid string length" when reaching Step 4 (Column Selection) after processing 219k row dataset with 74 enriched columns.
+
+**Error Stack Trace:**
+```
+RangeError: Invalid string length
+  at JSON.stringify (<anonymous>)
+  at The (https://...)
+  at Array.forEach (<anonymous>)
+  at A (https://...)
+  at kC (https://...)
+  at yA (https://...)
+  at kr (https://...)
+```
+
+**Root Cause Hypothesis:**
+- Error occurs in ColumnSelectionStep component
+- Likely caused by trying to stringify large merged data (219k rows × 74 columns = ~16M cells)
+- JavaScript has max string length limit (~2^28 characters = 268MB)
+- Need to optimize how we handle large datasets in Step 4
+
+**Root Cause Found:**
+- ColumnSelectionStep was receiving full originalFile and enrichedFiles objects
+- These objects contained ALL data (219k rows × 74 columns = ~16M cells)
+- React was trying to process/render these massive objects
+- JavaScript string length limit exceeded when serializing large objects
+
+**Solution:**
+- Pass empty data arrays to ColumnSelectionStep (data: [])
+- Keep all metadata (columns, rowCount, file names, etc.)
+- Full data remains in parent component for Step 5 (Output)
+- ColumnSelectionStep only needs column names, not row data
+
+**Tasks:**
+- [x] Investigate ColumnSelectionStep.tsx for JSON.stringify calls
+- [x] Check if mergedData is being passed/stringified unnecessarily
+- [x] Implement data optimization - pass empty arrays instead of full data
+- [x] Optimize data structures to avoid large string operations
+- [x] Dev server hot-reloaded with fix
+- [ ] User testing: Test with 219k row dataset
+- [ ] User testing: Verify no crash in Step 4
+- [ ] Create checkpoint v3.34.2
