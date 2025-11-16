@@ -1029,5 +1029,5 @@
 - [x] Add icons and visual styling
 - [x] Position guide prominently on page
 - [x] Update footer to v3.30.0
-- [ ] Create checkpoint v3.30.0
+- [x] Create checkpoint v3.30.0
 - [ ] Push to GitHub
