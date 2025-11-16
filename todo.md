@@ -975,5 +975,5 @@
 - [x] Update UI to show both mapping directions clearly
 - [x] Test with files that have different schemas
 - [x] Update footer to v3.27.0
-- [ ] Create checkpoint v3.27.0
+- [x] Create checkpoint v3.27.0
 - [ ] Push to GitHub
