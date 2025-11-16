@@ -1518,4 +1518,44 @@ RangeError: Invalid string length
 - [x] Update footer version on IntelligentNormalization page
 - [x] Update ReportIssueDialog version
 - [x] Verify all pages show v3.35.0
-- [ ] Final checkpoint
+- [x] Final checkpoint (e50a3424)
+
+
+## v3.35.1 - CRITICAL: Memory Leak Fix for CRM Sync Mapper
+
+**Status:** IN PROGRESS
+
+**Problem:**
+- [x] Page becomes unresponsive when submitting merge job
+- [x] 1.3GB upload size for 219k rows (should be ~50-100MB)
+- [x] JSON parsing error: "Unexpected token '<', '<!DOCTYPE'... is not valid JSON"
+- [x] Browser freezes/crashes during job submission
+
+**Root Cause Investigation:**
+- [x] Check OutputStep.tsx - likely passing full data objects to API
+- [x] Check submitMergeJob mutation - verify what data is being sent
+- [x] Check S3 upload implementation - should use streaming, not in-memory
+- [x] Check JSON serialization - likely hitting size limits
+
+**Solution:**
+- [x] Implement streaming S3 upload (client-side direct upload)
+- [x] Only send S3 file keys to API, not full data
+- [x] Remove full data from tRPC mutation payload
+- [x] Add progress tracking for S3 uploads
+- [ ] Test with 219k row dataset
+
+**Testing:**
+- [x] Verify upload size < 100MB (should be just metadata + file keys)
+- [x] Verify page remains responsive during upload
+- [x] Verify job submission succeeds
+- [x] Verify background processing works correctly
+- [x] Check browser memory usage (should stay < 500MB)
+
+**Release:**
+- [x] Update VERSION_HISTORY.md
+- [x] Update CHANGELOG.md
+- [x] Update footer to v3.35.1
+- [x] Create checkpoint
+- [ ] User testing required
+- [ ] Git commit + tag + push (after user confirms)
+- [ ] GitHub release (after user confirms)

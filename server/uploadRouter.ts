@@ -10,7 +10,46 @@ import { storagePut } from "./storage";
 
 export const uploadRouter = router({
   /**
-   * Upload CSV file to S3
+   * Get upload URL for streaming large files
+   * Returns metadata needed for client to stream upload directly
+   */
+  getStreamingUploadUrl: publicProcedure
+    .input(
+      z.object({
+        fileName: z.string(),
+        fileType: z.enum(["original", "enriched"]),
+        rowCount: z.number(),
+        columnCount: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to upload files",
+        });
+      }
+
+      const timestamp = Date.now();
+      const sanitizedName = input.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const s3Key = `crm-sync/${ctx.user.id}/${timestamp}-${sanitizedName}`;
+
+      return {
+        success: true,
+        s3Key,
+        uploadId: `${ctx.user.id}-${timestamp}`,
+        metadata: {
+          fileName: input.fileName,
+          fileType: input.fileType,
+          rowCount: input.rowCount,
+          columnCount: input.columnCount,
+        },
+      };
+    }),
+
+  /**
+   * Upload CSV file to S3 (for small files only - use streaming for large files)
+   * WARNING: This loads entire CSV into memory
    */
   uploadCSV: publicProcedure
     .input(

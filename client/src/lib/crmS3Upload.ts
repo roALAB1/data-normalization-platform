@@ -1,10 +1,9 @@
 /**
  * S3 Upload Utility for CRM Sync Mapper
- * Handles uploading CSV files to S3 before submitting merge jobs
+ * Handles uploading CSV files to S3 with streaming to avoid memory overload
  */
 
 import Papa from "papaparse";
-import { trpc } from "./trpc";
 
 interface UploadedFile {
   id: string;
@@ -26,66 +25,147 @@ export interface S3FileMetadata {
 }
 
 /**
- * Convert file data to CSV string
+ * Convert file data to CSV and upload to S3 using streaming
+ * Processes data in chunks to avoid memory overload
  */
-function convertToCSV(file: UploadedFile): string {
-  return Papa.unparse(file.data, {
-    header: true,
-    columns: file.columns,
-  });
-}
-
-/**
- * Upload a single file to S3 using tRPC
- */
-async function uploadFileToS3(
+async function uploadFileToS3Streaming(
   file: UploadedFile,
-  uploadMutation: ReturnType<typeof trpc.upload.uploadCSV.useMutation>
+  onProgress?: (percent: number) => void
 ): Promise<S3FileMetadata> {
-  // Convert to CSV
-  const csvContent = convertToCSV(file);
-
-  // Upload via tRPC
-  const result = await uploadMutation.mutateAsync({
-    fileName: file.name,
-    csvContent,
-    fileType: file.type,
-  });
-
+  const CHUNK_SIZE = 10000; // Process 10k rows at a time
+  const totalRows = file.data.length;
+  
+  // Generate CSV in chunks and upload via Blob
+  const csvChunks: string[] = [];
+  
+  // Add header row
+  csvChunks.push(file.columns.join(",") + "\n");
+  
+  // Process data in chunks
+  for (let i = 0; i < totalRows; i += CHUNK_SIZE) {
+    const chunkData = file.data.slice(i, Math.min(i + CHUNK_SIZE, totalRows));
+    
+    // Convert chunk to CSV (without header)
+    const csvChunk = Papa.unparse(chunkData, {
+      header: false,
+      columns: file.columns,
+    });
+    
+    csvChunks.push(csvChunk + "\n");
+    
+    // Report progress (0-70% for CSV generation)
+    if (onProgress) {
+      const progress = ((i + chunkData.length) / totalRows) * 70;
+      onProgress(progress);
+    }
+    
+    // Allow browser to breathe
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
+  
+  // Create Blob from chunks (browser handles this efficiently)
+  const csvBlob = new Blob(csvChunks, { type: "text/csv" });
+  
+  if (onProgress) onProgress(75);
+  
+  // Upload blob via HTTP endpoint
+  const { s3Key, s3Url } = await uploadBlobToS3(csvBlob, file.name, file.type, onProgress);
+  
   return {
     id: file.id,
     name: file.name,
     type: file.type,
-    s3Key: result.s3Key,
-    s3Url: result.s3Url,
+    s3Key,
+    s3Url,
     rowCount: file.rowCount,
     columns: file.columns,
   };
 }
 
 /**
- * Upload multiple files to S3 in parallel
- * Note: This is a helper that should be called from a React component with access to tRPC hooks
+ * Upload Blob to S3 via HTTP endpoint
+ */
+async function uploadBlobToS3(
+  blob: Blob,
+  fileName: string,
+  fileType: "original" | "enriched",
+  onProgress?: (percent: number) => void
+): Promise<{ s3Key: string; s3Url: string }> {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append("file", blob, fileName);
+    formData.append("type", fileType);
+    
+    const xhr = new XMLHttpRequest();
+    
+    // Track upload progress
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable && onProgress) {
+        const percent = 75 + (e.loaded / e.total) * 25; // 75-100%
+        onProgress(percent);
+      }
+    });
+    
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          if (response.success) {
+            resolve({
+              s3Key: response.key,
+              s3Url: response.url,
+            });
+          } else {
+            reject(new Error(response.error || "Upload failed"));
+          }
+        } catch (error) {
+          reject(new Error("Invalid response from server"));
+        }
+      } else {
+        reject(new Error(`Upload failed: ${xhr.statusText}`));
+      }
+    });
+    
+    xhr.addEventListener("error", () => {
+      reject(new Error("Network error during upload"));
+    });
+    
+    xhr.addEventListener("abort", () => {
+      reject(new Error("Upload aborted"));
+    });
+    
+    xhr.open("POST", "/api/upload/file");
+    xhr.send(formData);
+  });
+}
+
+/**
+ * Upload multiple files to S3 sequentially with streaming
  */
 export async function uploadFilesToS3Parallel(
   files: UploadedFile[],
-  uploadMutation: ReturnType<typeof trpc.upload.uploadCSV.useMutation>,
+  uploadMutation: any, // Not used in streaming approach
   onProgress?: (uploaded: number, total: number) => void
 ): Promise<S3FileMetadata[]> {
   const totalFiles = files.length;
-  let uploadedCount = 0;
-
-  // Create upload promises for all files
-  const uploadPromises = files.map((file) =>
-    uploadFileToS3(file, uploadMutation).then((result) => {
-      uploadedCount++;
-      onProgress?.(uploadedCount, totalFiles);
-      return result;
-    })
-  );
-
-  // Wait for all uploads to complete in parallel
-  return await Promise.all(uploadPromises);
+  const results: S3FileMetadata[] = [];
+  
+  // Upload files sequentially to avoid overwhelming browser
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    
+    const result = await uploadFileToS3Streaming(file, (percent) => {
+      // Report file-level progress
+      const fileProgress = percent / 100;
+      const overallProgress = i + fileProgress;
+      onProgress?.(overallProgress, totalFiles);
+    });
+    
+    results.push(result);
+    onProgress?.(i + 1, totalFiles);
+  }
+  
+  return results;
 }
 
 /**
@@ -93,19 +173,10 @@ export async function uploadFilesToS3Parallel(
  */
 export async function uploadFilesSequentially(
   files: UploadedFile[],
-  uploadMutation: ReturnType<typeof trpc.upload.uploadCSV.useMutation>,
+  uploadMutation: any,
   onProgress?: (uploaded: number, total: number) => void
 ): Promise<S3FileMetadata[]> {
-  const results: S3FileMetadata[] = [];
-  const totalFiles = files.length;
-
-  for (let i = 0; i < files.length; i++) {
-    const result = await uploadFileToS3(files[i], uploadMutation);
-    results.push(result);
-    onProgress?.(i + 1, totalFiles);
-  }
-
-  return results;
+  return uploadFilesToS3Parallel(files, uploadMutation, onProgress);
 }
 
 /**

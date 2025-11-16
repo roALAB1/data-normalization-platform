@@ -8,6 +8,7 @@ import { metricsRouter } from "./metricsRouter";
 import { monitoringRouter } from "./monitoringRouter";
 import { crmSyncRouter } from "./crmSyncRouter";
 import { uploadRouter } from "./uploadRouter";
+import { storageRouter } from "./storageRouter";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -40,6 +41,9 @@ export const appRouter = router({
 
   // File upload for CRM Sync (v3.35.0)
   upload: uploadRouter,
+
+  // Storage management for CRM Sync (v3.35.1)
+  storage: storageRouter,
 });
 
 export type AppRouter = typeof appRouter;

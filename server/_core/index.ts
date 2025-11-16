@@ -59,6 +59,10 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // File upload endpoint for CRM Sync (bypasses tRPC for large files)
+  const { handleFileUpload } = await import("./fileUploadEndpoint.js");
+  app.post("/api/upload/file", handleFileUpload);
   // REST API for external integrations
   const apiRouter = await import("../apiRouter.js");
   app.use("/api", apiRouter.default);
