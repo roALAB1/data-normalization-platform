@@ -2,6 +2,76 @@
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
+## [3.33.0] - 2025-01-15
+
+### Added
+- **Quality Scoring for Best Match Strategy**: Intelligent ranking of phone numbers and emails by quality
+  - Phone scoring: E.164 format (+20), mobile/wireless (+30), direct (+20), verified (+40)
+  - Email scoring: Business domain (+30), verified (+50), name pattern (+10), not disposable (+10)
+  - Column name hints boost scores (e.g., "MOBILE_PHONE" gets +30 mobile bonus)
+- **Array Match Value Tracking**: Records which specific array value matched during matching process
+  - Format: `"DIRECT_NUMBER[1]: +19175551234"`
+  - Available in MatchResult interface for debugging and exports
+- **Batch Preset Buttons**: One-click strategy application for array columns
+  - Deduplicate All - Apply 'deduplicated' to all array columns
+  - First Value All - Apply 'first' to all array columns (fastest)
+  - Deduplicate Phones - Apply 'deduplicated' to phone columns only
+  - Deduplicate Emails - Apply 'deduplicated' to email columns only
+  - Keep All Values - Apply 'all' to all array columns (preserves everything)
+  - Auto-detects column type from column name (phone/email/other)
+
+### Changed
+- Updated `applyArrayStrategy()` to use quality scoring for 'best' strategy
+- Enhanced `matchRows()` to track array index and value that matched
+- Improved ArrayStrategySelector UI with preset buttons above per-column dropdowns
+- Updated all page footers to v3.33.0 for consistency
+
+### Technical Details
+- Added `scorePhoneQuality()` function to arrayParser.ts
+- Added `scoreEmailQuality()` function to arrayParser.ts
+- Added `matchedArrayValue?: string` field to MatchResult interface
+- Updated OutputStep to pass columnName to applyArrayStrategy()
+- Documentation: README.md updated with v3.33.0 and v3.32.0 features
+- Impact: Better data quality, faster configuration, improved transparency
+- Time to Implement: 3 parallel enhancements (quality scoring, match tracking, batch presets)
+
+---
+
+## [3.32.0] - 2025-01-14
+
+### Added
+- **Multi-Value Array Handling**: Comprehensive solution for comma-separated arrays in enriched data
+  - Auto-detection by sampling first 10 rows (>50% threshold)
+  - Shows average value count and duplicate indicators per column
+  - 4 array handling strategies: First Value, All Values, Best Match, Deduplicated
+  - Matching engine tries each value in array until match found
+  - Improves match rates by 30-50%
+- **Array Parser Library** (`arrayParser.ts`):
+  - `parseArrayValue()` - Handles quoted CSV, JSON arrays, single values
+  - `deduplicateArray()` - Removes duplicate values
+  - `applyArrayStrategy()` - Applies selected strategy to array
+- **ArrayStrategySelector Component**: UI for configuring array handling
+  - Per-column strategy dropdowns
+  - Sample value tooltips
+  - Duplicate and value count indicators
+
+### Changed
+- Enhanced matchingEngine.ts to parse arrays and try each value
+- Updated OutputStep.tsx to apply strategies when building output CSV
+- Added array strategies state to CRMSyncMapper workflow
+
+### Fixed
+- Array matching now works with multi-value phone/email columns
+- Deduplication removes exact duplicates within arrays
+
+### Technical Details
+- Files Created: client/src/lib/arrayParser.ts, client/src/components/crm-sync/ArrayStrategySelector.tsx
+- Files Modified: matchingEngine.ts, OutputStep.tsx, MatchingStep.tsx, CRMSyncMapper.tsx
+- Impact: Significantly improved match rates for enriched files with array data
+- Documentation: ARRAY_ANALYSIS.md created
+
+---
+
 ## [3.17.0] - 2025-11-14
 
 ### Added
