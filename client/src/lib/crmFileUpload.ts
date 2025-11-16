@@ -146,33 +146,34 @@ async function uploadViaHTTP(
  * Used for preview and matching configuration
  */
 export async function loadSampleData(
-  s3Key: string,
-  maxRows: number = 100
+  s3Url: string,
+  maxRows: number = 1000
 ): Promise<Record<string, any>[]> {
-  // Download file content via tRPC
-  const response = await fetch(`/api/trpc/storage.downloadFile?input=${encodeURIComponent(JSON.stringify({ key: s3Key }))}`);
-  
-  if (!response.ok) {
-    throw new Error(`Failed to load sample data: ${response.statusText}`);
-  }
-  
-  const result = await response.json();
-  
-  if (!result.result?.data?.success) {
-    throw new Error("Failed to load sample data");
-  }
-  
-  return new Promise((resolve, reject) => {
-    Papa.parse(result.result.data.content, {
-      header: true,
-      skipEmptyLines: true,
-      preview: maxRows,
-      complete: (results) => {
-        resolve(results.data as Record<string, any>[]);
-      },
-      error: (error) => {
-        reject(new Error(`Failed to parse sample data: ${error.message}`));
-      },
+  try {
+    // Download file content directly from S3 URL
+    const response = await fetch(s3Url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to download file: ${response.statusText}`);
+    }
+    
+    const content = await response.text();
+    
+    // Parse CSV and extract sample rows
+    return new Promise((resolve, reject) => {
+      Papa.parse(content, {
+        header: true,
+        skipEmptyLines: true,
+        preview: maxRows,
+        complete: (results) => {
+          resolve(results.data as Record<string, any>[]);
+        },
+        error: (error) => {
+          reject(new Error(`Failed to parse sample data: ${error.message}`));
+        },
+      });
     });
-  });
+  } catch (error) {
+    throw new Error(`Failed to load sample data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

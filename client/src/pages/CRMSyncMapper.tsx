@@ -74,7 +74,7 @@ export default function CRMSyncMapper() {
             console.log(`Upload progress: ${progress}%`);
           });
 
-          const sampleData = await loadSampleData(fileMetadata.s3Key, 1000); // Load 1000 rows for matching
+          const sampleData = await loadSampleData(fileMetadata.s3Url, 1000); // Load 1000 rows for matching
 
           const uploadedFile: UploadedFile = {
             ...fileMetadata,
