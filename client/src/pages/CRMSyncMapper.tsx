@@ -235,7 +235,7 @@ export default function CRMSyncMapper() {
                       <h4 className="font-semibold text-sm">Upload Files</h4>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      Upload your original CRM export and one or more enriched data files (e.g., from Apollo, ZoomInfo)
+                      Upload your original CRM export and one or more enriched data files (e.g., from AudienceLab)
                     </p>
                   </div>
 
@@ -595,7 +595,7 @@ export default function CRMSyncMapper() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>v3.30.0 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
+          <p>v3.30.1 • CRM Sync Mapper - Intelligent Multi-File Merge</p>
         </div>
       </footer>
     </div>

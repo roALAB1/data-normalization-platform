@@ -1030,4 +1030,15 @@
 - [x] Position guide prominently on page
 - [x] Update footer to v3.30.0
 - [x] Create checkpoint v3.30.0
+- [x] Push to GitHub
+
+
+---
+
+## v3.30.1 - Update Guide Text
+
+### Change: Reference AudienceLab in How It Works Guide
+- [x] Update Step 1 text from "Apollo, ZoomInfo" to "AudienceLab"
+- [x] Update footer to v3.30.1
+- [ ] Create checkpoint v3.30.1
 - [ ] Push to GitHub
