@@ -25,17 +25,7 @@ import ColumnSelectionStep from "@/components/crm-sync/ColumnSelectionStep";
 import OutputStep from "@/components/crm-sync/OutputStep";
 import type { Conflict, ResolutionConfig } from "@/lib/conflictResolver";
 import type { ColumnConfig, ColumnOrderingMode } from "@/components/crm-sync/ColumnSelectionStep";
-
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: "original" | "enriched";
-  rowCount: number;
-  columns: string[];
-  data: Record<string, any>[];
-  matchFields?: string[];
-  uploadedAt: Date;
-}
+import type { UploadedFile } from "@/types/crmSync";
 
 type WorkflowStep = "upload" | "matching" | "conflicts" | "columns" | "output";
 
@@ -65,30 +55,30 @@ export default function CRMSyncMapper() {
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig[]>([]);
   const [showGuide, setShowGuide] = useState(true);
 
-  // File upload handler
+  // File upload handler - supports both legacy (parse all) and optimized (S3 upload) modes
   const handleFileUpload = useCallback(
-    (file: File, type: "original" | "enriched") => {
+    async (file: File, type: "original" | "enriched") => {
       setIsUploading(true);
       setUploadError("");
 
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            setUploadError(`Error parsing ${file.name}: ${results.errors[0].message}`);
-            setIsUploading(false);
-            return;
-          }
+      // Check file size to determine upload strategy
+      const fileSizeMB = file.size / (1024 * 1024);
+      const USE_OPTIMIZED_UPLOAD = fileSizeMB > 10; // Use optimized upload for files > 10MB
+
+      try {
+        if (USE_OPTIMIZED_UPLOAD) {
+          // OPTIMIZED PATH: Upload to S3 immediately, load sample data
+          const { uploadCSVToS3, loadSampleData } = await import("@/lib/crmFileUpload");
+          
+          const fileMetadata = await uploadCSVToS3(file, type, (progress) => {
+            console.log(`Upload progress: ${progress}%`);
+          });
+
+          const sampleData = await loadSampleData(fileMetadata.s3Key, 1000); // Load 1000 rows for matching
 
           const uploadedFile: UploadedFile = {
-            id: `${Date.now()}-${Math.random()}`,
-            name: file.name,
-            type,
-            rowCount: results.data.length,
-            columns: results.meta.fields || [],
-            data: results.data as Record<string, any>[],
-            uploadedAt: new Date(),
+            ...fileMetadata,
+            data: sampleData, // Use sample data for matching
           };
 
           if (type === "original") {
@@ -96,14 +86,52 @@ export default function CRMSyncMapper() {
           } else {
             setEnrichedFiles((prev) => [...prev, uploadedFile]);
           }
+        } else {
+          // LEGACY PATH: Parse entire file in browser (for small files)
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+              if (results.errors.length > 0) {
+                setUploadError(`Error parsing ${file.name}: ${results.errors[0].message}`);
+                setIsUploading(false);
+                return;
+              }
 
-          setIsUploading(false);
-        },
-        error: (error) => {
-          setUploadError(`Error reading ${file.name}: ${error.message}`);
-          setIsUploading(false);
-        },
-      });
+              const uploadedFile: UploadedFile = {
+                id: `${Date.now()}-${Math.random()}`,
+                name: file.name,
+                type,
+                rowCount: results.data.length,
+                columns: results.meta.fields || [],
+                data: results.data as Record<string, any>[],
+                uploadedAt: new Date(),
+              };
+
+              if (type === "original") {
+                setOriginalFile(uploadedFile);
+              } else {
+                setEnrichedFiles((prev) => [...prev, uploadedFile]);
+              }
+
+              setIsUploading(false);
+            },
+            error: (error) => {
+              setUploadError(`Error reading ${file.name}: ${error.message}`);
+              setIsUploading(false);
+            },
+          });
+          return; // Exit early for legacy path
+        }
+
+        setIsUploading(false);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        setUploadError(
+          `Error uploading ${file.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
+        setIsUploading(false);
+      }
     },
     []
   );

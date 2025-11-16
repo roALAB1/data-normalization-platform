@@ -1,3 +1,4 @@
+import type { UploadedFile } from "@/types/crmSync";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,15 +9,6 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ResolutionConfig } from "@/lib/conflictResolver";
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: "original" | "enriched";
-  rowCount: number;
-  columns: string[];
-  data: Record<string, any>[];
-  matchFields?: string[];
-}
 
 export type ColumnOrderingMode = "append" | "insert_related" | "custom";
 

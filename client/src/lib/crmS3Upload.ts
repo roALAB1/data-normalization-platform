@@ -4,15 +4,7 @@
  */
 
 import Papa from "papaparse";
-
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: "original" | "enriched";
-  rowCount: number;
-  columns: string[];
-  data: Record<string, any>[];
-}
+import type { UploadedFile } from "@/types/crmSync";
 
 export interface S3FileMetadata {
   id: string;

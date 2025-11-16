@@ -1,3 +1,4 @@
+import type { UploadedFile } from "@/types/crmSync";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,15 +25,6 @@ import {
 } from "@/lib/conflictResolver";
 import type { MatchResult } from "@/lib/matchingEngine";
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: "original" | "enriched";
-  rowCount: number;
-  columns: string[];
-  data: Record<string, any>[];
-  matchFields?: string[];
-}
 
 interface ConflictResolutionStepProps {
   originalFile: UploadedFile;
@@ -62,8 +54,8 @@ export default function ConflictResolutionStep({
     enrichedFiles.forEach((file) => {
       const matches = matchResults.get(file.id) || [];
       const fileConflicts = detectConflicts(
-        originalFile.data,
-        file.data,
+        originalFile.data || [],
+        file.data || [],
         matches,
         file.id,
         file.name

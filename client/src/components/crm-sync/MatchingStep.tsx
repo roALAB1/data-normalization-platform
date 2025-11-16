@@ -1,3 +1,4 @@
+import type { UploadedFile } from "@/types/crmSync";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,15 +31,6 @@ import { autoMapColumns, matchesToMappings, type ColumnMatch } from "@/lib/colum
 import { type ArrayHandlingStrategy } from "@/lib/arrayParser";
 import ArrayStrategySelector from "./ArrayStrategySelector";
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: "original" | "enriched";
-  rowCount: number;
-  columns: string[];
-  data: Record<string, any>[];
-  matchFields?: string[];
-}
 
 interface MatchingStepProps {
   originalFile: UploadedFile;
@@ -87,11 +79,11 @@ export default function MatchingStep({
     if (enrichedFiles.length === 0) return;
 
     // Get available identifiers from first enriched file
-    const identifiers = getAvailableIdentifiers(originalFile.data, enrichedFiles[0].data);
+    const identifiers = getAvailableIdentifiers(originalFile.data || [], enrichedFiles[0].data || []);
     setAvailableIdentifiers(identifiers);
 
     // Auto-detect best identifier
-    const detected = autoDetectIdentifier(originalFile.data, enrichedFiles[0].data);
+    const detected = autoDetectIdentifier(originalFile.data || [], enrichedFiles[0].data || []);
     if (detected) {
       setSelectedIdentifiers([detected]); // Start with single auto-detected identifier
     }
@@ -114,11 +106,11 @@ export default function MatchingStep({
       const newMatchInstances = new Map<string, Map<number, MatchInstance[]>>();
 
       enrichedFiles.forEach(file => {
-        const matches = matchRows(originalFile.data, file.data, selectedIdentifiers, appliedInputMappings);
-        const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifiers[0]); // Use primary for stats
-        const instances = calculateMatchInstances(originalFile.data, file.data, matches, appliedInputMappings);
-        const enhancedStats = calculateEnhancedMatchStats(originalFile.data, file.data, matches, instances, selectedIdentifiers[0]);
-        const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifiers[0]);
+        const matches = matchRows(originalFile.data || [], file.data || [], selectedIdentifiers, appliedInputMappings);
+        const stats = calculateMatchStats(originalFile.data || [], file.data || [], matches, selectedIdentifiers[0]); // Use primary for stats
+        const instances = calculateMatchInstances(originalFile.data || [], file.data || [], matches, appliedInputMappings);
+        const enhancedStats = calculateEnhancedMatchStats(originalFile.data || [], file.data || [], matches, instances, selectedIdentifiers[0]);
+        const unmatched = getUnmatchedRows(originalFile.data || [], matches, selectedIdentifiers[0]);
 
         newMatchResults.set(file.id, matches);
         newMatchStats.set(file.id, stats);
@@ -189,8 +181,8 @@ export default function MatchingStep({
             <div className="space-y-2 mb-3">
               {selectedIdentifiers.map((identifier, index) => {
                 const quality = calculateIdentifierQuality(
-                  originalFile.data,
-                  enrichedFiles[0].data,
+                  originalFile.data || [],
+                  enrichedFiles[0].data || [],
                   identifier
                 );
                 const priorityLabel = index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary";
@@ -234,8 +226,8 @@ export default function MatchingStep({
                   .filter(col => !selectedIdentifiers.includes(col))
                   .map(col => {
                     const quality = calculateIdentifierQuality(
-                      originalFile.data,
-                      enrichedFiles[0].data,
+                      originalFile.data || [],
+                      enrichedFiles[0].data || [],
                       col
                     );
                     return (
@@ -286,8 +278,8 @@ export default function MatchingStep({
                 setShowBulkTest(true);
                 // Test all identifiers
                 const results = availableIdentifiers.map(id => {
-                  const matches = matchRows(originalFile.data, enrichedFiles[0].data, id);
-                  const stats = calculateMatchStats(originalFile.data, enrichedFiles[0].data, matches, id);
+                  const matches = matchRows(originalFile.data || [], enrichedFiles[0].data || [], id);
+                  const stats = calculateMatchStats(originalFile.data || [], enrichedFiles[0].data || [], matches, id);
                   return {
                     identifier: id,
                     matchRate: stats.matchRate,
@@ -516,8 +508,8 @@ export default function MatchingStep({
                   </thead>
                   <tbody>
                     {Array.from(matchResults.values())[0]?.slice(0, 10).map((match, idx) => {
-                      const origRow = originalFile.data[match.originalRowIndex];
-                      const enrichedRow = enrichedFiles[0].data[match.enrichedRowIndex];
+                      const origRow = originalFile.data || [][match.originalRowIndex];
+                      const enrichedRow = enrichedFiles[0].data || [][match.enrichedRowIndex];
                       const matchedByCol = match.matchedBy || selectedIdentifiers[0];
                       return (
                         <tr key={idx} className="border-t">

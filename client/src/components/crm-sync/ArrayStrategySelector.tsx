@@ -1,3 +1,4 @@
+import type { UploadedFile } from "@/types/crmSync";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,12 +29,7 @@ interface ArrayColumn {
 }
 
 interface ArrayStrategySelectorProps {
-  enrichedFiles: Array<{
-    id: string;
-    name: string;
-    columns: string[];
-    data: Record<string, any>[];
-  }>;
+  enrichedFiles: UploadedFile[];
   arrayStrategies: Map<string, ArrayHandlingStrategy>;
   onStrategyChange: (column: string, strategy: ArrayHandlingStrategy) => void;
 }
@@ -51,8 +47,9 @@ export default function ArrayStrategySelector({
 
     enrichedFiles.forEach((file) => {
       // Sample more rows for better detection (100 rows or 10% of file, whichever is larger)
-      const sampleSize = Math.max(100, Math.min(Math.floor(file.data.length * 0.1), file.data.length));
-      const sampleRows = file.data.slice(0, sampleSize);
+      const fileData = file.data || [];
+      const sampleSize = Math.max(100, Math.min(Math.floor(fileData.length * 0.1), fileData.length));
+      const sampleRows = fileData.slice(0, sampleSize);
 
       file.columns.forEach((column) => {
         let totalValues = 0;

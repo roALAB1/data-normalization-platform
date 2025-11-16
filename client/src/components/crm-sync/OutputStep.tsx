@@ -1,3 +1,4 @@
+import type { UploadedFile } from "@/types/crmSync";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,15 +15,6 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { uploadFilesToS3Parallel, estimateUploadSize, formatBytes, type S3FileMetadata } from "@/lib/crmS3Upload";
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: "original" | "enriched";
-  rowCount: number;
-  columns: string[];
-  data: Record<string, any>[];
-  matchFields?: string[];
-}
 
 interface OutputStepProps {
   originalFile: UploadedFile;
