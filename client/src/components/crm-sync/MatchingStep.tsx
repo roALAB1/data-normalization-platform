@@ -22,6 +22,7 @@ import {
   type MatchStats,
   type UnmatchedRow
 } from "@/lib/matchingEngine";
+import { autoMapColumns, matchesToMappings, type ColumnMatch } from "@/lib/columnMatcher";
 
 interface UploadedFile {
   id: string;
@@ -65,6 +66,8 @@ export default function MatchingStep({
   const [showMatchPreview, setShowMatchPreview] = useState(false);
   const [showBulkTest, setShowBulkTest] = useState(false);
   const [bulkTestResults, setBulkTestResults] = useState<Array<{identifier: string, matchRate: number, matchedCount: number}>>([]);
+  const [autoMapSuggestions, setAutoMapSuggestions] = useState<ColumnMatch[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Auto-detect identifier on mount
   useEffect(() => {
@@ -223,8 +226,9 @@ export default function MatchingStep({
                 </p>
               </div>
 
-              {/* Tabs */}
-              <div className="flex gap-2 border-b">
+              {/* Header with Smart Auto-Map button */}
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2 border-b flex-1">
                 <button
                   onClick={() => setColumnMappingTab("input")}
                   className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -245,7 +249,84 @@ export default function MatchingStep({
                 >
                   Output Mapping
                 </button>
+                </div>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => {
+                    const sourceColumns = columnMappingTab === "input" ? enrichedFiles[0].columns : originalFile.columns;
+                    const targetColumns = columnMappingTab === "input" ? originalFile.columns : enrichedFiles[0].columns;
+                    const suggestions = autoMapColumns(sourceColumns, targetColumns);
+                    setAutoMapSuggestions(suggestions);
+                    setShowSuggestions(true);
+                  }}
+                  className="ml-2"
+                >
+                  Smart Auto-Map
+                </Button>
               </div>
+
+              {/* Auto-Map Suggestions */}
+              {showSuggestions && autoMapSuggestions.length > 0 && (
+                <div className="border rounded-lg p-3 bg-blue-50 dark:bg-blue-950 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h5 className="text-sm font-medium">Suggested Mappings ({autoMapSuggestions.length})</h5>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => {
+                          const mappings = matchesToMappings(autoMapSuggestions);
+                          if (columnMappingTab === "input") {
+                            setInputMappings(prev => ({ ...prev, ...mappings }));
+                          } else {
+                            setOutputMappings(prev => ({ ...prev, ...mappings }));
+                          }
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        Accept All
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowSuggestions(false)}
+                      >
+                        Dismiss
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {autoMapSuggestions.map((suggestion, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm bg-white dark:bg-gray-900 rounded p-2">
+                        <span className="w-1/4 truncate font-medium">{suggestion.sourceColumn}</span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        <span className="w-1/4 truncate">{suggestion.targetColumn}</span>
+                        <Badge
+                          variant={suggestion.confidence >= 80 ? "default" : suggestion.confidence >= 60 ? "secondary" : "outline"}
+                          className="text-xs"
+                        >
+                          {suggestion.confidence}%
+                        </Badge>
+                        <span className="text-xs text-muted-foreground flex-1">{suggestion.reason}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (columnMappingTab === "input") {
+                              setInputMappings(prev => ({ ...prev, [suggestion.sourceColumn]: suggestion.targetColumn }));
+                            } else {
+                              setOutputMappings(prev => ({ ...prev, [suggestion.sourceColumn]: suggestion.targetColumn }));
+                            }
+                          }}
+                        >
+                          Accept
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Input Mapping Tab */}
               {columnMappingTab === "input" && (

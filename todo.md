@@ -976,4 +976,22 @@
 - [x] Test with files that have different schemas
 - [x] Update footer to v3.27.0
 - [x] Create checkpoint v3.27.0
+- [x] Push to GitHub
+
+
+---
+
+## v3.28.0 - Smart Auto-Map Feature
+
+### Feature: Automatic Column Mapping Suggestions
+- [x] Create fuzzy string matching algorithm for column names
+- [x] Calculate similarity scores (0-100%)
+- [x] Add "Smart Auto-Map" button to column mapper
+- [x] Show suggested mappings with confidence scores
+- [x] Add one-click "Accept All" button
+- [x] Add individual accept/reject for each suggestion
+- [x] Support both Input and Output mapping tabs
+- [x] Test with various naming patterns (snake_case, camelCase, spaces)
+- [x] Update footer to v3.28.0
+- [ ] Create checkpoint v3.28.0
 - [ ] Push to GitHub
