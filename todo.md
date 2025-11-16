@@ -1621,3 +1621,52 @@ Step 5: Backend reads from S3 → Process server-side
 - [ ] Update VERSION_HISTORY.md
 - [ ] Update CHANGELOG.md
 - [ ] Create checkpoint v3.35.2
+
+
+---
+
+## v3.35.4 - CRM Sync Mapper UX Improvements
+
+**Goal:** Add 3 UX improvements to file upload workflow
+
+**Features:**
+1. Upload progress indicator with estimated time remaining
+2. CSV file validation before upload (structure, column count)
+3. Sample data preview table showing first 5 rows after upload
+
+**Tasks:**
+
+### Feature 1: Upload Progress Indicator
+- [x] Add Progress component to upload section
+- [x] Show percentage (0-100%) during S3 upload
+- [x] Calculate and display estimated time remaining
+- [x] Show upload speed (MB/s)
+- [x] Add visual progress bar with animation
+
+### Feature 2: File Validation
+- [x] Validate file extension (.csv only)
+- [x] Check file size limits (warn if > 100MB)
+- [x] Parse first row to verify CSV structure
+- [x] Check minimum column count (at least 2 columns)
+- [x] Show clear error messages for validation failures
+- [x] Add "Validation passed" success indicator
+
+### Feature 3: Sample Data Preview
+- [x] Create SampleDataPreview component
+- [x] Display first 5 rows in a table after upload
+- [x] Show column headers
+- [x] Add row numbers (1-5)
+- [x] Make table scrollable horizontally for many columns
+- [x] Add expand/collapse toggle
+- [x] Show "Showing 5 of X total rows" message
+
+### Testing
+- [ ] Test progress indicator with large files (50MB+)
+- [ ] Test validation with invalid files (.txt, .xlsx, corrupted CSV)
+- [ ] Test sample preview with various column counts (5, 20, 74)
+- [ ] Verify all features work together
+- [ ] Test with user's jerry_LN_PH_EM_AND.csv file
+
+### Documentation
+- [ ] Update VERSION_HISTORY.md with v3.35.4
+- [ ] Create checkpoint v3.35.4

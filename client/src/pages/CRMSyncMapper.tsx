@@ -35,6 +35,10 @@ export default function CRMSyncMapper() {
   const [enrichedFiles, setEnrichedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadSpeed, setUploadSpeed] = useState(0);
+  const [uploadStartTime, setUploadStartTime] = useState(0);
+  const [currentFileName, setCurrentFileName] = useState("");
 
   // Matching state
   const [selectedIdentifier, setSelectedIdentifier] = useState<string>("");
@@ -60,18 +64,42 @@ export default function CRMSyncMapper() {
     async (file: File, type: "original" | "enriched") => {
       setIsUploading(true);
       setUploadError("");
-
-      // Check file size to determine upload strategy
-      const fileSizeMB = file.size / (1024 * 1024);
-      const USE_OPTIMIZED_UPLOAD = fileSizeMB > 10; // Use optimized upload for files > 10MB
+      setUploadProgress(0);
+      setUploadSpeed(0);
+      setUploadStartTime(Date.now());
+      setCurrentFileName(file.name);
 
       try {
+        // Step 1: Validate CSV file
+        const { validateCSVFile } = await import("@/lib/csvValidator");
+        const validation = await validateCSVFile(file);
+        
+        if (!validation.valid) {
+          setUploadError(validation.errors.join(". "));
+          setIsUploading(false);
+          return;
+        }
+        
+        // Show warnings if any
+        if (validation.warnings.length > 0) {
+          console.warn("CSV validation warnings:", validation.warnings);
+        }
+
+        // Check file size to determine upload strategy
+        const fileSizeMB = file.size / (1024 * 1024);
+        const USE_OPTIMIZED_UPLOAD = fileSizeMB > 10; // Use optimized upload for files > 10MB
         if (USE_OPTIMIZED_UPLOAD) {
           // OPTIMIZED PATH: Upload to S3 immediately, load sample data
           const { uploadCSVToS3, loadSampleData } = await import("@/lib/crmFileUpload");
           
           const fileMetadata = await uploadCSVToS3(file, type, (progress) => {
-            console.log(`Upload progress: ${progress}%`);
+            setUploadProgress(Math.round(progress));
+            
+            // Calculate upload speed
+            const elapsed = (Date.now() - uploadStartTime) / 1000; // seconds
+            const uploadedBytes = (progress / 100) * file.size;
+            const speedMBps = (uploadedBytes / (1024 * 1024)) / elapsed;
+            setUploadSpeed(speedMBps);
           });
 
           const sampleData = await loadSampleData(fileMetadata.s3Url, 1000); // Load 1000 rows for matching
@@ -423,33 +451,44 @@ export default function CRMSyncMapper() {
                       </div>
                     </div>
 
-                    {/* Sample Data */}
+                    {/* Sample Data Preview */}
                     <div>
-                      <p className="text-sm font-medium mb-2">Sample Data (First 3 rows):</p>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm border rounded">
-                          <thead className="bg-muted">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-medium">Sample Data Preview</p>
+                        <p className="text-xs text-muted-foreground">
+                          Showing 5 of {originalFile.rowCount.toLocaleString()} rows
+                        </p>
+                      </div>
+                      <div className="overflow-x-auto border rounded-lg">
+                        <table className="w-full text-sm">
+                          <thead className="bg-muted/50">
                             <tr>
+                              <th className="px-3 py-2 text-left font-medium text-muted-foreground w-12">
+                                #
+                              </th>
                               {originalFile.columns.slice(0, 6).map((col) => (
                                 <th key={col} className="px-3 py-2 text-left font-medium">
                                   {col}
                                 </th>
                               ))}
                               {originalFile.columns.length > 6 && (
-                                <th className="px-3 py-2 text-left font-medium">...</th>
+                                <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+                                  +{originalFile.columns.length - 6} more
+                                </th>
                               )}
                             </tr>
                           </thead>
                           <tbody>
-                            {originalFile.data.slice(0, 3).map((row, i) => (
-                              <tr key={i} className="border-t">
+                            {originalFile.data.slice(0, 5).map((row, i) => (
+                              <tr key={i} className="border-t hover:bg-muted/30">
+                                <td className="px-3 py-2 text-muted-foreground">{i + 1}</td>
                                 {originalFile.columns.slice(0, 6).map((col) => (
-                                  <td key={col} className="px-3 py-2">
-                                    {String(row[col] || "").substring(0, 30)}
+                                  <td key={col} className="px-3 py-2 max-w-[200px] truncate">
+                                    {String(row[col] || "")}
                                   </td>
                                 ))}
                                 {originalFile.columns.length > 6 && (
-                                  <td className="px-3 py-2">...</td>
+                                  <td className="px-3 py-2 text-muted-foreground">...</td>
                                 )}
                               </tr>
                             ))}
@@ -512,6 +551,31 @@ export default function CRMSyncMapper() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Upload Progress */}
+            {isUploading && (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">Uploading {currentFileName}...</span>
+                      <span className="text-muted-foreground">{uploadProgress}%</span>
+                    </div>
+                    <Progress value={uploadProgress} className="h-2" />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>
+                        {uploadSpeed > 0 ? `${uploadSpeed.toFixed(2)} MB/s` : "Calculating..."}
+                      </span>
+                      <span>
+                        {uploadProgress > 0 && uploadSpeed > 0
+                          ? `~${Math.ceil((100 - uploadProgress) / (uploadSpeed * 10))}s remaining`
+                          : "Estimating..."}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Error Alert */}
             {uploadError && (
