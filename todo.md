@@ -1505,15 +1505,17 @@ RangeError: Invalid string length
 **Status:** IN PROGRESS
 
 **Tasks:**
-- [ ] Create/update CHANGELOG.md with v3.35.0 release notes
-- [ ] Update README.md with v3.35.0 features and architecture overview
-- [ ] Commit all changes with descriptive message
-- [ ] Create Git tag v3.35.0
-- [ ] Push commits and tags to GitHub
-- [ ] Create GitHub release with changelog
-- [ ] Update footer version on Homepage
-- [ ] Update footer version on CRM Sync page
-- [ ] Update footer version on Batch Jobs page
-- [ ] Update footer version on Monitoring page
-- [ ] Verify all pages show v3.35.0
+- [x] Create/update CHANGELOG.md with v3.35.0 release notes
+- [x] Update README.md with v3.35.0 features and architecture overview
+- [x] Commit all changes with descriptive message
+- [x] Create Git tag v3.35.0
+- [x] Push commits and tags to GitHub
+- [x] Create GitHub release with changelog
+- [x] Update footer version on Homepage
+- [x] Update footer version on CRM Sync page
+- [x] Update footer version on Batch Jobs page
+- [x] Update footer version on Monitoring page
+- [x] Update footer version on IntelligentNormalization page
+- [x] Update ReportIssueDialog version
+- [x] Verify all pages show v3.35.0
 - [ ] Final checkpoint
