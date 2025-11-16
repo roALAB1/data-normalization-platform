@@ -960,5 +960,5 @@
 - [x] Test end-to-end workflow
 - [x] Update footer to v3.26.0
 - [x] Create checkpoint v3.26.0
-- [ ] Push to GitHub with tags
-- [ ] Create GitHub release
+- [x] Push to GitHub with tags
+- [x] Create GitHub release
