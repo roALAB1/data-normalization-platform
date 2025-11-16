@@ -1277,3 +1277,27 @@
 - [ ] Update all page footers to v3.34.0
 - [ ] Create git commit and tag v3.34.0
 - [ ] Push to GitHub and create release
+
+
+---
+
+## v3.34.1 - CRITICAL: Column Mapping Performance Fix
+
+**Status:** IN PROGRESS
+
+**Issue:** Page becomes unresponsive when adding column mappings. Every mapping change triggers full matching engine re-run with 219k+ rows, causing 5-10 second lag per mapping.
+
+**Root Cause:** 
+- `inputMappings` state change triggers `useEffect` with `[selectedIdentifiers, originalFile, enrichedFiles, inputMappings]` dependencies
+- Matching engine processes 219k original rows × 29k-94k enriched rows on EVERY mapping change
+- No debouncing or optimization
+
+**Tasks:**
+- [x] Analyze current useEffect dependencies and trigger logic
+- [x] Implement debouncing for inputMappings changes (500ms delay)
+- [x] Add "Skip matching during mapping" mode (only run on "Apply Mappings" button)
+- [x] Show loading overlay during matching with progress indicator
+- [x] Optimize matching to skip if only mappings changed (not identifiers)
+- [ ] Test with user's 219k row dataset
+- [ ] Verify no lag when adding mappings
+- [ ] Create checkpoint v3.34.1

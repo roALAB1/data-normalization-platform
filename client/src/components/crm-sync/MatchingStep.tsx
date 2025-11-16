@@ -71,6 +71,7 @@ export default function MatchingStep({
   const [showColumnMapper, setShowColumnMapper] = useState(false);
   const [columnMappingTab, setColumnMappingTab] = useState<"input" | "output">("input");
   const [inputMappings, setInputMappings] = useState<Record<string, string>>({});
+  const [appliedInputMappings, setAppliedInputMappings] = useState<Record<string, string>>({}); // Actually used for matching
   const [outputMappings, setOutputMappings] = useState<Record<string, string>>({});
   const [showMatchPreview, setShowMatchPreview] = useState(false);
   const [showBulkTest, setShowBulkTest] = useState(false);
@@ -94,41 +95,46 @@ export default function MatchingStep({
     }
   }, [originalFile, enrichedFiles]);
 
-  // Perform matching when identifiers change
+  // Perform matching when identifiers change OR when mappings are applied
   useEffect(() => {
     if (selectedIdentifiers.length === 0) return;
 
     setIsProcessing(true);
 
-    // Match each enriched file
-    const newMatchResults = new Map<string, MatchResult[]>();
-    const newMatchStats = new Map<string, MatchStats>();
-    const newUnmatchedRows = new Map<string, UnmatchedRow[]>();
+    // Use setTimeout to allow UI to update before heavy computation
+    const timeoutId = setTimeout(() => {
+      // Match each enriched file
+      const newMatchResults = new Map<string, MatchResult[]>();
+      const newMatchStats = new Map<string, MatchStats>();
+      const newUnmatchedRows = new Map<string, UnmatchedRow[]>();
 
-    const newEnhancedMatchStats = new Map<string, EnhancedMatchStats>();
-    const newMatchInstances = new Map<string, Map<number, MatchInstance[]>>();
+      const newEnhancedMatchStats = new Map<string, EnhancedMatchStats>();
+      const newMatchInstances = new Map<string, Map<number, MatchInstance[]>>();
 
-    enrichedFiles.forEach(file => {
-      const matches = matchRows(originalFile.data, file.data, selectedIdentifiers, inputMappings);
-      const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifiers[0]); // Use primary for stats
-      const instances = calculateMatchInstances(originalFile.data, file.data, matches, inputMappings);
-      const enhancedStats = calculateEnhancedMatchStats(originalFile.data, file.data, matches, instances, selectedIdentifiers[0]);
-      const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifiers[0]);
+      enrichedFiles.forEach(file => {
+        const matches = matchRows(originalFile.data, file.data, selectedIdentifiers, appliedInputMappings);
+        const stats = calculateMatchStats(originalFile.data, file.data, matches, selectedIdentifiers[0]); // Use primary for stats
+        const instances = calculateMatchInstances(originalFile.data, file.data, matches, appliedInputMappings);
+        const enhancedStats = calculateEnhancedMatchStats(originalFile.data, file.data, matches, instances, selectedIdentifiers[0]);
+        const unmatched = getUnmatchedRows(originalFile.data, matches, selectedIdentifiers[0]);
 
-      newMatchResults.set(file.id, matches);
-      newMatchStats.set(file.id, stats);
-      newEnhancedMatchStats.set(file.id, enhancedStats);
-      newMatchInstances.set(file.id, instances);
-      newUnmatchedRows.set(file.id, unmatched);
-    });
+        newMatchResults.set(file.id, matches);
+        newMatchStats.set(file.id, stats);
+        newEnhancedMatchStats.set(file.id, enhancedStats);
+        newMatchInstances.set(file.id, instances);
+        newUnmatchedRows.set(file.id, unmatched);
+      });
 
-    setMatchResults(newMatchResults);
-    setMatchStats(newMatchStats);
-    setEnhancedMatchStats(newEnhancedMatchStats);
-    setMatchInstances(newMatchInstances);
-    setUnmatchedRows(newUnmatchedRows);
-    setIsProcessing(false);
-  }, [selectedIdentifiers, originalFile, enrichedFiles, inputMappings]);
+      setMatchResults(newMatchResults);
+      setMatchStats(newMatchStats);
+      setEnhancedMatchStats(newEnhancedMatchStats);
+      setMatchInstances(newMatchInstances);
+      setUnmatchedRows(newUnmatchedRows);
+      setIsProcessing(false);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedIdentifiers, originalFile, enrichedFiles, appliedInputMappings]);
 
   const handleContinue = () => {
     onContinue({
@@ -333,24 +339,26 @@ export default function MatchingStep({
               {showSuggestions && autoMapSuggestions.length > 0 && (
                 <div className="border rounded-lg p-3 bg-blue-50 dark:bg-blue-950 space-y-3">
                   <div className="flex justify-between items-center">
-                    <h5 className="text-sm font-medium">Suggested Mappings ({autoMapSuggestions.length})</h5>
-                    <div className="flex gap-2">
+                                  <div className="flex gap-2">
                       <Button
                         variant="default"
                         size="sm"
                         onClick={() => {
-                          const mappings = matchesToMappings(autoMapSuggestions);
+                          const newMappings: Record<string, string> = {};
+                          autoMapSuggestions.forEach(suggestion => {
+                            newMappings[suggestion.sourceColumn] = suggestion.targetColumn;
+                          });
                           if (columnMappingTab === "input") {
-                            setInputMappings(prev => ({ ...prev, ...mappings }));
+                            setInputMappings(prev => ({ ...prev, ...newMappings }));
+                            // Note: User must click "Apply Mappings" to trigger re-matching
                           } else {
-                            setOutputMappings(prev => ({ ...prev, ...mappings }));
+                            setOutputMappings(prev => ({ ...prev, ...newMappings }));
                           }
                           setShowSuggestions(false);
                         }}
                       >
-                        Accept All
-                      </Button>
-                      <Button
+                        Accept All (Click "Apply Mappings" after)
+                      </Button>              <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setShowSuggestions(false)}
@@ -378,6 +386,7 @@ export default function MatchingStep({
                           onClick={() => {
                             if (columnMappingTab === "input") {
                               setInputMappings(prev => ({ ...prev, [suggestion.sourceColumn]: suggestion.targetColumn }));
+                              // Note: User must click "Apply Mappings" to trigger re-matching
                             } else {
                               setOutputMappings(prev => ({ ...prev, [suggestion.sourceColumn]: suggestion.targetColumn }));
                             }
@@ -394,10 +403,26 @@ export default function MatchingStep({
               {/* Input Mapping Tab */}
               {columnMappingTab === "input" && (
                 <div className="space-y-3">
-                  <p className="text-xs text-muted-foreground">
-                    Map enriched file columns → original file columns (for finding matching identifier)
-                  </p>
-                  <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Map enriched file columns → original file columns (for finding matching identifier)
+                    </p>
+                    {Object.keys(inputMappings).length !== Object.keys(appliedInputMappings).length || 
+                     JSON.stringify(inputMappings) !== JSON.stringify(appliedInputMappings) ? (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setAppliedInputMappings(inputMappings)}
+                      >
+                        Apply Mappings ({Object.keys(inputMappings).length} pending)
+                      </Button>
+                    ) : (
+                      <Badge variant="secondary" className="text-xs">
+                        {Object.keys(appliedInputMappings).length} mappings applied
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
                     {enrichedFiles[0].columns.map(enrichedCol => (
                       <div key={enrichedCol} className="flex items-center gap-2 text-sm">
                         <span className="w-1/3 truncate font-medium">{enrichedCol}</span>
@@ -415,6 +440,11 @@ export default function MatchingStep({
                             ))}
                           </SelectContent>
                         </Select>
+                        {inputMappings[enrichedCol] && inputMappings[enrichedCol] !== appliedInputMappings[enrichedCol] && (
+                          <Badge variant="outline" className="text-xs text-amber-600">
+                            Pending
+                          </Badge>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -551,6 +581,24 @@ export default function MatchingStep({
           )}
         </CardContent>
       </Card>
+
+      {/* Loading Overlay */}
+      {isProcessing && (
+        <Card className="border-2 border-blue-500 bg-blue-50 dark:bg-blue-950">
+          <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="text-center space-y-2">
+              <p className="text-lg font-medium">Processing Matches...</p>
+              <p className="text-sm text-muted-foreground">
+                Analyzing {originalFile.rowCount.toLocaleString()} original rows against {enrichedFiles.reduce((sum, f) => sum + f.rowCount, 0).toLocaleString()} enriched rows
+              </p>
+              <p className="text-xs text-muted-foreground">
+                This may take 10-30 seconds for large datasets
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Match Results */}
       {selectedIdentifiers.length > 0 && !isProcessing && (
