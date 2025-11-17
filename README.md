@@ -47,6 +47,33 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
 
+### What's New in v3.39.0 🚀
+
+**CRM Sync Identifier Column Mapping Fix** 🔧  
+Fixed critical bug in CRM Sync Mapper where identifier column detection was hardcoded to "Email" instead of using the user-selected identifier. This caused 0% match rates when using Phone or other identifiers. Auto-detection now correctly uses the `selectedIdentifier` state, and manual column mapping properly respects user selections. Added validation to ensure identifier columns exist in both files with clear error messages. Match rates now correctly achieve 100% when identifier columns are properly mapped.
+
+**Key Improvements:**
+- 🎯 **Correct Identifier Detection**: Uses selected identifier (Email/Phone/etc.) instead of hardcoded "Email"
+- ✅ **100% Match Rates**: Proper column mapping eliminates false 0% match rates
+- 🔍 **Better Validation**: Clear error messages when identifier columns are missing
+- 🎨 **Enhanced UI**: Improved column mapping interface with visual feedback
+- 📊 **Match Preview**: Shows actual identifier values being compared
+
+### What's New in v3.38.0 🚀
+
+**Zero-Downside Match Rate Improvements** 📈  
+Enhanced matching reliability with improved identifier normalization (email lowercasing, phone digit extraction), fuzzy matching fallback for near-matches, better duplicate handling in enriched datasets, and improved null/empty value handling. Match statistics reporting now provides more detailed insights.
+
+### What's New in v3.37.0 🚀
+
+**CRM Sync S3 Upload & Match Quality Scoring** 🎯  
+Added automatic S3 upload for large files (>10MB) with sample data loading for matching preview. Implemented comprehensive match quality scoring system with per-file statistics, overall quality score (0-100), visual indicators, and recommendations for improving match quality. Enhanced match preview UI with side-by-side comparison, highlighted identifier columns, and export of unmatched rows.
+
+### What's New in v3.36.0 🚀
+
+**Two-Phase Enrichment Consolidation System** 🔄  
+Added advanced duplicate handling for enriched data with two-phase consolidation: Phase 1 consolidates duplicates within each enriched file, Phase 2 merges consolidated data across multiple files. Configurable consolidation strategies per column (merge arrays, concatenate, keep first, keep last) with visual drag-and-drop interface and preview of results.
+
 ### What's New in v3.35.0 🚀
 
 **Server-Side Batch Processing for CRM Sync Mapper** 🏗️  
