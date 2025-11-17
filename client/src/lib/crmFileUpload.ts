@@ -45,42 +45,72 @@ export async function uploadCSVToS3(
 
 /**
  * Extract minimal metadata (columns + row count estimate)
- * Only parses first 100 rows to avoid memory issues
+ * Reads full header row to ensure accurate column names, then samples 100 rows for row count
  */
 async function extractMinimalMetadata(
   file: File,
   onProgress?: (percent: number) => void
 ): Promise<{ rowCount: number; columns: string[] }> {
   return new Promise((resolve, reject) => {
-    let columns: string[] = [];
-    let sampleRowCount = 0;
+    // First pass: Read only the header row to get accurate column names
+    const reader = new FileReader();
     
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      preview: 100, // Only parse first 100 rows
-      complete: (results) => {
-        if (results.meta.fields) {
-          columns = results.meta.fields;
-        }
-        sampleRowCount = results.data.length;
-        
-        // Estimate total rows based on file size
-        // Rough estimate: file size / average row size
-        const avgRowSize = file.size / sampleRowCount;
-        const estimatedRows = Math.floor(file.size / avgRowSize);
-        
-        if (onProgress) onProgress(10);
-        
-        resolve({
-          rowCount: estimatedRows,
-          columns,
-        });
-      },
-      error: (error) => {
-        reject(new Error(`Failed to parse CSV: ${error.message}`));
-      },
-    });
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (!text) {
+        reject(new Error('Failed to read file'));
+        return;
+      }
+      
+      // Parse just the first line to get headers
+      const firstLineEnd = text.indexOf('\n');
+      const headerLine = firstLineEnd > 0 ? text.substring(0, firstLineEnd) : text;
+      
+      // Parse header line to extract column names
+      Papa.parse(headerLine, {
+        header: false,
+        skipEmptyLines: true,
+        complete: (headerResults) => {
+          const columns = headerResults.data[0] as string[];
+          
+          // Second pass: Parse sample rows for row count estimation
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            preview: 100, // Only parse first 100 rows for estimation
+            complete: (results) => {
+              const sampleRowCount = results.data.length;
+              
+              // Estimate total rows based on file size
+              // Rough estimate: file size / average row size
+              const avgRowSize = file.size / sampleRowCount;
+              const estimatedRows = Math.floor(file.size / avgRowSize);
+              
+              if (onProgress) onProgress(10);
+              
+              resolve({
+                rowCount: estimatedRows,
+                columns,
+              });
+            },
+            error: (error) => {
+              reject(new Error(`Failed to parse CSV: ${error.message}`));
+            },
+          });
+        },
+        error: (error) => {
+          reject(new Error(`Failed to parse CSV header: ${error.message}`));
+        },
+      });
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+    
+    // Read first 10KB to get header (should be more than enough)
+    const headerBlob = file.slice(0, 10240);
+    reader.readAsText(headerBlob);
   });
 }
 

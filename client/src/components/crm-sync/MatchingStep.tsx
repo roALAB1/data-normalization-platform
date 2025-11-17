@@ -131,17 +131,27 @@ export default function MatchingStep({
   }, [selectedIdentifiers, originalFile, enrichedFiles, appliedInputMappings]);
 
   const handleContinue = () => {
-    // Convert inputMappings object to array format
-    const inputMappingsArray = Object.entries(appliedInputMappings).flatMap(([enrichedFileId, mappings]) => {
-      if (typeof mappings === 'object' && mappings !== null) {
-        return Object.entries(mappings as Record<string, string>).map(([originalColumn, enrichedColumn]) => ({
-          originalColumn,
-          enrichedColumn,
-          enrichedFileId,
-        }));
-      }
-      return [];
+    // CRITICAL FIX: Auto-apply pending mappings before continuing
+    // This ensures mappings are sent to backend even if user forgets to click "Apply Mappings"
+    const mappingsToUse = Object.keys(inputMappings).length > Object.keys(appliedInputMappings).length
+      ? inputMappings  // Use pending mappings if they exist
+      : appliedInputMappings;  // Otherwise use already applied mappings
+    
+    console.log('[MatchingStep] Continuing with mappings:', mappingsToUse);
+    console.log('[MatchingStep] Enriched files:', enrichedFiles.map(f => ({ id: f.id, name: f.name })));
+    
+    // CRITICAL FIX: Convert flat inputMappings object to array format
+    // mappingsToUse is { enrichedColumn: originalColumn }, not nested by file ID
+    // We need to create one mapping entry per enriched file
+    const inputMappingsArray = enrichedFiles.flatMap(enrichedFile => {
+      return Object.entries(mappingsToUse).map(([enrichedColumn, originalColumn]) => ({
+        originalColumn,
+        enrichedColumn,
+        enrichedFileId: enrichedFile.id,
+      }));
     });
+    
+    console.log('[MatchingStep] Input mappings array:', inputMappingsArray);
 
     onContinue({
       identifier: selectedIdentifiers.join(', '), // Pass comma-separated list

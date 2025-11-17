@@ -2005,7 +2005,7 @@ Jose,Alvarez,,,
   - [x] Performance test (1)
   - [x] Match statistics tests (2)
 - [x] Update VERSION_HISTORY.md
-- [ ] Create checkpoint v3.38.0
+- [x] Create checkpoint v3.38.0
 
 **Expected Results:**
 - Match rate improvement: +13-18 percentage points
@@ -2016,3 +2016,88 @@ Jose,Alvarez,,,
 - Zero performance penalty
 - Zero infrastructure changes
 
+
+---
+
+## v3.38.1 - CRITICAL BUG FIX: CRM Sync Identifier Column Error
+
+**Status:** IN PROGRESS
+
+**Problem:** User gets "File missing identifier column: Email" error at Step 5 (Output & Download) when trying to submit merge job with multiple enriched files. This blocks the entire CRM Sync workflow from completing.
+
+**User Report:**
+- Published site: Cannot even add multiple enriched files
+- Dev server: Can add multiple files but fails at Step 5 with identifier error
+- Error message: "File missing identifier column: Email"
+
+**Root Cause Investigation:**
+- [ ] Check CRMMergeProcessor validation logic
+- [ ] Check how enriched files are stored after upload
+- [ ] Check if identifier column is preserved in file metadata
+- [ ] Check if sample data loading affects column detection
+- [ ] Review v3.35.2 hybrid upload changes (files > 10MB use S3 + sample data)
+
+**Suspected Issues:**
+1. Sample data (1000 rows) may not include identifier column
+2. Column names may be getting lost during S3 upload/download
+3. Validation may be checking wrong file object (sample vs full data)
+4. Published site may have different behavior than dev server
+
+**Tasks:**
+- [ ] Reproduce the error with test files
+- [ ] Add debug logging to identify where column is lost
+- [ ] Fix the bug (likely in file upload or validation)
+- [ ] Test with multiple enriched files
+- [ ] Verify identifier column is preserved throughout workflow
+- [ ] Test on both dev server and published site
+- [ ] Create checkpoint v3.38.1
+- [ ] Deploy fix to published site
+
+**Expected Result:**
+Users can successfully complete CRM Sync workflow with multiple enriched files without "missing identifier column" error.
+
+
+---
+
+## v3.38.1 - COMPLETED ✅
+
+**Bug Fixed:** CRM Sync identifier column mapping
+
+**Root Cause:**
+- Input mappings were stored as flat object `{ enrichedColumn: originalColumn }`
+- Conversion to array format was incorrect, resulting in empty array
+- Backend never received the mappings, so identifier column (Email) wasn't found in enriched files
+
+**Fixes Applied:**
+1. ✅ Fixed `extractMinimalMetadata` to read full header row (not just preview)
+2. ✅ Fixed `consolidateEnrichedFiles` to use stored column names from FileMetadata
+3. ✅ Fixed `consolidateEnrichedFiles` to apply input mappings before validation
+4. ✅ Fixed `handleContinue` to auto-apply pending mappings
+5. ✅ Fixed `handleContinue` to properly convert flat mappings to array format
+6. ✅ Added detailed error logging throughout the pipeline
+
+**Result:** CRM Sync now successfully processes files with different column names between original and enriched files.
+
+---
+
+## v3.39.0 - UI Improvements: Column Selection Step
+
+**Status:** COMPLETED ✅
+
+**Feature Requests:**
+1. [x] Add "Select All" button in Step 4 (Column Selection)
+2. [x] Add "Deselect All" button in Step 4 (Column Selection)
+3. [x] Add grouped column selection by category:
+   - [x] Company columns (COMPANY_*) - Quick Select button
+   - [x] Personal columns (PERSONAL_*) - Quick Select button
+   - [x] Skiptrace columns (SKIPTRACE_*) - Quick Select button
+   - [x] Contact columns (EMAIL, PHONE, NUMBER) - Quick Select button
+
+**Implementation Plan:**
+- Add bulk action buttons to ColumnSelectionStep component
+- Detect column groups based on column name prefixes
+- Add group selection UI (checkboxes or buttons)
+- Preserve existing functionality (individual selection still works)
+
+**Expected Result:**
+Users can quickly select/deselect large numbers of columns instead of clicking 50+ individual checkboxes.

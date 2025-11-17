@@ -205,12 +205,103 @@ export default function ColumnSelectionStep({
 
           {/* Enriched Columns */}
           <div>
-            <h4 className="font-medium mb-3">
-              Enriched Columns{" "}
-              <Badge variant="outline" className="ml-2">
-                Select to Add
-              </Badge>
-            </h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium">
+                Enriched Columns{" "}
+                <Badge variant="outline" className="ml-2">
+                  {selectedEnrichedColumns.size} of {enrichedColumns.length} selected
+                </Badge>
+              </h4>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const allEnrichedCols = enrichedColumns.map(c => c.name);
+                    setSelectedEnrichedColumns(new Set(allEnrichedCols));
+                  }}
+                >
+                  Select All
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedEnrichedColumns(new Set())}
+                >
+                  Deselect All
+                </Button>
+              </div>
+            </div>
+            
+            {/* Group Selection Buttons */}
+            <div className="flex flex-wrap gap-2 mb-4 p-3 bg-muted/30 rounded-lg">
+              <span className="text-sm font-medium text-muted-foreground">Quick Select:</span>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const companyCols = enrichedColumns
+                    .filter(c => c.name.startsWith('COMPANY_'))
+                    .map(c => c.name);
+                  setSelectedEnrichedColumns(prev => {
+                    const newSet = new Set(prev);
+                    companyCols.forEach(col => newSet.add(col));
+                    return newSet;
+                  });
+                }}
+              >
+                + Company ({enrichedColumns.filter(c => c.name.startsWith('COMPANY_')).length})
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const personalCols = enrichedColumns
+                    .filter(c => c.name.startsWith('PERSONAL_'))
+                    .map(c => c.name);
+                  setSelectedEnrichedColumns(prev => {
+                    const newSet = new Set(prev);
+                    personalCols.forEach(col => newSet.add(col));
+                    return newSet;
+                  });
+                }}
+              >
+                + Personal ({enrichedColumns.filter(c => c.name.startsWith('PERSONAL_')).length})
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const skiptraceCols = enrichedColumns
+                    .filter(c => c.name.startsWith('SKIPTRACE_'))
+                    .map(c => c.name);
+                  setSelectedEnrichedColumns(prev => {
+                    const newSet = new Set(prev);
+                    skiptraceCols.forEach(col => newSet.add(col));
+                    return newSet;
+                  });
+                }}
+              >
+                + Skiptrace ({enrichedColumns.filter(c => c.name.startsWith('SKIPTRACE_')).length})
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const contactCols = enrichedColumns
+                    .filter(c => c.name.includes('EMAIL') || c.name.includes('PHONE') || c.name.includes('NUMBER'))
+                    .map(c => c.name);
+                  setSelectedEnrichedColumns(prev => {
+                    const newSet = new Set(prev);
+                    contactCols.forEach(col => newSet.add(col));
+                    return newSet;
+                  });
+                }}
+              >
+                + Contact Info ({enrichedColumns.filter(c => c.name.includes('EMAIL') || c.name.includes('PHONE') || c.name.includes('NUMBER')).length})
+              </Button>
+            </div>
+            
             <div className="space-y-2">
               {enrichedColumns.map((col) => (
                 <label

@@ -98,11 +98,24 @@ export class EnrichmentConsolidator {
    * Validate that all files have the identifier column
    */
   private validateInputs(files: ParsedCSV[]): void {
-    for (const file of files) {
+    console.log(`[EnrichmentConsolidator] Validating ${files.length} files for identifier column: "${this.config.identifierColumn}"`);
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      console.log(`[EnrichmentConsolidator] File ${i + 1} headers (${file.headers.length} total):`, file.headers);
+      console.log(`[EnrichmentConsolidator] File ${i + 1} checking for identifier: "${this.config.identifierColumn}"`);
+      console.log(`[EnrichmentConsolidator] File ${i + 1} includes check result:`, file.headers.includes(this.config.identifierColumn));
+      
       if (!file.headers.includes(this.config.identifierColumn)) {
-        throw new Error(`File missing identifier column: ${this.config.identifierColumn}`);
+        console.error(`[EnrichmentConsolidator] ERROR: File ${i + 1} missing identifier column!`);
+        console.error(`[EnrichmentConsolidator] Expected: "${this.config.identifierColumn}"`);
+        console.error(`[EnrichmentConsolidator] Available columns:`, file.headers);
+        console.error(`[EnrichmentConsolidator] First few rows:`, file.rows.slice(0, 2));
+        throw new Error(`File missing identifier column: ${this.config.identifierColumn}. Available columns: ${file.headers.join(', ')}`);
       }
     }
+    
+    console.log(`[EnrichmentConsolidator] ✓ All files have identifier column: "${this.config.identifierColumn}"`);
   }
 
   /**

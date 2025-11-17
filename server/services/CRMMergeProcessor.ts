@@ -218,21 +218,60 @@ export class CRMMergeProcessor {
     masterFile: ParsedCSV;
     stats: any;
   }> {
+    // Determine identifier column from first selected identifier
+    const identifierColumn = this.jobData.selectedIdentifiers[0];
+    
+    console.log(`[CRMMergeProcessor] Looking for identifier column: "${identifierColumn}"`);
+    console.log(`[CRMMergeProcessor] Input mappings:`, this.jobData.inputMappings);
+    
     // Convert enriched data sets to ParsedCSV format
     const parsedFiles: ParsedCSV[] = enrichedDataSets.map((dataSet, index) => {
       const enrichedFile = this.jobData.enrichedFiles[index];
       
-      // Get headers from first row
-      const headers = dataSet.length > 0 ? Object.keys(dataSet[0]) : [];
+      // CRITICAL FIX: Use stored column names from FileMetadata instead of extracting from parsed data
+      // This ensures column names match what was detected during upload, even if Papa.parse
+      // returns different keys (e.g., due to special characters, quotes, etc.)
+      let headers = enrichedFile.columns.length > 0 
+        ? enrichedFile.columns 
+        : (dataSet.length > 0 ? Object.keys(dataSet[0]) : []);
+      
+      console.log(`[CRMMergeProcessor] Enriched file ${index + 1} original headers:`, headers);
+      
+      // CRITICAL FIX v2: Apply input mappings to rename columns
+      // Find mappings for this enriched file
+      const fileMappings = this.jobData.inputMappings.filter(m => m.enrichedFileId === enrichedFile.id);
+      
+      if (fileMappings.length > 0) {
+        console.log(`[CRMMergeProcessor] Applying ${fileMappings.length} input mappings to file ${index + 1}`);
+        
+        // Create a mapping lookup: enrichedColumn -> originalColumn
+        const mappingLookup = new Map<string, string>();
+        fileMappings.forEach(m => {
+          mappingLookup.set(m.enrichedColumn, m.originalColumn);
+          console.log(`[CRMMergeProcessor]   ${m.enrichedColumn} -> ${m.originalColumn}`);
+        });
+        
+        // Rename headers according to mappings
+        headers = headers.map(h => mappingLookup.get(h) || h);
+        
+        // Rename keys in data rows
+        dataSet = dataSet.map(row => {
+          const newRow: Record<string, any> = {};
+          for (const [key, value] of Object.entries(row)) {
+            const newKey = mappingLookup.get(key) || key;
+            newRow[newKey] = value;
+          }
+          return newRow;
+        });
+        
+        console.log(`[CRMMergeProcessor] File ${index + 1} headers after mapping:`, headers);
+      }
       
       return {
         headers,
         rows: dataSet
       };
     });
-
-    // Determine identifier column from first selected identifier
-    const identifierColumn = this.jobData.selectedIdentifiers[0];
 
     // Configure consolidation
     const config: ConsolidationConfig = {
