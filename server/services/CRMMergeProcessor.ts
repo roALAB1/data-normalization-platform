@@ -237,34 +237,39 @@ export class CRMMergeProcessor {
       
       console.log(`[CRMMergeProcessor] Enriched file ${index + 1} original headers:`, headers);
       
-      // CRITICAL FIX v2: Apply input mappings to rename columns
-      // Find mappings for this enriched file
+      // CRITICAL FIX v3.39.2: Create virtual identifier columns for matching
+      // Problem: Enriched files have columns like BUSINESS_EMAIL, but we need to match on "Email"
+      // Solution: Add virtual identifier columns (e.g., "Email") that copy values from enriched columns
+      // This allows matching to work while keeping original enriched column names intact
+      
       const fileMappings = this.jobData.inputMappings.filter(m => m.enrichedFileId === enrichedFile.id);
       
       if (fileMappings.length > 0) {
-        console.log(`[CRMMergeProcessor] Applying ${fileMappings.length} input mappings to file ${index + 1}`);
+        console.log(`[CRMMergeProcessor] Found ${fileMappings.length} input mappings for file ${index + 1}`);
         
-        // Create a mapping lookup: enrichedColumn -> originalColumn
+        // Create mapping lookup: originalColumn -> enrichedColumn
         const mappingLookup = new Map<string, string>();
         fileMappings.forEach(m => {
-          mappingLookup.set(m.enrichedColumn, m.originalColumn);
-          console.log(`[CRMMergeProcessor]   ${m.enrichedColumn} -> ${m.originalColumn}`);
+          mappingLookup.set(m.originalColumn, m.enrichedColumn);
+          console.log(`[CRMMergeProcessor]   ${m.originalColumn} <- ${m.enrichedColumn}`);
         });
         
-        // Rename headers according to mappings
-        headers = headers.map(h => mappingLookup.get(h) || h);
+        // Add virtual identifier columns to headers
+        const virtualColumns = Array.from(mappingLookup.keys());
+        headers = [...headers, ...virtualColumns];
         
-        // Rename keys in data rows
+        // Add virtual identifier columns to data rows
         dataSet = dataSet.map(row => {
-          const newRow: Record<string, any> = {};
-          for (const [key, value] of Object.entries(row)) {
-            const newKey = mappingLookup.get(key) || key;
-            newRow[newKey] = value;
+          const newRow = { ...row };
+          for (const [originalColumn, enrichedColumn] of mappingLookup.entries()) {
+            // Copy value from enriched column to virtual identifier column
+            newRow[originalColumn] = row[enrichedColumn] || '';
           }
           return newRow;
         });
         
-        console.log(`[CRMMergeProcessor] File ${index + 1} headers after mapping:`, headers);
+        console.log(`[CRMMergeProcessor] Added ${virtualColumns.length} virtual identifier columns:`, virtualColumns);
+        console.log(`[CRMMergeProcessor] File ${index + 1} headers after adding virtual columns:`, headers.slice(0, 10), '...');
       }
       
       return {
@@ -299,12 +304,13 @@ export class CRMMergeProcessor {
     const { selectedIdentifiers, inputMappings, arrayStrategies } = this.jobData;
 
     // Build mapping lookup: originalColumn -> enrichedColumn
+    // This is used to find which enriched column corresponds to each original identifier
     const mappingLookup = new Map<string, string>();
     for (const mapping of inputMappings) {
-      // For master file, we just need the enriched column name
-      // (no file ID needed since there's only one master file)
       mappingLookup.set(mapping.originalColumn, mapping.enrichedColumn);
     }
+    
+    console.log('[CRMMergeProcessor] Mapping lookup for matching:', Array.from(mappingLookup.entries()));
 
     // Build hash index for master enriched file (O(n) instead of O(n²))
     // Key: normalized identifier value -> array of { rowIndex, matchedIdentifier }
@@ -313,9 +319,9 @@ export class CRMMergeProcessor {
     masterEnrichedData.forEach((enrichedRow, enrichedIndex_idx) => {
       // For each identifier, index this row
       for (const identifier of selectedIdentifiers) {
-        const enrichedColumn = mappingLookup.get(identifier);
-        if (!enrichedColumn) continue;
-
+        // Try to find mapped enriched column, otherwise use identifier as-is
+        const enrichedColumn = mappingLookup.get(identifier) || identifier;
+        
         const enrichedValue = this.normalizeValue(enrichedRow[enrichedColumn]);
         const strategy = arrayStrategies[enrichedColumn] || 'first';
         const enrichedCompareValue = this.extractArrayValue(enrichedValue, strategy);
@@ -511,13 +517,50 @@ export class CRMMergeProcessor {
 
     // Filter to only selected columns
     const selectedColumns = columnConfigs.filter(c => c.selected).map(c => c.name);
-    console.log(`[CRMMergeProcessor] Applying column selection: ${selectedColumns.length} columns`);
+    console.log(`[CRMMergeProcessor] ========== COLUMN SELECTION DEBUG ==========`);
+    console.log(`[CRMMergeProcessor] Total column configs: ${columnConfigs.length}`);
+    console.log(`[CRMMergeProcessor] Selected columns (${selectedColumns.length}):`, selectedColumns);
     
-    return mergedData.map(row => {
+    if (mergedData.length > 0) {
+      const availableColumns = Object.keys(mergedData[0]);
+      console.log(`[CRMMergeProcessor] Available columns in merged data (${availableColumns.length}):`, availableColumns);
+      
+      // Check which selected columns are missing from merged data
+      const missingColumns = selectedColumns.filter(col => !availableColumns.includes(col));
+      if (missingColumns.length > 0) {
+        console.error(`[CRMMergeProcessor] ⚠️ WARNING: ${missingColumns.length} selected columns are MISSING from merged data:`, missingColumns);
+      }
+      
+      // Check first row data for enriched columns
+      const firstRow = mergedData[0];
+      const enrichedColumns = selectedColumns.filter(col => 
+        !this.jobData.originalFile.columns.includes(col)
+      );
+      console.log(`[CRMMergeProcessor] Enriched columns in selection (${enrichedColumns.length}):`, enrichedColumns);
+      console.log(`[CRMMergeProcessor] First row enriched data sample:`);
+      enrichedColumns.slice(0, 5).forEach(col => {
+        console.log(`  ${col}: ${JSON.stringify(firstRow[col])}`);
+      });
+    }
+    
+    return mergedData.map((row, index) => {
       const filteredRow: Record<string, any> = {};
       for (const column of selectedColumns) {
-        filteredRow[column] = row[column] || '';
+        filteredRow[column] = row[column] !== undefined ? row[column] : '';
       }
+      
+      // Debug first row
+      if (index === 0) {
+        console.log(`[CRMMergeProcessor] First filtered row columns:`, Object.keys(filteredRow));
+        const enrichedCols = selectedColumns.filter(col => 
+          !this.jobData.originalFile.columns.includes(col)
+        );
+        console.log(`[CRMMergeProcessor] First filtered row enriched values:`);
+        enrichedCols.slice(0, 5).forEach(col => {
+          console.log(`  ${col}: ${JSON.stringify(filteredRow[col])}`);
+        });
+      }
+      
       return filteredRow;
     });
   }

@@ -2101,3 +2101,31 @@ Users can successfully complete CRM Sync workflow with multiple enriched files w
 
 **Expected Result:**
 Users can quickly select/deselect large numbers of columns instead of clicking 50+ individual checkboxes.
+
+
+---
+
+## v3.40.0 - CRITICAL: Enriched Columns Empty in CRM Merge Output
+
+**Status:** IN PROGRESS
+
+**Issue:** Enriched data columns are present in output CSV headers but all values are empty
+- Headers correctly show: FIRST_NAME, LAST_NAME, PERSONAL_ADDRESS, DIRECT_NUMBER, MOBILE_PHONE, BUSINESS_EMAIL, etc.
+- All enriched column values are empty (no data from enriched files)
+- Original file columns (First Name, Last Name, Email) have data ✅
+- Match rates show correct percentages in UI
+- Quick Select buttons work correctly ✅
+- No alternating blank lines ✅
+
+**Root Cause:** Data merging logic in CRMMergeProcessor not copying enriched data to output rows
+
+**Tasks:**
+- [ ] Investigate CRMMergeProcessor.ts mergeData() method
+- [ ] Check if matched enriched rows are being found correctly
+- [ ] Verify enriched data is being copied to output rows
+- [ ] Check if column selection is being applied correctly
+- [ ] Add debug logging to trace data flow
+- [ ] Fix data merging logic
+- [ ] Test with user's dataset (jerry files, 219k rows)
+- [ ] Verify all selected enriched columns have data in output
+- [ ] Create checkpoint v3.40.0
