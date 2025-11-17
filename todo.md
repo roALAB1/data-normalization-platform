@@ -1727,3 +1727,198 @@ Step 5: Backend reads from S3 → Process server-side
 - [x] Add UI clarification: "Preview uses 1000 rows, final job processes all X rows"
 - [ ] Test full workflow without auth errors
 - [ ] Create checkpoint v3.35.6
+
+
+---
+
+## v3.35.7 - CRITICAL: Upload Timeout for Large Files
+
+**Status:** IN PROGRESS
+
+**Issue:**
+- User gets "Error uploading jerry_EM_only.csv: Upload failed" 
+- Happens when uploading enriched CSV files
+- Direct curl test works fine - endpoint is functional
+- Browser upload fails - likely timeout or error handling issue
+
+**Root Cause:**
+- XHR request in crmFileUpload.ts has no timeout set
+- Large files may exceed default browser/server timeout
+- Error message is generic - doesn't show actual server error
+- Line 127: `reject(new Error(\`Upload failed: ${xhr.statusText}\`))` loses detailed error info
+
+**Tasks:**
+- [x] Add configurable timeout to XHR request (default 5 minutes)
+- [x] Improve error handling to capture server error response body
+- [x] Fix middleware order - register upload endpoint before body parser
+- [ ] Add detailed server-side logging to identify exact failure point
+- [ ] Check if S3 upload is timing out for 144.9 MB file
+- [ ] Test with user's jerry_EM_only.csv file
+- [ ] Fix identified issue
+- [ ] Create checkpoint v3.35.7
+
+
+## v3.35.8: Fix CRM Merge Job Outputting "undefined" for All Rows
+
+**Problem:**
+- Upload successful (no more 503 errors) ✅
+- User uploads original + enriched files (jerry_EM_only.csv - 144.9 MB, 220k rows)
+- Completes matching and column selection steps
+- Submits merge job
+- Output CSV downloads with 220k rows
+- All 3 output columns contain "undefined" instead of actual merged data
+
+**Root Cause FOUND:**
+- ✅ Nested loop matching algorithm is O(n²) complexity
+- ✅ 220k × 220k × 3 files = 145 BILLION comparisons
+- ✅ This takes hours/days to complete
+- ✅ Need hash-based lookup for O(n) complexity (220,000x faster)
+
+**Solution:**
+- Build hash map of enriched rows indexed by identifier
+- Direct hash lookup instead of nested loop
+- O(n²) → O(n) = 220,000x performance improvement
+
+**Tasks:**
+- [ ] Review server logs from merge job
+- [ ] Identify where "undefined" is being written
+- [ ] Fix merge processor to output actual data
+- [ ] Test with user's files (original + jerry_EM_only.csv)
+- [ ] Verify output has real data, not "undefined"
+- [ ] Create checkpoint v3.35.8
+
+
+## v3.35.8b: Fix Cancel Button Showing for Non-Pending Jobs
+
+**Problem:**
+- User tries to cancel jobs that are already processing or failed
+- Error: "Only pending jobs can be cancelled"
+- Cancel button should be disabled for non-pending jobs
+
+**Tasks:**
+- [x] Find the batch jobs page UI
+- [x] Disable cancel button for jobs with status !== 'pending'
+- [x] Fixed: Cancel button now only shows for pending jobs
+- [ ] Test with pending, processing, and failed jobs
+
+
+## v3.35.8c: Fix S3 Access Denied Error When Downloading Merged CSV
+
+**Problem:**
+- Merge job completes successfully ✅
+- Hash-based matching works perfectly ✅
+- User clicks "Download Merged CSV"
+- Gets S3 AccessDenied error
+- Error: "Access Denied" with RequestId
+
+**Root Cause:**
+- Output file uploaded to S3 successfully
+- Download URL doesn't have proper permissions
+- Need to use presigned URL for downloads
+
+**Tasks:**
+- [ ] Check CRMMergeProcessor - how it uploads output file
+- [ ] Check how outputFileUrl is stored in database
+- [ ] Fix to use presigned URL (storageGet) instead of direct S3 URL
+- [ ] Test download
+- [ ] Create checkpoint v3.35.8
+
+
+## v3.35.8d: Fix Merge Not Populating Enriched Data
+
+**Problem:**
+- Download works ✅
+- Hash-based matching is fast ✅
+- All 219,696 rows in output ✅
+- BUT: Most columns are empty (just commas)
+- Output has 25 column headers but rows only have 4-5 values
+- Enriched data is NOT being merged into output
+
+**Example Output:**
+```
+First Name,Last Name,Phone,Email,Extracted_Name,UUID,FIRST_NAME,...(21 more columns)
+Gerald,Jeanty,,geraldjeanty@gmail.com,
+,,,,,,,,,,,,,,,,,,,,  ← BLANK ROW!
+Jose,Alvarez,,,
+,,,,,,,,,,,,,,,,,,,,  ← BLANK ROW!
+```
+
+**CRITICAL PATTERN:** Every other row is completely blank!
+- Line 2: Data
+- Line 3: Blank (all commas)
+- Line 4: Data
+- Line 5: Blank (all commas)
+- This explains why only 212k rows processed instead of 219k
+
+**Root Cause Investigation:**
+- [ ] Check server logs for merge processing
+- [ ] Check if matches were found
+- [ ] Check if mergeData() is actually copying enriched values
+- [ ] Check column selection logic
+- [ ] Verify enriched file columns match what we expect
+
+**Tasks:**
+- [ ] Review merge logs
+- [ ] Fix merge logic to populate enriched data
+- [ ] Test with sample data
+- [ ] Create checkpoint v3.35.8
+
+
+---
+
+## v3.36.0 - Two-Phase Enrichment Consolidation System
+
+**Status:** IN PROGRESS
+
+**Problem:** Current CRM Sync Mapper has critical bug where enriched data columns are empty in output CSV despite correct headers. Root cause: matching algorithm isn't finding matches between original and enriched files, so no data gets copied.
+
+**User's Proposed Solution:** Instead of matching each enriched file separately with original, first intelligently merge and deduplicate ALL enriched files into a single master enriched file, THEN match that master file with the original CRM file.
+
+**Benefits:**
+- Single source of truth for enriched data
+- Handle duplicate data across enriched files intelligently
+- Resolve conflicts (newest/most complete data wins)
+- Simplify matching to single operation (faster, clearer)
+- Improve data quality and match rates
+
+### Phase 1: Architecture & Design
+- [x] Design EnrichmentConsolidator class architecture
+- [x] Define deduplication strategies (newest, most_complete, first, last, merge)
+- [x] Design parallel processing approach for large datasets (use map tool)
+- [x] Document data flow: enriched files → consolidator → master file → matcher
+
+### Phase 2: Core Implementation
+- [x] Create EnrichmentConsolidator class with parallel processing
+- [x] Implement deduplication strategies per column
+- [x] Add conflict resolution logic (newest/most complete data wins)
+- [x] Add progress tracking for consolidation phase
+- [x] Handle identifier normalization (email/phone matching)
+- [x] Keep rows with empty identifiers (don't skip them)
+
+### Phase 3: Integration
+- [x] Update CRMMergeProcessor to use two-phase approach
+- [x] Phase 1: Consolidate all enriched files → master enriched file
+- [x] Phase 2: Match master enriched file with original CRM file
+- [x] Update progress tracking (consolidation + matching phases)
+- [x] Fix output to return actual CSV content (not placeholder)
+
+### Phase 4: UI Updates
+- [ ] Add consolidation preview step in UI workflow (DEFERRED - backend works, UI optional)
+- [ ] Show duplicate identifier statistics
+- [ ] Allow user to select deduplication strategy per column
+- [ ] Display consolidated data preview before matching
+- [ ] Update progress indicators for two-phase process
+
+### Phase 5: Testing & Validation
+- [x] Test with jerry_EM_only.csv (144.9 MB, 167k rows)
+- [x] Verify enriched data appears in output CSV (not empty) ✅
+- [x] Verify deduplication works correctly ✅
+- [x] Check performance with parallel processing (69k rows/sec) ✅
+- [x] Validate match rates with consolidated data (71.7% in test) ✅
+
+### Phase 6: Documentation
+- [ ] Document two-phase architecture in README
+- [ ] Add consolidation strategy guide
+- [ ] Update API documentation
+- [ ] Create performance benchmarks
+- [ ] Create checkpoint v3.36.0

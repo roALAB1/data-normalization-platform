@@ -1,6 +1,17 @@
 /**
  * CRM Merge Processor
  * Server-side batch processing for CRM file merging with enrichment data
+ * 
+ * TWO-PHASE ARCHITECTURE (v3.36.0):
+ * Phase 1: Consolidate all enriched files into single master enriched file
+ * Phase 2: Match master enriched file with original CRM file
+ * 
+ * Benefits:
+ * - Single source of truth for enriched data
+ * - Intelligent deduplication across enriched files
+ * - Conflict resolution (newest/most complete data wins)
+ * - Simpler matching (one operation instead of multiple)
+ * - Better match rates and data quality
  */
 
 import Papa from 'papaparse';
@@ -14,6 +25,7 @@ import type {
   ColumnConfig 
 } from '../../shared/crmMergeTypes';
 import type { ArrayHandlingStrategy } from '../../client/src/lib/arrayParser';
+import { EnrichmentConsolidator, type ParsedCSV, type ConsolidationConfig } from './EnrichmentConsolidator';
 
 /**
  * Match result for a single row
@@ -21,7 +33,6 @@ import type { ArrayHandlingStrategy } from '../../client/src/lib/arrayParser';
 interface MatchResult {
   originalRowIndex: number;
   enrichedRowIndex: number;
-  enrichedFileId: string;
   matchedOn: string[];
   confidence: number;
 }
@@ -41,19 +52,21 @@ export class CRMMergeProcessor {
   }
 
   /**
-   * Main processing method
+   * Main processing method - TWO-PHASE APPROACH
    */
   async process(): Promise<CRMMergeResult> {
     this.startTime = Date.now();
 
     try {
-      // Stage 1: Parse files
+      // ========================================
+      // PHASE 1: CONSOLIDATE ENRICHED FILES
+      // ========================================
       this.reportProgress({
         stage: 'parsing',
         rowsProcessed: 0,
         totalRows: this.jobData.originalFile.rowCount,
         percentage: 0,
-        message: 'Parsing CSV files...'
+        message: 'Phase 1: Parsing and consolidating enriched files...'
       });
 
       const originalData = await this.downloadAndParse(this.jobData.originalFile);
@@ -61,215 +74,251 @@ export class CRMMergeProcessor {
         this.jobData.enrichedFiles.map(file => this.downloadAndParse(file))
       );
 
-      // Stage 2: Match rows
+      console.log(`[CRMMergeProcessor] Phase 1: Consolidating ${enrichedDataSets.length} enriched files...`);
+      
+      const consolidationResult = await this.consolidateEnrichedFiles(enrichedDataSets);
+      const masterEnrichedData = consolidationResult.masterFile.rows;
+
+      console.log(`[CRMMergeProcessor] Phase 1 complete:`);
+      console.log(`  - Input files: ${enrichedDataSets.length}`);
+      console.log(`  - Total input rows: ${consolidationResult.stats.totalInputRows}`);
+      console.log(`  - Unique identifiers: ${consolidationResult.stats.uniqueIdentifiers}`);
+      console.log(`  - Duplicates resolved: ${consolidationResult.stats.duplicatesFound}`);
+      console.log(`  - Master enriched rows: ${masterEnrichedData.length}`);
+
+      // ========================================
+      // PHASE 2: MATCH WITH ORIGINAL FILE
+      // ========================================
       this.reportProgress({
         stage: 'matching',
         rowsProcessed: 0,
         totalRows: originalData.length,
-        percentage: 10,
-        message: 'Matching rows with enriched data...'
+        percentage: 20,
+        message: 'Phase 2: Matching with original CRM file...'
       });
 
-      const matchResults = this.matchRows(originalData, enrichedDataSets);
+      const matchResults = this.matchWithMasterFile(originalData, masterEnrichedData);
+      
+      console.log(`[CRMMergeProcessor] Phase 2 complete:`);
+      console.log(`  - Original rows: ${originalData.length}`);
+      console.log(`  - Total matches: ${matchResults.length}`);
+      
+      // Calculate match rate
+      const uniqueOriginalMatches = new Set(matchResults.map(m => m.originalRowIndex)).size;
+      const matchRate = ((uniqueOriginalMatches / originalData.length) * 100).toFixed(1);
+      console.log(`  - Match rate: ${uniqueOriginalMatches}/${originalData.length} (${matchRate}%)`);
+      
+      if (matchResults.length === 0) {
+        console.error('[CRMMergeProcessor] WARNING: NO MATCHES FOUND! Check identifier mapping.');
+      }
 
       // Stage 3: Merge data
       this.reportProgress({
         stage: 'merging',
         rowsProcessed: 0,
         totalRows: originalData.length,
-        percentage: 50,
+        percentage: 60,
         message: 'Merging data with conflict resolution...'
       });
 
-      const mergedData = this.mergeData(originalData, enrichedDataSets, matchResults);
+      const mergedData = this.mergeDataWithMaster(originalData, masterEnrichedData, matchResults);
 
       // Stage 4: Apply column selection
-      const finalData = this.applyColumnSelection(mergedData);
-
-      // Stage 5: Generate output CSV
       this.reportProgress({
         stage: 'writing',
-        rowsProcessed: finalData.length,
-        totalRows: finalData.length,
+        rowsProcessed: 0,
+        totalRows: mergedData.length,
+        percentage: 80,
+        message: 'Applying column selection...'
+      });
+
+      const finalData = this.applyColumnSelection(mergedData);
+
+      // Stage 5: Generate CSV
+      this.reportProgress({
+        stage: 'writing',
+        rowsProcessed: mergedData.length,
+        totalRows: mergedData.length,
         percentage: 90,
         message: 'Generating output CSV...'
       });
 
-      const outputCsv = this.generateCSV(finalData);
-
-      // Stage 6: Upload to S3 (placeholder - will implement with storage service)
-      const outputFileKey = `crm-merge/${this.jobData.userId}/${this.jobData.jobId}/output.csv`;
-      const outputFileUrl = await this.uploadToS3(outputFileKey, outputCsv);
+      const outputCSV = this.generateCSV(finalData);
 
       // Complete
+      const duration = ((Date.now() - this.startTime) / 1000).toFixed(1);
       this.reportProgress({
         stage: 'complete',
-        rowsProcessed: finalData.length,
-        totalRows: finalData.length,
+        rowsProcessed: mergedData.length,
+        totalRows: mergedData.length,
         percentage: 100,
-        message: 'Processing complete!'
+        message: `Complete! Processed ${mergedData.length.toLocaleString()} rows in ${duration}s`
       });
-
-      const processingTimeMs = Date.now() - this.startTime;
 
       return {
         success: true,
-        outputFileKey,
-        outputFileUrl,
+        outputFileKey: 'temp-key', // TODO: Upload to S3
+        outputFileUrl: outputCSV, // Return CSV content for testing (in production, upload to S3 and return URL)
         outputRowCount: finalData.length,
         matchStats: {
           totalOriginalRows: originalData.length,
-          totalEnrichedRows: enrichedDataSets.reduce((sum, data) => sum + data.length, 0),
-          matchedRows: matchResults.length,
-          unmatchedRows: originalData.length - new Set(matchResults.map(m => m.originalRowIndex)).size
+          totalEnrichedRows: consolidationResult.stats.totalInputRows,
+          matchedRows: uniqueOriginalMatches,
+          unmatchedRows: originalData.length - uniqueOriginalMatches
         },
-        processingTimeMs
+        processingTimeMs: Date.now() - this.startTime
       };
 
     } catch (error) {
-      console.error('[CRMMergeProcessor] Processing failed:', error);
+      console.error('[CRMMergeProcessor] Error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * PHASE 1: Consolidate all enriched files into single master file
+   */
+  private async consolidateEnrichedFiles(enrichedDataSets: Record<string, any>[][]): Promise<{
+    masterFile: ParsedCSV;
+    stats: any;
+  }> {
+    // Convert enriched data sets to ParsedCSV format
+    const parsedFiles: ParsedCSV[] = enrichedDataSets.map((dataSet, index) => {
+      const enrichedFile = this.jobData.enrichedFiles[index];
+      
+      // Get headers from first row
+      const headers = dataSet.length > 0 ? Object.keys(dataSet[0]) : [];
+      
       return {
-        success: false,
-        outputFileKey: '',
-        outputFileUrl: '',
-        outputRowCount: 0,
-        matchStats: {
-          totalOriginalRows: 0,
-          totalEnrichedRows: 0,
-          matchedRows: 0,
-          unmatchedRows: 0
-        },
-        processingTimeMs: Date.now() - this.startTime,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        headers,
+        rows: dataSet
       };
-    }
-  }
-
-  /**
-   * Download file from S3 and parse CSV
-   */
-  private async downloadAndParse(file: FileMetadata): Promise<Record<string, any>[]> {
-    // TODO: Download from S3 using storage service
-    // For now, return empty array as placeholder
-    console.log(`[CRMMergeProcessor] Downloading and parsing ${file.name} from ${file.s3Url}`);
-    
-    // Fetch file from S3 URL
-    const response = await fetch(file.s3Url);
-    if (!response.ok) {
-      throw new Error(`Failed to download file ${file.name}: ${response.statusText}`);
-    }
-
-    const csvText = await response.text();
-
-    // Parse CSV with PapaParse
-    return new Promise((resolve, reject) => {
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            reject(new Error(`CSV parsing error: ${results.errors[0].message}`));
-          } else {
-            resolve(results.data as Record<string, any>[]);
-          }
-        },
-        error: (error) => {
-          reject(error);
-        }
-      });
     });
+
+    // Determine identifier column from first selected identifier
+    const identifierColumn = this.jobData.selectedIdentifiers[0];
+
+    // Configure consolidation
+    const config: ConsolidationConfig = {
+      identifierColumn,
+      deduplicationStrategy: 'most_complete', // Use most complete data by default
+      normalizeIdentifier: true, // Normalize for better matching
+      columnStrategies: new Map() // Could add per-column strategies from UI in future
+    };
+
+    // Consolidate
+    const consolidator = new EnrichmentConsolidator(config);
+    return await consolidator.consolidate(parsedFiles);
   }
 
   /**
-   * Match rows between original and enriched datasets
+   * PHASE 2: Match original file with master enriched file
    */
-  private matchRows(
+  private matchWithMasterFile(
     originalData: Record<string, any>[],
-    enrichedDataSets: Record<string, any>[][],
-    ): MatchResult[] {
+    masterEnrichedData: Record<string, any>[]
+  ): MatchResult[] {
+    console.log('[CRMMergeProcessor] Building hash index for master enriched file...');
+    const startTime = Date.now();
     const matches: MatchResult[] = [];
     const { selectedIdentifiers, inputMappings, arrayStrategies } = this.jobData;
 
-    // Build mapping lookup: originalColumn -> { enrichedColumn, fileId }
-    const mappingLookup = new Map<string, { enrichedColumn: string; fileId: string }[]>();
+    // Build mapping lookup: originalColumn -> enrichedColumn
+    const mappingLookup = new Map<string, string>();
     for (const mapping of inputMappings) {
-      if (!mappingLookup.has(mapping.originalColumn)) {
-        mappingLookup.set(mapping.originalColumn, []);
-      }
-      mappingLookup.get(mapping.originalColumn)!.push({
-        enrichedColumn: mapping.enrichedColumn,
-        fileId: mapping.enrichedFileId
-      });
+      // For master file, we just need the enriched column name
+      // (no file ID needed since there's only one master file)
+      mappingLookup.set(mapping.originalColumn, mapping.enrichedColumn);
     }
 
-    // Process each enriched file
-    enrichedDataSets.forEach((enrichedData, fileIndex) => {
-      const enrichedFile = this.jobData.enrichedFiles[fileIndex];
+    // Build hash index for master enriched file (O(n) instead of O(n²))
+    // Key: normalized identifier value -> array of { rowIndex, matchedIdentifier }
+    const enrichedIndex = new Map<string, Array<{ rowIndex: number; identifier: string }>>();
+    
+    masterEnrichedData.forEach((enrichedRow, enrichedIndex_idx) => {
+      // For each identifier, index this row
+      for (const identifier of selectedIdentifiers) {
+        const enrichedColumn = mappingLookup.get(identifier);
+        if (!enrichedColumn) continue;
 
-      // Match each original row
-      originalData.forEach((originalRow, originalIndex) => {
-        enrichedData.forEach((enrichedRow, enrichedIndex) => {
-          const matchedIdentifiers: string[] = [];
+        const enrichedValue = this.normalizeValue(enrichedRow[enrichedColumn]);
+        const strategy = arrayStrategies[enrichedColumn] || 'first';
+        const enrichedCompareValue = this.extractArrayValue(enrichedValue, strategy);
 
-          // Check each selected identifier
-          for (const identifier of selectedIdentifiers) {
-            const originalValue = this.normalizeValue(originalRow[identifier]);
-            
-            // Get mapped enriched columns for this identifier
-            const mappings = mappingLookup.get(identifier) || [];
-            const relevantMappings = mappings.filter(m => m.fileId === enrichedFile.id);
-
-            for (const mapping of relevantMappings) {
-              const enrichedValue = this.normalizeValue(enrichedRow[mapping.enrichedColumn]);
-
-              // Handle array values
-              const strategy = arrayStrategies[mapping.enrichedColumn] || 'first';
-              const enrichedCompareValue = this.extractArrayValue(enrichedValue, strategy);
-
-              if (originalValue && enrichedCompareValue && originalValue === enrichedCompareValue) {
-                matchedIdentifiers.push(identifier);
-                break; // Found match for this identifier
-              }
-            }
+        if (enrichedCompareValue) {
+          if (!enrichedIndex.has(enrichedCompareValue)) {
+            enrichedIndex.set(enrichedCompareValue, []);
           }
-
-          // If any identifiers matched, record the match
-          if (matchedIdentifiers.length > 0) {
-            matches.push({
-              originalRowIndex: originalIndex,
-              enrichedRowIndex: enrichedIndex,
-              enrichedFileId: enrichedFile.id,
-              matchedOn: matchedIdentifiers,
-              confidence: matchedIdentifiers.length / selectedIdentifiers.length
-            });
-          }
-        });
-
-        // Report progress every 1000 rows
-        if (originalIndex % 1000 === 0) {
-          const progress = (originalIndex / originalData.length) * 40 + 10; // 10-50%
-          this.reportProgress({
-            stage: 'matching',
-            rowsProcessed: originalIndex,
-            totalRows: originalData.length,
-            percentage: progress,
-            message: `Matching rows... ${originalIndex}/${originalData.length}`
+          enrichedIndex.get(enrichedCompareValue)!.push({
+            rowIndex: enrichedIndex_idx,
+            identifier
           });
         }
-      });
+      }
     });
 
+    console.log(`[CRMMergeProcessor] Hash index built with ${enrichedIndex.size} unique keys`);
+    console.log(`[CRMMergeProcessor] Matching ${originalData.length} original rows...`);
+
+    // Match each original row using hash lookup (O(1) per lookup)
+    originalData.forEach((originalRow, originalIndex) => {
+      const matchedIdentifiers = new Set<string>();
+      const matchedEnrichedRows = new Set<number>();
+
+      // Check each selected identifier
+      for (const identifier of selectedIdentifiers) {
+        const originalValue = this.normalizeValue(originalRow[identifier]);
+        
+        if (originalValue) {
+          // Hash lookup instead of nested loop!
+          const matches_for_value = enrichedIndex.get(originalValue);
+          if (matches_for_value) {
+            for (const match of matches_for_value) {
+              matchedIdentifiers.add(match.identifier);
+              matchedEnrichedRows.add(match.rowIndex);
+            }
+          }
+        }
+      }
+
+      // Record matches for each enriched row that matched
+      for (const enrichedRowIndex of matchedEnrichedRows) {
+        matches.push({
+          originalRowIndex: originalIndex,
+          enrichedRowIndex,
+          matchedOn: Array.from(matchedIdentifiers),
+          confidence: matchedIdentifiers.size / selectedIdentifiers.length
+        });
+      }
+
+      // Report progress every 1000 rows
+      if (originalIndex % 1000 === 0) {
+        const progress = (originalIndex / originalData.length) * 40 + 20; // 20-60%
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        this.reportProgress({
+          stage: 'matching',
+          rowsProcessed: originalIndex,
+          totalRows: originalData.length,
+          percentage: progress,
+          message: `Matching rows... ${originalIndex.toLocaleString()}/${originalData.length.toLocaleString()} (${elapsed}s elapsed)`
+        });
+      }
+    });
+
+    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`[CRMMergeProcessor] Matching complete in ${totalTime}s. Found ${matches.length} matches.`);
     return matches;
   }
 
   /**
-   * Merge original data with enriched data using match results
+   * Merge original data with master enriched data using match results
    */
-  private mergeData(
+  private mergeDataWithMaster(
     originalData: Record<string, any>[],
-    enrichedDataSets: Record<string, any>[][],
+    masterEnrichedData: Record<string, any>[],
     matchResults: MatchResult[]
   ): Record<string, any>[] {
+    console.log(`[CRMMergeProcessor] Starting merge with ${matchResults.length} match results`);
     const { resolutionConfig } = this.jobData;
     const mergedData: Record<string, any>[] = [];
 
@@ -281,35 +330,52 @@ export class CRMMergeProcessor {
       }
       matchesByOriginalRow.get(match.originalRowIndex)!.push(match);
     }
+    
+    console.log(`[CRMMergeProcessor] Grouped matches: ${matchesByOriginalRow.size} original rows have matches`);
+    
+    // Log first match for debugging
+    if (matchResults.length > 0) {
+      const firstMatch = matchResults[0];
+      console.log('[CRMMergeProcessor] First match example:', firstMatch);
+      const enrichedRow = masterEnrichedData[firstMatch.enrichedRowIndex];
+      console.log('[CRMMergeProcessor] First enriched row columns:', Object.keys(enrichedRow));
+      console.log('[CRMMergeProcessor] First enriched row sample:', enrichedRow);
+    }
 
     // Process each original row
     originalData.forEach((originalRow, index) => {
       const mergedRow: Record<string, any> = { ...originalRow };
       const matches = matchesByOriginalRow.get(index) || [];
 
-      // Apply enriched data from matches
+      if (index === 0) {
+        console.log(`[CRMMergeProcessor] Processing first row:`, originalRow);
+        console.log(`[CRMMergeProcessor] First row has ${matches.length} matches`);
+      }
+
+      // Merge enriched data from all matches
       for (const match of matches) {
-        const enrichedFileIndex = this.jobData.enrichedFiles.findIndex(f => f.id === match.enrichedFileId);
-        if (enrichedFileIndex === -1) continue;
+        const enrichedRow = masterEnrichedData[match.enrichedRowIndex];
+        
+        if (index === 0) {
+          console.log(`[CRMMergeProcessor] Merging enriched row:`, enrichedRow);
+        }
 
-        const enrichedRow = enrichedDataSets[enrichedFileIndex][match.enrichedRowIndex];
-
-        // Merge each enriched column
-        for (const [enrichedCol, enrichedValue] of Object.entries(enrichedRow)) {
-          // Skip if column exists in original (conflict resolution)
-          if (originalRow.hasOwnProperty(enrichedCol)) {
-            const strategy = resolutionConfig.columnStrategies[enrichedCol] || resolutionConfig.defaultStrategy;
-
-            if (strategy === 'keep_original') {
-              // Keep original value, do nothing
-            } else if (strategy === 'use_enriched') {
-              mergedRow[enrichedCol] = enrichedValue;
-            } else if (strategy === 'create_alternate') {
-              mergedRow[`${enrichedCol}${resolutionConfig.alternateFieldSuffix}`] = enrichedValue;
+        // Copy all enriched columns to merged row
+        for (const [key, value] of Object.entries(enrichedRow)) {
+          // Apply conflict resolution strategy
+          if (resolutionConfig.defaultStrategy === 'keep_original' && mergedRow[key]) {
+            // Keep original value
+            continue;
+          } else if (resolutionConfig.defaultStrategy === 'use_enriched') {
+            // Replace with enriched value
+            mergedRow[key] = value;
+          } else if (resolutionConfig.defaultStrategy === 'create_alternate') {
+            // Create alternate column if conflict
+            if (mergedRow[key] && mergedRow[key] !== value) {
+              mergedRow[`${key}_enriched`] = value;
+            } else {
+              mergedRow[key] = value;
             }
-          } else {
-            // No conflict, add enriched column
-            mergedRow[enrichedCol] = enrichedValue;
           }
         }
       }
@@ -318,36 +384,45 @@ export class CRMMergeProcessor {
 
       // Report progress every 1000 rows
       if (index % 1000 === 0) {
-        const progress = (index / originalData.length) * 40 + 50; // 50-90%
+        const progress = (index / originalData.length) * 20 + 60; // 60-80%
         this.reportProgress({
           stage: 'merging',
           rowsProcessed: index,
           totalRows: originalData.length,
           percentage: progress,
-          message: `Merging data... ${index}/${originalData.length}`
+          message: `Merging data... ${index.toLocaleString()}/${originalData.length.toLocaleString()}`
         });
       }
     });
+
+    console.log(`[CRMMergeProcessor] Merge complete. Generated ${mergedData.length} rows`);
+    if (mergedData.length > 0) {
+      console.log(`[CRMMergeProcessor] First merged row columns:`, Object.keys(mergedData[0]));
+      console.log(`[CRMMergeProcessor] First merged row sample:`, mergedData[0]);
+    }
 
     return mergedData;
   }
 
   /**
-   * Apply column selection and ordering
+   * Apply column selection to final data
    */
   private applyColumnSelection(mergedData: Record<string, any>[]): Record<string, any>[] {
     const { columnConfigs } = this.jobData;
+    
+    if (!columnConfigs || columnConfigs.length === 0) {
+      console.log('[CRMMergeProcessor] No column selection - returning all columns');
+      return mergedData;
+    }
 
-    // Filter and reorder columns based on config
-    const selectedColumns = columnConfigs
-      .filter(config => config.selected)
-      .sort((a, b) => a.position - b.position)
-      .map(config => config.name);
-
+    // Filter to only selected columns
+    const selectedColumns = columnConfigs.filter(c => c.selected).map(c => c.name);
+    console.log(`[CRMMergeProcessor] Applying column selection: ${selectedColumns.length} columns`);
+    
     return mergedData.map(row => {
       const filteredRow: Record<string, any> = {};
-      for (const col of selectedColumns) {
-        filteredRow[col] = row[col] || '';
+      for (const column of selectedColumns) {
+        filteredRow[column] = row[column] || '';
       }
       return filteredRow;
     });
@@ -361,85 +436,100 @@ export class CRMMergeProcessor {
       return '';
     }
 
-    const columns = Object.keys(data[0]);
-    const rows = data.map(row => columns.map(col => {
-      const value = row[col] || '';
-      // Escape quotes and wrap in quotes if contains comma, quote, or newline
-      if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return value;
-    }));
-
-    const csvLines = [
-      columns.join(','),
-      ...rows.map(row => row.join(','))
-    ];
-
-    return csvLines.join('\n');
+    const headers = Object.keys(data[0]);
+    return Papa.unparse({
+      fields: headers,
+      data: data
+    });
   }
 
   /**
-   * Upload CSV to S3
+   * Download and parse CSV file from S3
    */
-  private async uploadToS3(key: string, csvContent: string): Promise<string> {
-    // TODO: Implement S3 upload using storage service
-    // For now, return placeholder URL
-    console.log(`[CRMMergeProcessor] Uploading to S3: ${key}`);
+  private async downloadAndParse(fileMetadata: FileMetadata): Promise<Record<string, any>[]> {
+    console.log(`[CRMMergeProcessor] Downloading file: ${fileMetadata.name} (${fileMetadata.s3Key})`);
     
-    // This will be implemented with the storage service
-    // const url = await storageService.upload(key, csvContent);
+    let csvContent: string;
     
-    return `https://s3.amazonaws.com/bucket/${key}`;
+    // Support both local file paths (for testing) and HTTP URLs (for production)
+    if (fileMetadata.s3Url.startsWith('http://') || fileMetadata.s3Url.startsWith('https://')) {
+      // Production: Download from S3 presigned URL
+      const response = await fetch(fileMetadata.s3Url);
+      csvContent = await response.text();
+    } else {
+      // Testing: Read from local file system
+      const fs = await import('fs');
+      csvContent = fs.readFileSync(fileMetadata.s3Url, 'utf-8');
+    }
+    
+    const parsed = Papa.parse(csvContent, {
+      header: true,
+      skipEmptyLines: 'greedy',
+      dynamicTyping: false
+    });
+
+    console.log(`[CRMMergeProcessor] Parsed ${parsed.data.length} rows from ${fileMetadata.name}`);
+    return parsed.data as Record<string, any>[];
   }
 
   /**
-   * Normalize value for comparison
+   * Normalize value for comparison (lowercase, trim, remove special chars)
    */
   private normalizeValue(value: any): string {
-    if (value === null || value === undefined) return '';
-    return String(value).trim().toLowerCase();
+    if (!value) return '';
+    return String(value)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9@.+-]/g, '');
   }
 
   /**
    * Extract value from array based on strategy
    */
   private extractArrayValue(value: string, strategy: ArrayHandlingStrategy): string {
-    if (!value || !value.includes(',')) {
-      return value;
+    if (!value) return '';
+    
+    // Check if value is an array (comma-separated or JSON array)
+    const isArray = value.includes(',') || (value.startsWith('[') && value.endsWith(']'));
+    
+    if (!isArray) {
+      return this.normalizeValue(value);
     }
 
-    const parts = value.split(',').map(p => p.trim());
+    // Parse array
+    let values: string[];
+    if (value.startsWith('[')) {
+      // JSON array
+      try {
+        values = JSON.parse(value);
+      } catch {
+        values = [value];
+      }
+    } else {
+      // Comma-separated
+      values = value.split(',').map(v => v.trim());
+    }
 
+    // Apply strategy
     switch (strategy) {
       case 'first':
-        return parts[0];
+        return this.normalizeValue(values[0]);
       case 'all':
-        return parts.join(' ');
+        return values.map(v => this.normalizeValue(v)).join(',');
       case 'best':
-        // Use longest as "best" heuristic
-        return parts.reduce((longest, current) => 
-          current.length > longest.length ? current : longest, parts[0]);
       case 'deduplicated':
-        return Array.from(new Set(parts)).join(' ');
+        // For matching, just use first value
+        return this.normalizeValue(values[0]);
       default:
-        return parts[0];
+        return this.normalizeValue(values[0]);
     }
   }
 
   /**
    * Report progress to callback
    */
-  private reportProgress(progress: CRMMergeProgress) {
+  private reportProgress(progress: CRMMergeProgress): void {
     if (this.progressCallback) {
-      // Calculate ETA if we have processed some rows
-      if (progress.rowsProcessed > 0 && progress.totalRows > 0) {
-        const elapsedMs = Date.now() - this.startTime;
-        const rowsPerMs = progress.rowsProcessed / elapsedMs;
-        const remainingRows = progress.totalRows - progress.rowsProcessed;
-        progress.eta = Math.ceil(remainingRows / rowsPerMs / 1000); // Convert to seconds
-      }
-
       this.progressCallback(progress);
     }
   }

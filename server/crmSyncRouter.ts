@@ -205,14 +205,29 @@ export const crmSyncRouter = router({
         });
       }
 
+      // Generate presigned download URL if output file exists
+      let outputFileUrl = job.outputFileUrl;
+      if (job.status === 'completed' && job.outputFileKey) {
+        try {
+          const { storageGet } = await import('./storage.js');
+          const result = await storageGet(job.outputFileKey);
+          outputFileUrl = result.url;
+          console.log(`[getJobStatus] Generated presigned URL for job ${job.id}`);
+        } catch (error) {
+          console.error(`[getJobStatus] Failed to generate presigned URL:`, error);
+          // Fall back to stored URL
+        }
+      }
+
       return {
         id: job.id,
+        type: job.type,
         status: job.status,
         totalRows: job.totalRows,
         processedRows: job.processedRows,
         validRows: job.validRows,
         invalidRows: job.invalidRows,
-        outputFileUrl: job.outputFileUrl,
+        outputFileUrl,
         error: job.errorMessage,
         createdAt: job.createdAt,
         startedAt: job.startedAt,

@@ -100,6 +100,9 @@ async function uploadViaHTTP(
     
     const xhr = new XMLHttpRequest();
     
+    // Set timeout to 5 minutes for large files
+    xhr.timeout = 5 * 60 * 1000; // 5 minutes
+    
     // Track upload progress
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable && onProgress) {
@@ -124,16 +127,30 @@ async function uploadViaHTTP(
           reject(new Error("Invalid response from server"));
         }
       } else {
-        reject(new Error(`Upload failed: ${xhr.statusText}`));
+        // Try to parse error response body
+        let errorMessage = `Upload failed: ${xhr.statusText}`;
+        try {
+          const errorResponse = JSON.parse(xhr.responseText);
+          if (errorResponse.error) {
+            errorMessage = errorResponse.error;
+          }
+        } catch {
+          // Use default error message
+        }
+        reject(new Error(errorMessage));
       }
     });
     
     xhr.addEventListener("error", () => {
-      reject(new Error("Network error during upload"));
+      reject(new Error("Network error during upload. Please check your connection and try again."));
     });
     
     xhr.addEventListener("abort", () => {
-      reject(new Error("Upload aborted"));
+      reject(new Error("Upload aborted by user"));
+    });
+    
+    xhr.addEventListener("timeout", () => {
+      reject(new Error("Upload timed out after 5 minutes. Please try a smaller file or check your connection."));
     });
     
     xhr.open("POST", "/api/upload/file");

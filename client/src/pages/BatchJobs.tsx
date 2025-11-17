@@ -352,11 +352,12 @@ export default function BatchJobs() {
                                 <Download className="w-4 h-4" />
                               </Button>
                             )}
-                            {(job.status === "pending" || job.status === "processing") && (
+                            {job.status === "pending" && (
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleCancelJob(job.id)}
+                                title="Cancel job"
                               >
                                 <X className="w-4 h-4" />
                               </Button>

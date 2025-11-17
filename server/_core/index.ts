@@ -54,15 +54,17 @@ async function startServer() {
       console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
     });
   });
+  
+  // File upload endpoint for CRM Sync (bypasses tRPC for large files)
+  // MUST be registered BEFORE body parser to avoid 50MB limit
+  const { handleFileUpload } = await import("./fileUploadEndpoint.js");
+  app.post("/api/upload/file", handleFileUpload);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
-
-  // File upload endpoint for CRM Sync (bypasses tRPC for large files)
-  const { handleFileUpload } = await import("./fileUploadEndpoint.js");
-  app.post("/api/upload/file", handleFileUpload);
   // REST API for external integrations
   const apiRouter = await import("../apiRouter.js");
   app.use("/api", apiRouter.default);
