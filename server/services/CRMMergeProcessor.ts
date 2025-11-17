@@ -26,15 +26,19 @@ import type {
 } from '../../shared/crmMergeTypes';
 import type { ArrayHandlingStrategy } from '../../client/src/lib/arrayParser';
 import { EnrichmentConsolidator, type ParsedCSV, type ConsolidationConfig } from './EnrichmentConsolidator';
+import { S3UploadService } from './S3UploadService';
 
 /**
- * Match result for a single row
+ * Match result for a single row with quality scoring
  */
 interface MatchResult {
   originalRowIndex: number;
   enrichedRowIndex: number;
-  matchedOn: string[];
-  confidence: number;
+  matchedOn: string[]; // Which identifiers matched
+  confidence: number; // Overall confidence score (0-1)
+  qualityScore: number; // Quality score based on data completeness (0-100)
+  matchQuality: 'high' | 'medium' | 'low'; // Classification
+  reasoning: string[]; // Human-readable reasons for match
 }
 
 /**
@@ -145,6 +149,35 @@ export class CRMMergeProcessor {
 
       const outputCSV = this.generateCSV(finalData);
 
+      // Stage 6: Upload to S3
+      this.reportProgress({
+        stage: 'writing',
+        rowsProcessed: mergedData.length,
+        totalRows: mergedData.length,
+        percentage: 95,
+        message: 'Uploading output file to S3...'
+      });
+
+      const uploadResult = await S3UploadService.uploadOutputFile(
+        outputCSV,
+        this.jobData.jobId,
+        this.jobData.userId,
+        (progress) => {
+          // Report upload progress
+          const uploadPercentage = 95 + (progress.percentage * 0.05); // 95-100%
+          this.reportProgress({
+            stage: 'writing',
+            rowsProcessed: mergedData.length,
+            totalRows: mergedData.length,
+            percentage: uploadPercentage,
+            message: `Uploading... ${progress.percentage.toFixed(0)}%`
+          });
+        }
+      );
+
+      console.log(`[CRMMergeProcessor] Output uploaded to S3: ${uploadResult.key}`);
+      console.log(`[CRMMergeProcessor] Download URL expires in ${uploadResult.expiresIn / 3600} hours`);
+
       // Complete
       const duration = ((Date.now() - this.startTime) / 1000).toFixed(1);
       this.reportProgress({
@@ -157,8 +190,8 @@ export class CRMMergeProcessor {
 
       return {
         success: true,
-        outputFileKey: 'temp-key', // TODO: Upload to S3
-        outputFileUrl: outputCSV, // Return CSV content for testing (in production, upload to S3 and return URL)
+        outputFileKey: uploadResult.key,
+        outputFileUrl: uploadResult.url,
         outputRowCount: finalData.length,
         matchStats: {
           totalOriginalRows: originalData.length,
@@ -283,11 +316,30 @@ export class CRMMergeProcessor {
 
       // Record matches for each enriched row that matched
       for (const enrichedRowIndex of matchedEnrichedRows) {
+        const enrichedRow = masterEnrichedData[enrichedRowIndex];
+        const confidence = matchedIdentifiers.size / selectedIdentifiers.length;
+        
+        // Calculate quality score based on data completeness
+        const qualityScore = this.calculateQualityScore(originalRow, enrichedRow);
+        
+        // Classify match quality
+        const matchQuality = this.classifyMatchQuality(confidence, qualityScore);
+        
+        // Generate reasoning
+        const reasoning = this.generateMatchReasoning(
+          Array.from(matchedIdentifiers),
+          confidence,
+          qualityScore
+        );
+        
         matches.push({
           originalRowIndex: originalIndex,
           enrichedRowIndex,
           matchedOn: Array.from(matchedIdentifiers),
-          confidence: matchedIdentifiers.size / selectedIdentifiers.length
+          confidence,
+          qualityScore,
+          matchQuality,
+          reasoning
         });
       }
 
@@ -532,5 +584,101 @@ export class CRMMergeProcessor {
     if (this.progressCallback) {
       this.progressCallback(progress);
     }
+  }
+
+  /**
+   * Calculate quality score based on data completeness
+   * Score 0-100: Higher = more complete/valuable data
+   */
+  private calculateQualityScore(
+    originalRow: Record<string, any>,
+    enrichedRow: Record<string, any>
+  ): number {
+    let score = 0;
+    let maxScore = 0;
+
+    // Check each enriched column for data quality
+    for (const [key, value] of Object.entries(enrichedRow)) {
+      maxScore += 10;
+
+      if (!value || String(value).trim() === '') {
+        // Empty field: 0 points
+        continue;
+      }
+
+      const strValue = String(value);
+      
+      // Length contributes to score (up to 3 points)
+      score += Math.min(3, strValue.length / 10);
+
+      // Non-whitespace characters (up to 2 points)
+      const nonWhitespace = (strValue.match(/\S/g) || []).length;
+      score += Math.min(2, nonWhitespace / 5);
+
+      // Multiple words (1 point)
+      if (strValue.split(/\s+/).length > 1) {
+        score += 1;
+      }
+
+      // Special value types (bonus points)
+      if (/@/.test(strValue)) score += 2; // Email
+      if (/\d{3}/.test(strValue)) score += 2; // Phone
+      if (/https?:\/\//.test(strValue)) score += 1; // URL
+    }
+
+    // Normalize to 0-100
+    return maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+  }
+
+  /**
+   * Classify match quality based on confidence and data quality
+   */
+  private classifyMatchQuality(
+    confidence: number,
+    qualityScore: number
+  ): 'high' | 'medium' | 'low' {
+    // Combined score: 70% confidence, 30% quality
+    const combinedScore = (confidence * 0.7) + (qualityScore / 100 * 0.3);
+
+    if (combinedScore >= 0.8) return 'high';
+    if (combinedScore >= 0.5) return 'medium';
+    return 'low';
+  }
+
+  /**
+   * Generate human-readable reasoning for match
+   */
+  private generateMatchReasoning(
+    matchedIdentifiers: string[],
+    confidence: number,
+    qualityScore: number
+  ): string[] {
+    const reasons: string[] = [];
+
+    // Identifier matches
+    if (matchedIdentifiers.length > 0) {
+      reasons.push(`Matched on ${matchedIdentifiers.length} identifier(s): ${matchedIdentifiers.join(', ')}`);
+    }
+
+    // Confidence level
+    const confidencePercent = Math.round(confidence * 100);
+    if (confidence === 1) {
+      reasons.push(`Perfect match: All identifiers matched (${confidencePercent}%)`);
+    } else if (confidence >= 0.5) {
+      reasons.push(`Partial match: ${confidencePercent}% of identifiers matched`);
+    } else {
+      reasons.push(`Weak match: Only ${confidencePercent}% of identifiers matched`);
+    }
+
+    // Data quality
+    if (qualityScore >= 80) {
+      reasons.push(`High quality enriched data (${qualityScore}/100)`);
+    } else if (qualityScore >= 50) {
+      reasons.push(`Moderate quality enriched data (${qualityScore}/100)`);
+    } else {
+      reasons.push(`Low quality enriched data (${qualityScore}/100) - may have missing fields`);
+    }
+
+    return reasons;
   }
 }
