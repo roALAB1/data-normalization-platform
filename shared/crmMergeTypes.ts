@@ -86,17 +86,66 @@ export interface CRMMergeProgress {
 /**
  * CRM Merge Job Result
  */
+/**
+ * Match statistics by identifier
+ * v3.38.0: Added detailed match breakdown
+ */
+export interface MatchStatsByIdentifier {
+  count: number;
+  percentage: number;
+  avgQualityScore: number;
+}
+
+/**
+ * Quality distribution of matches
+ * v3.38.0: Added quality scoring
+ */
+export interface QualityDistribution {
+  high: number;    // 80-100%
+  medium: number;  // 50-80%
+  low: number;     // <50%
+}
+
+/**
+ * Data completeness metrics
+ * v3.38.0: Added field-level completeness tracking
+ */
+export interface DataCompleteness {
+  [field: string]: {
+    populatedCount: number;
+    percentage: number;
+  };
+}
+
+/**
+ * Enhanced match statistics
+ * v3.38.0: Added detailed match breakdown, quality distribution, and data completeness
+ */
+export interface MatchStats {
+  totalOriginalRows: number;
+  totalEnrichedRows: number;
+  matchedRows: number;
+  unmatchedRows: number;
+  matchRate: number; // percentage
+  
+  // v3.38.0: Detailed match breakdown
+  matchesByIdentifier?: {
+    [identifier: string]: MatchStatsByIdentifier;
+  };
+  
+  // v3.38.0: Quality distribution
+  qualityDistribution?: QualityDistribution;
+  
+  // v3.38.0: Data completeness (top 10 fields)
+  dataCompleteness?: DataCompleteness;
+}
+
 export interface CRMMergeResult {
   success: boolean;
   outputFileKey: string;
   outputFileUrl: string;
   outputRowCount: number;
-  matchStats: {
-    totalOriginalRows: number;
-    totalEnrichedRows: number;
-    matchedRows: number;
-    unmatchedRows: number;
-  };
+  matchStats: MatchStats;
   processingTimeMs: number;
   error?: string;
 }

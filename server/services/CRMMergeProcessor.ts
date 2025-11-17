@@ -188,17 +188,20 @@ export class CRMMergeProcessor {
         message: `Complete! Processed ${mergedData.length.toLocaleString()} rows in ${duration}s`
       });
 
+      // Calculate detailed match statistics
+      const matchStats = this.calculateMatchStatistics(
+        originalData,
+        consolidationResult.stats.totalInputRows,
+        matchResults,
+        mergedData
+      );
+
       return {
         success: true,
         outputFileKey: uploadResult.key,
         outputFileUrl: uploadResult.url,
         outputRowCount: finalData.length,
-        matchStats: {
-          totalOriginalRows: originalData.length,
-          totalEnrichedRows: consolidationResult.stats.totalInputRows,
-          matchedRows: uniqueOriginalMatches,
-          unmatchedRows: originalData.length - uniqueOriginalMatches
-        },
+        matchStats,
         processingTimeMs: Date.now() - this.startTime
       };
 
@@ -680,5 +683,100 @@ export class CRMMergeProcessor {
     }
 
     return reasons;
+  }
+
+  /**
+   * Calculate detailed match statistics
+   * v3.38.0: Zero-downside improvement #3 - Enhanced statistics reporting
+   */
+  private calculateMatchStatistics(
+    originalData: Record<string, any>[],
+    totalEnrichedRows: number,
+    matchResults: MatchResult[],
+    mergedData: Record<string, any>[]
+  ): import('../../shared/crmMergeTypes').MatchStats {
+    const uniqueOriginalMatches = new Set(matchResults.map(m => m.originalRowIndex)).size;
+    const matchRate = (uniqueOriginalMatches / originalData.length) * 100;
+
+    // Count matches by identifier
+    const matchesByIdentifier: { [key: string]: { count: number; totalQuality: number } } = {};
+    
+    matchResults.forEach(match => {
+      match.matchedOn.forEach(identifier => {
+        if (!matchesByIdentifier[identifier]) {
+          matchesByIdentifier[identifier] = { count: 0, totalQuality: 0 };
+        }
+        matchesByIdentifier[identifier].count++;
+        matchesByIdentifier[identifier].totalQuality += match.qualityScore;
+      });
+    });
+
+    // Calculate percentages and averages
+    const matchesByIdentifierStats: { [key: string]: import('../../shared/crmMergeTypes').MatchStatsByIdentifier } = {};
+    Object.entries(matchesByIdentifier).forEach(([identifier, stats]) => {
+      matchesByIdentifierStats[identifier] = {
+        count: stats.count,
+        percentage: (stats.count / matchResults.length) * 100,
+        avgQualityScore: stats.totalQuality / stats.count
+      };
+    });
+
+    // Quality distribution
+    const qualityDistribution = {
+      high: 0,
+      medium: 0,
+      low: 0
+    };
+    
+    matchResults.forEach(match => {
+      if (match.qualityScore >= 80) qualityDistribution.high++;
+      else if (match.qualityScore >= 50) qualityDistribution.medium++;
+      else qualityDistribution.low++;
+    });
+
+    // Data completeness (analyze merged data)
+    const dataCompleteness: import('../../shared/crmMergeTypes').DataCompleteness = {};
+    
+    if (mergedData.length > 0) {
+      const allColumns = Object.keys(mergedData[0]);
+      
+      // Calculate completeness for each column
+      const completenessMap = new Map<string, { populated: number; total: number }>();
+      
+      allColumns.forEach(column => {
+        const populatedCount = mergedData.filter(row => {
+          const value = row[column];
+          return value !== null && value !== undefined && String(value).trim() !== '';
+        }).length;
+        
+        completenessMap.set(column, {
+          populated: populatedCount,
+          total: mergedData.length
+        });
+      });
+      
+      // Sort by completeness percentage and take top 10
+      const sortedColumns = Array.from(completenessMap.entries())
+        .sort((a, b) => (b[1].populated / b[1].total) - (a[1].populated / a[1].total))
+        .slice(0, 10);
+      
+      sortedColumns.forEach(([column, stats]) => {
+        dataCompleteness[column] = {
+          populatedCount: stats.populated,
+          percentage: (stats.populated / stats.total) * 100
+        };
+      });
+    }
+
+    return {
+      totalOriginalRows: originalData.length,
+      totalEnrichedRows,
+      matchedRows: uniqueOriginalMatches,
+      unmatchedRows: originalData.length - uniqueOriginalMatches,
+      matchRate,
+      matchesByIdentifier: matchesByIdentifierStats,
+      qualityDistribution,
+      dataCompleteness
+    };
   }
 }

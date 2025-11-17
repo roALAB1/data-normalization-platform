@@ -162,13 +162,61 @@ export class EnrichmentConsolidator {
   }
 
   /**
-   * Normalize identifier for matching (lowercase, trim, remove special chars)
+   * Normalize identifier for matching with enhanced email and whitespace handling
+   * v3.38.0: Added email normalization (Gmail dots, plus-addressing) and whitespace normalization
    */
   private normalizeIdentifierValue(value: string): string {
+    if (!value) return '';
+    
+    let normalized = String(value).toLowerCase().trim();
+    
+    // Step 1: Normalize whitespace and special characters
+    normalized = this.normalizeWhitespace(normalized);
+    
+    // Step 2: Detect if this is an email and apply email-specific normalization
+    if (normalized.includes('@')) {
+      normalized = this.normalizeEmail(normalized);
+    }
+    
+    // Step 3: Remove remaining special characters (keep alphanumeric + email/phone chars)
+    normalized = normalized.replace(/[^a-z0-9@.+-]/g, '');
+    
+    return normalized;
+  }
+
+  /**
+   * Normalize whitespace and special characters
+   * v3.38.0: Zero-downside improvement #2
+   */
+  private normalizeWhitespace(value: string): string {
     return value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9@.+-]/g, ''); // Keep alphanumeric + email/phone chars
+      .replace(/\s+/g, ' ')           // Multiple spaces/tabs/newlines to single space
+      .replace(/[\u2014\u2013]/g, '-')  // Em dash, en dash to hyphen
+      .replace(/[\u201C\u201D]/g, '"')  // Smart quotes to straight quotes
+      .replace(/[\u2018\u2019]/g, "'")  // Smart apostrophes to straight
+      .replace(/[\u200B-\u200D\uFEFF]/g, '') // Zero-width characters
+      .trim();
+  }
+
+  /**
+   * Normalize email addresses
+   * v3.38.0: Zero-downside improvement #1
+   */
+  private normalizeEmail(email: string): string {
+    const parts = email.split('@');
+    if (parts.length !== 2) return email;
+    
+    let [localPart, domain] = parts;
+    
+    // Gmail: Remove dots from local part (Gmail ignores them)
+    if (domain === 'gmail.com' || domain === 'googlemail.com') {
+      localPart = localPart.replace(/\./g, '');
+    }
+    
+    // Remove plus addressing (user+tag@domain.com -> user@domain.com)
+    localPart = localPart.replace(/\+.*$/, '');
+    
+    return localPart + '@' + domain;
   }
 
   /**
