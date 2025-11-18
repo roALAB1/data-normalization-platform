@@ -2239,7 +2239,7 @@ Users can quickly select/deselect large numbers of columns instead of clicking 5
 - [x] Update README.md with v3.40.0 overview
 - [x] Update CHANGELOG.md with v3.40.0 entry
 - [x] Update package.json version to 3.40.0
-- [ ] Git commit all changes
-- [ ] Create git tag v3.40.0
-- [ ] Push commits and tags to GitHub
-- [ ] Create GitHub release for v3.40.0
+- [x] Git commit all changes
+- [x] Create git tag v3.40.0
+- [x] Push commits and tags to GitHub
+- [x] Create GitHub release for v3.40.0
