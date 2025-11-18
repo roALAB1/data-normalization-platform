@@ -2396,3 +2396,102 @@ Users can quickly select/deselect large numbers of columns instead of clicking 5
 - Implement streaming/chunking for both processors
 - Add memory limits and job size validation
 - Re-enable workers after optimization
+
+
+---
+
+## v3.41.0 - Streaming/Chunking Architecture for Large Datasets
+
+**Status:** IN PROGRESS
+
+**Goal:** Implement memory-efficient streaming to handle 200k+ row datasets without crashes
+
+**Current Memory Issues:**
+- CRMMergeProcessor loads all 219k rows into memory at once
+- Builds hash indexes for entire dataset (5.7M+ cells)
+- Regular job processor also loads full files into memory
+- Both cause heap exhaustion even with 4GB allocation
+
+**Streaming Architecture Design:**
+
+**Phase 1: Analysis**
+- [x] Analyze CRMMergeProcessor memory usage patterns
+- [x] Analyze jobProcessor memory usage patterns
+- [x] Design streaming architecture for both processors
+- [x] Define chunk size (10,000 rows per chunk)
+- [x] Plan incremental hash index building
+
+**Phase 2: CRMMergeProcessor Streaming**
+- [ ] Implement CSV streaming reader (PapaParse streaming mode)
+- [ ] Implement chunked file reading from S3
+- [ ] Build hash indexes incrementally (chunk by chunk)
+- [ ] Process matches in chunks instead of all at once
+- [ ] Write output incrementally to S3
+- [ ] Add progress tracking per chunk
+- [ ] Test with 219k row dataset
+
+**Phase 3: Regular Job Processor Streaming**
+- [ ] Implement CSV streaming for job processor
+- [ ] Process normalization in 10k row chunks
+- [ ] Write results incrementally instead of buffering
+- [ ] Add memory monitoring per chunk
+- [ ] Test with large batch jobs
+
+**Phase 4: Testing & Re-enabling**
+- [ ] Test CRM merge with 219k row dataset
+- [ ] Monitor memory usage (should stay < 500MB)
+- [ ] Test regular jobs with 100k+ rows
+- [ ] Verify no memory leaks
+- [ ] Re-enable both workers in server/_core/index.ts
+- [ ] Monitor production stability
+
+**Technical Approach:**
+1. Use PapaParse streaming mode for CSV reading
+2. Process data in 10,000 row chunks
+3. Build hash indexes incrementally
+4. Write output to S3 in chunks (append mode)
+5. Track progress per chunk
+6. Release memory after each chunk
+
+**Expected Results:**
+- Memory usage: < 500MB regardless of dataset size
+- Processing speed: 1,000-5,000 rows/second
+- Support for unlimited dataset sizes
+- No crashes or memory exhaustion
+
+**Files to Modify:**
+- server/services/CRMMergeProcessor.ts
+- server/jobProcessor.ts
+- server/_core/index.ts (re-enable workers)
+
+
+---
+
+## v3.42.0 - ARCHITECTURE DECISION: CRM Merge Backend Redesign
+
+**Status:** RESEARCH & ANALYSIS
+
+**Question:** Should we continue with CSV streaming or switch to DuckDB/alternative approach?
+
+**Current Problem:**
+- CSV-based processing crashes with 200k+ rows
+- Memory exhaustion even with 4GB heap
+- Complex streaming implementation required
+- User asking about better alternatives
+
+**User's Proposal:**
+- Upload CRM + enrichments all at once (single upload)
+- Convert to DuckDB format
+- Use SQL joins for matching (reverse ETL approach)
+- More efficient for large datasets?
+
+**Analysis Tasks:**
+- [ ] Document current CSV streaming approach (pros/cons/blind spots)
+- [ ] Research DuckDB approach (pros/cons/blind spots)
+- [ ] Research alternative approaches (PostgreSQL, SQLite, Parquet, Arrow)
+- [ ] Compare scalability implications
+- [ ] Compare operational complexity
+- [ ] Identify blind spots and hidden costs
+- [ ] Make recommendation with justification
+- [ ] Discuss with user
+- [ ] Implement chosen approach
