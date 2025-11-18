@@ -94,30 +94,37 @@ export const crmSyncRouter = router({
           });
         }
 
-        // Create job record in database
+        // Import crmMergeJobs table
+        const { crmMergeJobs } = await import("../drizzle/schema.js");
+
+        // Create job record in crmMergeJobs table
         const result = await db
-          .insert(jobsTable)
+          .insert(crmMergeJobs)
           .values({
             userId,
-            type: "intelligent", // Reuse intelligent type for now
             status: "pending",
-            inputFileKey: input.originalFile.s3Key,
-            inputFileUrl: input.originalFile.s3Url,
+            originalFileKey: input.originalFile.s3Key,
+            originalFileUrl: input.originalFile.s3Url,
+            enrichedFileKeys: input.enrichedFiles.map(f => f.s3Key),
+            enrichedFileUrls: input.enrichedFiles.map(f => f.s3Url),
             totalRows: input.originalFile.rowCount,
             processedRows: 0,
             validRows: 0,
             invalidRows: 0,
             config: {
-              crmMerge: true,
-              enrichedFiles: input.enrichedFiles.length,
               selectedIdentifiers: input.selectedIdentifiers,
+              inputMappings: input.inputMappings,
+              arrayStrategies: input.arrayStrategies,
+              resolutionConfig: input.resolutionConfig,
+              columnConfigs: input.columnConfigs,
+              orderingMode: input.orderingMode,
             },
           });
 
         const jobId = Number(result[0].insertId);
 
         // Fetch the created job
-        const [job] = await db.select().from(jobsTable).where(eq(jobsTable.id, jobId)).limit(1);
+        const [job] = await db.select().from(crmMergeJobs).where(eq(crmMergeJobs.id, jobId)).limit(1);
 
         // Prepare job data
         const jobData: CRMMergeJobData = {

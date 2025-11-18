@@ -5,7 +5,7 @@
 
 import { Worker, Job } from 'bullmq';
 import type { CRMMergeJobData, CRMMergeProgress } from '../../shared/crmMergeTypes';
-import { updateJobStatus, updateJobProgressSimple } from '../jobDb';
+import { updateCRMMergeJobStatus, updateCRMMergeJobProgressSimple } from '../jobDb';
 import { CRMMergeProcessor } from '../services/CRMMergeProcessor';
 
 /**
@@ -26,6 +26,7 @@ export class CRMMergeWorker {
   private static instance: CRMMergeWorker;
 
   private constructor() {
+    console.log('[CRMMergeWorker] Initializing CRM merge worker...');
     this.worker = new Worker<CRMMergeJobData>(
       'crm-merge-jobs',
       async (job: Job<CRMMergeJobData>) => {
@@ -44,6 +45,7 @@ export class CRMMergeWorker {
     );
 
     this.setupEventListeners();
+    console.log('[CRMMergeWorker] CRM merge worker initialized successfully');
   }
 
   /**
@@ -83,7 +85,7 @@ export class CRMMergeWorker {
       console.log(`[CRMMergeWorker] Processing CRM merge job ${jobId}`);
 
       // Update status to processing
-      await updateJobStatus(jobId, 'processing', new Date());
+      await updateCRMMergeJobStatus(jobId, 'processing', new Date());
 
       // Create processor with progress callback
       const processor = new CRMMergeProcessor(job.data, (progress: CRMMergeProgress) => {
@@ -95,7 +97,7 @@ export class CRMMergeWorker {
         });
 
         // Update database progress
-        updateJobProgressSimple(
+        updateCRMMergeJobProgressSimple(
           jobId,
           progress.rowsProcessed,
           progress.rowsProcessed, // validRows (all rows are valid in merge)
@@ -108,7 +110,7 @@ export class CRMMergeWorker {
 
       if (result.success) {
         // Update job with results
-        await updateJobStatus(
+        await updateCRMMergeJobStatus(
           jobId,
           'completed',
           undefined,
@@ -128,7 +130,7 @@ export class CRMMergeWorker {
       console.error(`[CRMMergeWorker] Error processing job ${jobId}:`, error);
 
       // Update job status to failed
-      await updateJobStatus(
+      await updateCRMMergeJobStatus(
         jobId,
         'failed',
         undefined,

@@ -197,3 +197,77 @@ export async function updateJobProgressSimple(
     invalidRows,
   });
 }
+
+/**
+ * CRM Merge Job Functions
+ */
+
+/**
+ * Update CRM merge job progress
+ */
+export async function updateCRMMergeJobProgress(
+  jobId: number,
+  updates: {
+    status?: "pending" | "processing" | "completed" | "failed" | "cancelled";
+    processedRows?: number;
+    validRows?: number;
+    invalidRows?: number;
+    errorMessage?: string;
+    startedAt?: Date;
+    completedAt?: Date;
+    outputFileKey?: string;
+    outputFileUrl?: string;
+  }
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const { crmMergeJobs } = await import("../drizzle/schema.js");
+  await db.update(crmMergeJobs).set(updates).where(eq(crmMergeJobs.id, jobId));
+}
+
+/**
+ * Update CRM merge job status (convenience function)
+ */
+export async function updateCRMMergeJobStatus(
+  jobId: number,
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled",
+  startedAt?: Date,
+  completedAt?: Date,
+  totalRows?: number,
+  validRows?: number,
+  invalidRows?: number,
+  outputFileKey?: string,
+  outputFileUrl?: string,
+  errorMessage?: string
+): Promise<void> {
+  const updates: any = { status };
+  if (startedAt) updates.startedAt = startedAt;
+  if (completedAt) updates.completedAt = completedAt;
+  if (totalRows !== undefined) updates.totalRows = totalRows;
+  if (validRows !== undefined) updates.validRows = validRows;
+  if (invalidRows !== undefined) updates.invalidRows = invalidRows;
+  if (outputFileKey) updates.outputFileKey = outputFileKey;
+  if (outputFileUrl) updates.outputFileUrl = outputFileUrl;
+  if (errorMessage) updates.errorMessage = errorMessage;
+
+  await updateCRMMergeJobProgress(jobId, updates);
+}
+
+/**
+ * Update CRM merge job progress (convenience function for worker)
+ */
+export async function updateCRMMergeJobProgressSimple(
+  jobId: number,
+  processedRows: number,
+  validRows: number,
+  invalidRows: number
+): Promise<void> {
+  await updateCRMMergeJobProgress(jobId, {
+    processedRows,
+    validRows,
+    invalidRows,
+  });
+}

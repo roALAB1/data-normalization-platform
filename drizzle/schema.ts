@@ -197,3 +197,40 @@ export const issueReports = mysqlTable("issueReports", {
 
 export type IssueReport = typeof issueReports.$inferSelect;
 export type InsertIssueReport = typeof issueReports.$inferInsert;
+
+/**
+ * CRM Merge Jobs table (v3.35.0)
+ * Tracks CRM file merging jobs with enrichment data
+ */
+export const crmMergeJobs = mysqlTable("crmMergeJobs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Reference to users table
+  status: mysqlEnum("status", ["pending", "processing", "completed", "failed", "cancelled"]).default("pending").notNull(),
+  totalRows: int("totalRows").notNull(),
+  processedRows: int("processedRows").default(0).notNull(),
+  validRows: int("validRows").default(0).notNull(),
+  invalidRows: int("invalidRows").default(0).notNull(),
+  
+  // File references
+  originalFileKey: varchar("originalFileKey", { length: 512 }), // S3 key for original CRM file
+  originalFileUrl: text("originalFileUrl"), // S3 URL for original file
+  enrichedFileKeys: json("enrichedFileKeys"), // Array of S3 keys for enriched files
+  enrichedFileUrls: json("enrichedFileUrls"), // Array of S3 URLs for enriched files
+  outputFileKey: varchar("outputFileKey", { length: 512 }), // S3 key for merged output file
+  outputFileUrl: text("outputFileUrl"), // S3 URL for merged output file
+  
+  // Configuration
+  config: json("config"), // Merge configuration (identifier type, column mappings, conflict resolution)
+  
+  // Error handling
+  errorMessage: text("errorMessage"), // Error details if failed
+  
+  // Timestamps
+  startedAt: timestamp("startedAt"),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CRMMergeJob = typeof crmMergeJobs.$inferSelect;
+export type InsertCRMMergeJob = typeof crmMergeJobs.$inferInsert;

@@ -1,0 +1,22 @@
+CREATE TABLE `crmMergeJobs` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`userId` int NOT NULL,
+	`status` enum('pending','processing','completed','failed','cancelled') NOT NULL DEFAULT 'pending',
+	`totalRows` int NOT NULL,
+	`processedRows` int NOT NULL DEFAULT 0,
+	`validRows` int NOT NULL DEFAULT 0,
+	`invalidRows` int NOT NULL DEFAULT 0,
+	`originalFileKey` varchar(512),
+	`originalFileUrl` text,
+	`enrichedFileKeys` json,
+	`enrichedFileUrls` json,
+	`outputFileKey` varchar(512),
+	`outputFileUrl` text,
+	`config` json,
+	`errorMessage` text,
+	`startedAt` timestamp,
+	`completedAt` timestamp,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `crmMergeJobs_id` PRIMARY KEY(`id`)
+);

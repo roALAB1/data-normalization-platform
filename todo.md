@@ -2243,3 +2243,60 @@ Users can quickly select/deselect large numbers of columns instead of clicking 5
 - [x] Create git tag v3.40.0
 - [x] Push commits and tags to GitHub
 - [x] Create GitHub release for v3.40.0
+
+
+---
+
+## v3.40.1 - CRM Merge Job Debugging (IN PROGRESS)
+
+**Status:** INVESTIGATING
+
+**Issue:** User submitted CRM merge job with 4 enrichment files but job appears stuck
+- Job was submitted successfully
+- User navigated to Batch Jobs page
+- Page shows loading spinner indefinitely
+- Job doesn't appear in job history
+
+**Investigation Tasks:**
+- [x] Check if CRM merge jobs table exists and has data
+  - **ROOT CAUSE FOUND:** crmMergeJobs table doesn't exist in database!
+- [x] Check if background worker is running
+- [x] Check Redis connection for job queue
+- [x] Review CRM merge job submission flow
+- [x] Check for errors in job processor logs
+
+**Debug Logging:**
+- [ ] Add console.log to CRMMergeProcessor constructor
+- [ ] Add logging to job queue worker
+- [ ] Add logging to submitMergeJob endpoint
+- [ ] Add progress tracking logs
+
+**Fixes:**
+- [x] Create missing crmMergeJobs table in database
+  - Added table definition to drizzle/schema.ts
+  - Table has 19 columns: id, userId, status, totalRows, processedRows, validRows, invalidRows, file references, config, error handling, timestamps
+- [x] Run database migrations to apply schema changes
+  - Generated migration: drizzle/0006_organic_hardball.sql
+  - Migration applied successfully
+  - Table verified in database
+- [x] Fix submitMergeJob to use crmMergeJobs table instead of jobs table
+  - Updated crmSyncRouter.ts to insert into crmMergeJobs
+  - Updated to store enrichedFileKeys and enrichedFileUrls as JSON arrays
+- [x] Create CRM-specific database update functions
+  - Added updateCRMMergeJobProgress, updateCRMMergeJobStatus, updateCRMMergeJobProgressSimple
+  - Updated CRMMergeWorker to use CRM-specific functions
+- [x] Add startup logging to CRMMergeWorker
+- [x] Restart server and verify worker starts
+  - Server restarted successfully
+  - All TypeScript compilation successful
+  - Ready for testing
+
+**Testing:**
+- [ ] User to test: Submit CRM merge job with 2-4 enrichment files
+- [ ] User to verify: Job record created in crmMergeJobs table
+- [ ] User to verify: Background worker processes the job
+- [ ] User to verify: Job completes and output file is available
+
+**Documentation:**
+- [x] Update README.md with v3.40.1 overview
+- [ ] Create checkpoint v3.40.1

@@ -47,6 +47,18 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
 
+### What's New in v3.40.1 🚀
+
+**CRM Merge Jobs Database Fix** 🔧  
+Fixed critical bug preventing CRM merge jobs from being submitted and processed. The `crmMergeJobs` database table was missing, causing job submissions to fail silently. Added complete database schema with 19 columns for tracking merge jobs, created CRM-specific update functions (updateCRMMergeJobStatus, updateCRMMergeJobProgress), and fixed submitMergeJob endpoint to use the correct table. Background worker now properly initializes and processes CRM merge jobs with multiple enrichment files.
+
+**Key Fixes:**
+- 🗄️ **Database Table Created**: Added crmMergeJobs table with proper schema (migration 0006_organic_hardball.sql)
+- 📝 **Correct Table Usage**: Fixed submitMergeJob to insert into crmMergeJobs instead of jobs table
+- 🔄 **CRM-Specific Functions**: Added updateCRMMergeJobStatus, updateCRMMergeJobProgress, updateCRMMergeJobProgressSimple
+- 🎯 **Worker Integration**: Updated CRMMergeWorker to use CRM-specific database functions
+- 📊 **Proper Data Storage**: Stores enrichedFileKeys and enrichedFileUrls as JSON arrays
+
 ### What's New in v3.40.0 🚀
 
 **Batch Jobs Authentication Fix** 🔒  

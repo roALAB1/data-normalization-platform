@@ -1,0 +1,36 @@
+{
+  "query": "SHOW CREATE TABLE crmMergeJobs;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2RTfe2F36qbNVzX.7e59071c076e --database MRXpdHeBYiqMHHEPvgWa5w --execute SHOW CREATE TABLE crmMergeJobs;",
+  "rows": [
+    {
+      "Table": "crmMergeJobs",
+      "Create Table": "CREATE TABLE `crmMergeJobs` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `userId` int(11) NOT NULL,",
+    "  `status` enum('pending','processing','completed','failed','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',",
+    "  `totalRows` int(11) NOT NULL,",
+    "  `processedRows` int(11) NOT NULL DEFAULT '0',",
+    "  `validRows` int(11) NOT NULL DEFAULT '0',",
+    "  `invalidRows` int(11) NOT NULL DEFAULT '0',",
+    "  `originalFileKey` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `originalFileUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `enrichedFileKeys` json DEFAULT NULL,",
+    "  `enrichedFileUrls` json DEFAULT NULL,",
+    "  `outputFileKey` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `outputFileUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `config` json DEFAULT NULL,",
+    "  `errorMessage` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `startedAt` timestamp NULL DEFAULT NULL,",
+    "  `completedAt` timestamp NULL DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\ncrmMergeJobs\tCREATE TABLE `crmMergeJobs` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `userId` int(11) NOT NULL,\n  `status` enum('pending','processing','completed','failed','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',\n  `totalRows` int(11) NOT NULL,\n  `processedRows` int(11) NOT NULL DEFAULT '0',\n  `validRows` int(11) NOT NULL DEFAULT '0',\n  `invalidRows` int(11) NOT NULL DEFAULT '0',\n  `originalFileKey` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `originalFileUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `enrichedFileKeys` json DEFAULT NULL,\n  `enrichedFileUrls` json DEFAULT NULL,\n  `outputFileKey` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `outputFileUrl` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `config` json DEFAULT NULL,\n  `errorMessage` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `startedAt` timestamp NULL DEFAULT NULL,\n  `completedAt` timestamp NULL DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}
