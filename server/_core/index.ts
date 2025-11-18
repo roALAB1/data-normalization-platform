@@ -126,12 +126,15 @@ async function startServer() {
     }
 
     // Start CRM merge worker
-    try {
-      const { crmMergeWorker } = await import("../queue/CRMMergeWorker.js");
-      console.log("[CRMMergeWorker] CRM merge worker started");
-    } catch (error) {
-      console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
-    }
+    // DISABLED: CRM worker causes memory crashes with large datasets (200k+ rows)
+    // TODO: Implement streaming/chunking before re-enabling
+    // try {
+    //   const { crmMergeWorker } = await import("../queue/CRMMergeWorker.js");
+    //   console.log("[CRMMergeWorker] CRM merge worker started");
+    // } catch (error) {
+    //   console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
+    // }
+    console.log("[CRMMergeWorker] CRM merge worker DISABLED (prevents memory crashes)");
 
     // Start connection pool metrics collection
     try {
