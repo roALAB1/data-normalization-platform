@@ -258,15 +258,13 @@ export class CRMMergeProcessor {
         const virtualColumns = Array.from(mappingLookup.keys());
         headers = [...headers, ...virtualColumns];
         
-        // Add virtual identifier columns to data rows
-        dataSet = dataSet.map(row => {
-          const newRow = { ...row };
+        // Add virtual identifier columns to data rows (in-place for performance)
+        for (const row of dataSet) {
           for (const [originalColumn, enrichedColumn] of mappingLookup.entries()) {
             // Copy value from enriched column to virtual identifier column
-            newRow[originalColumn] = row[enrichedColumn] || '';
+            row[originalColumn] = row[enrichedColumn] || '';
           }
-          return newRow;
-        });
+        }
         
         console.log(`[CRMMergeProcessor] Added ${virtualColumns.length} virtual identifier columns:`, virtualColumns);
         console.log(`[CRMMergeProcessor] File ${index + 1} headers after adding virtual columns:`, headers.slice(0, 10), '...');

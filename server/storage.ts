@@ -76,20 +76,50 @@ export async function storagePut(
   const key = normalizeKey(relKey);
   const uploadUrl = buildUploadUrl(baseUrl, key);
   const formData = toFormData(data, contentType, key.split("/").pop() ?? key);
-  const response = await fetch(uploadUrl, {
-    method: "POST",
-    headers: buildAuthHeaders(apiKey),
-    body: formData,
-  });
+  
+  // Calculate file size for logging
+  const sizeInMB = typeof data === 'string' 
+    ? (Buffer.byteLength(data, 'utf-8') / 1024 / 1024).toFixed(2)
+    : (data.length / 1024 / 1024).toFixed(2);
+  
+  console.log(`[Storage] Uploading ${sizeInMB} MB to ${key}...`);
+  const uploadStart = Date.now();
+  
+  // Add timeout (5 minutes for large files)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
+  
+  try {
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      headers: buildAuthHeaders(apiKey),
+      body: formData,
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    const message = await response.text().catch(() => response.statusText);
-    throw new Error(
-      `Storage upload failed (${response.status} ${response.statusText}): ${message}`
-    );
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      const message = await response.text().catch(() => response.statusText);
+      throw new Error(
+        `Storage upload failed (${response.status} ${response.statusText}): ${message}`
+      );
+    }
+    
+    const url = (await response.json()).url;
+    const uploadTime = ((Date.now() - uploadStart) / 1000).toFixed(2);
+    console.log(`[Storage] Upload complete in ${uploadTime}s: ${key}`);
+    
+    return { key, url };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Storage upload timed out after 5 minutes for file ${key} (${sizeInMB} MB)`);
+    }
+    
+    throw error;
   }
-  const url = (await response.json()).url;
-  return { key, url };
 }
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string; }> {

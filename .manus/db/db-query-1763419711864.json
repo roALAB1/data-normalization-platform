@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, status, type, createdAt, updatedAt FROM jobs WHERE type = 'crm-merge' ORDER BY id DESC LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2RTfe2F36qbNVzX.7e59071c076e --database MRXpdHeBYiqMHHEPvgWa5w --execute SELECT id, status, type, createdAt, updatedAt FROM jobs WHERE type = 'crm-merge' ORDER BY id DESC LIMIT 3",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 67
+}

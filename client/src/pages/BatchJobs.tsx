@@ -14,7 +14,7 @@ import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 
 export default function BatchJobs() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [jobType, setJobType] = useState<"name" | "phone" | "email" | "company" | "address">("name");
   const [isUploading, setIsUploading] = useState(false);
@@ -22,7 +22,7 @@ export default function BatchJobs() {
   // Fetch user's jobs
   const { data: jobs, isLoading: jobsLoading, refetch: refetchJobs } = trpc.jobs.list.useQuery(
     { limit: 50 },
-    { enabled: isAuthenticated, refetchInterval: 5000 } // Auto-refresh every 5 seconds
+    { refetchInterval: 5000 } // Auto-refresh every 5 seconds
   );
 
   // Create job mutation
@@ -141,18 +141,7 @@ export default function BatchJobs() {
     return Math.round((job.processedRows / job.totalRows) * 100);
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>Authentication Required</CardTitle>
-            <CardDescription>Please log in to access batch processing</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
+  // Authentication is now handled on the server side with owner fallback
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">

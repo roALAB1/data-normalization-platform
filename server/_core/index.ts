@@ -55,6 +55,17 @@ async function startServer() {
     });
   });
   
+  // Health check endpoint - always responds if server is alive
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      pid: process.pid
+    });
+  });
+
   // File upload endpoint for CRM Sync (bypasses tRPC for large files)
   // MUST be registered BEFORE body parser to avoid 50MB limit
   const { handleFileUpload } = await import("./fileUploadEndpoint.js");
@@ -91,13 +102,28 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
+  // Add error handler for server
+  server.on('error', (error: any) => {
+    console.error('[Server] Error:', error);
+    if (error.code === 'EADDRINUSE') {
+      console.error(`[Server] Port ${port} is already in use`);
+      process.exit(1);
+    }
+  });
+
   server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+    console.log(`[Health] Health check available at http://localhost:${port}/api/health`);
     
-    // Start job queue processor
-    const { startJobQueue } = await import("../jobProcessor.js");
-    startJobQueue();
-    console.log("[JobQueue] Background job processor started");
+    // Start job queue processor with error handling
+    try {
+      const { startJobQueue } = await import("../jobProcessor.js");
+      startJobQueue();
+      console.log("[JobQueue] Background job processor started");
+    } catch (error) {
+      console.error("[JobQueue] Failed to start job processor:", error);
+      // Continue without job processor rather than crashing
+    }
 
     // Start CRM merge worker
     try {
@@ -118,4 +144,20 @@ async function startServer() {
   });
 }
 
-startServer().catch(console.error);
+// Global error handlers to prevent server crashes
+process.on('uncaughtException', (error) => {
+  console.error('[FATAL] Uncaught Exception:', error);
+  console.error('[FATAL] Stack:', error.stack);
+  // Don't exit - try to keep server running
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[ERROR] Unhandled Promise Rejection at:', promise);
+  console.error('[ERROR] Reason:', reason);
+  // Don't exit - try to keep server running
+});
+
+startServer().catch((error) => {
+  console.error('[FATAL] Server startup failed:', error);
+  process.exit(1);
+});

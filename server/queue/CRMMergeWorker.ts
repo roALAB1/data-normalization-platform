@@ -34,6 +34,8 @@ export class CRMMergeWorker {
       {
         connection: redisConnection,
         concurrency: parseInt(process.env.WORKER_CONCURRENCY || '2'), // Process 2 jobs concurrently
+        lockDuration: 600000, // 10 minutes lock duration (jobs can take up to 10 min)
+        stalledInterval: 300000, // Check for stalled jobs every 5 minutes
         limiter: {
           max: 5, // Max 5 merge jobs
           duration: 1000, // per second
