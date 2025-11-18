@@ -116,14 +116,17 @@ async function startServer() {
     console.log(`[Health] Health check available at http://localhost:${port}/api/health`);
     
     // Start job queue processor with error handling
-    try {
-      const { startJobQueue } = await import("../jobProcessor.js");
-      startJobQueue();
-      console.log("[JobQueue] Background job processor started");
-    } catch (error) {
-      console.error("[JobQueue] Failed to start job processor:", error);
-      // Continue without job processor rather than crashing
-    }
+    // DISABLED: Job processor can cause memory issues with large datasets
+    // TODO: Implement proper queue management before re-enabling
+    // try {
+    //   const { startJobQueue } = await import("../jobProcessor.js");
+    //   startJobQueue();
+    //   console.log("[JobQueue] Background job processor started");
+    // } catch (error) {
+    //   console.error("[JobQueue] Failed to start job processor:", error);
+    //   // Continue without job processor rather than crashing
+    // }
+    console.log("[JobQueue] Job queue processor DISABLED (prevents memory issues)");
 
     // Start CRM merge worker
     // DISABLED: CRM worker causes memory crashes with large datasets (200k+ rows)
