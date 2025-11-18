@@ -7,20 +7,44 @@ import { TRPCError } from "@trpc/server";
 import { Redis } from "ioredis";
 import { ENV } from "./env";
 
-// Redis client for rate limiting
-const redis = new Redis({
-  host: ENV.redisHost,
-  port: ENV.redisPort,
-  maxRetriesPerRequest: 3,
-  retryStrategy: (times) => {
-    if (times > 3) return null;
-    return Math.min(times * 1000, 3000);
-  },
-});
+// Redis client for rate limiting (optional - gracefully degrades if unavailable)
+let redis: Redis | null = null;
+let redisAvailable = false;
 
-redis.on("error", (error) => {
-  console.error("[RateLimit] Redis error:", error);
-});
+try {
+  redis = new Redis({
+    host: ENV.redisHost,
+    port: ENV.redisPort,
+    maxRetriesPerRequest: 1,
+    retryStrategy: () => null, // Don't retry - fail fast
+    lazyConnect: true, // Don't connect immediately
+    enableOfflineQueue: false, // Don't queue commands when offline
+  });
+
+  // Handle connection errors gracefully
+  redis.on("error", (error) => {
+    if (!redisAvailable) {
+      // Only log once during initial connection attempt
+      console.warn("[RateLimit] Redis unavailable, rate limiting disabled:", error.message);
+    }
+    redisAvailable = false;
+  });
+
+  redis.on("connect", () => {
+    redisAvailable = true;
+    console.log("[RateLimit] Redis connected successfully");
+  });
+
+  // Attempt to connect (non-blocking)
+  redis.connect().catch(() => {
+    console.warn("[RateLimit] Redis connection failed, rate limiting disabled");
+    redisAvailable = false;
+  });
+} catch (error) {
+  console.warn("[RateLimit] Failed to initialize Redis client:", error);
+  redis = null;
+  redisAvailable = false;
+}
 
 export interface RateLimitConfig {
   /**
@@ -61,6 +85,15 @@ export async function checkRateLimit(
   const windowMs = config.windowSeconds * 1000;
   const windowStart = now - windowMs;
 
+  // If Redis is not available, allow all requests (fail open)
+  if (!redis || !redisAvailable) {
+    return {
+      allowed: true,
+      remaining: config.maxRequests,
+      resetAt: new Date(now + windowMs),
+    };
+  }
+
   try {
     // Use Redis sorted set with timestamps as scores
     // Remove old entries outside the window
@@ -95,8 +128,9 @@ export async function checkRateLimit(
       resetAt: new Date(now + windowMs),
     };
   } catch (error) {
-    // If Redis fails, allow the request (fail open)
-    console.error("[RateLimit] Error checking rate limit:", error);
+    // If Redis operation fails, allow the request (fail open)
+    console.warn("[RateLimit] Error checking rate limit, allowing request:", error);
+    redisAvailable = false; // Mark as unavailable
     return {
       allowed: true,
       remaining: config.maxRequests,
@@ -180,5 +214,11 @@ export const RateLimits = {
  * Cleanup function to close Redis connection
  */
 export async function closeRateLimitRedis(): Promise<void> {
-  await redis.quit();
+  if (redis) {
+    try {
+      await redis.quit();
+    } catch (error) {
+      console.warn("[RateLimit] Error closing Redis connection:", error);
+    }
+  }
 }

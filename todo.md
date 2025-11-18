@@ -2650,3 +2650,30 @@ If DuckDB implementation fails:
 3. Keep old UI flow
 4. Document lessons learned
 5. Try alternative approach (PostgreSQL or Arrow)
+
+
+---
+
+## v3.42.1 - CRITICAL: Redis Connection Fix
+
+**Status:** COMPLETED ✅
+
+### Problem
+Dev server crashes on startup due to unhandled Redis connection errors:
+- Rate limiting middleware tries to connect to Redis on localhost:6379
+- Redis not available in dev environment
+- ioredis emits unhandled error events
+- Node.js crashes the process with ECONNREFUSED errors
+
+### Solution
+Make Redis optional with graceful degradation:
+- [x] Update rateLimit.ts to handle connection failures gracefully
+- [x] Add error event handlers to prevent crashes
+- [x] Implement fallback mode when Redis unavailable
+- [x] Update JobQueue.ts with same pattern
+- [x] Test dev server stability
+- [x] Verify application still works without Redis
+
+### Files to Modify
+- server/_core/rateLimit.ts
+- server/queue/JobQueue.ts

@@ -25,22 +25,28 @@ const redisConnection = {
 
 /**
  * Validate Redis connection
- * Throws error if Redis is unreachable
+ * Returns true if Redis is available, false otherwise (non-blocking)
  */
-async function validateRedisConnection(): Promise<void> {
-  const redis = new Redis(redisConnection);
+async function validateRedisConnection(): Promise<boolean> {
+  const redis = new Redis({
+    ...redisConnection,
+    lazyConnect: true,
+    enableOfflineQueue: false,
+  });
   
   try {
+    await redis.connect();
     await redis.ping();
     console.log('[Redis] Connection validated successfully');
     await redis.quit();
+    return true;
   } catch (error) {
-    console.error('[Redis] Connection validation failed:', error);
-    await redis.quit();
-    throw new Error(
-      `Redis connection failed at ${redisConnection.host}:${redisConnection.port}. ` +
-      `Please ensure Redis is running and accessible. Error: ${error}`
-    );
+    console.warn('[Redis] Connection validation failed:', error.message);
+    console.warn('[Redis] Job queue will operate in degraded mode (no background processing)');
+    try {
+      await redis.quit();
+    } catch {}
+    return false;
   }
 }
 
@@ -73,13 +79,16 @@ export class JobQueue {
   private static instance: JobQueue;
 
   private constructor() {
-    // Validate Redis connection before creating queue
-    validateRedisConnection().catch((error) => {
-      console.error('[JobQueue] Failed to connect to Redis:', error);
-      throw error;
+    // Validate Redis connection before creating queue (non-blocking)
+    validateRedisConnection().then((available) => {
+      if (!available) {
+        console.warn('[JobQueue] Redis unavailable - queue operations will be disabled');
+      }
+    }).catch((error) => {
+      console.warn('[JobQueue] Redis validation error:', error.message);
     });
 
-    // Create the normalization jobs queue
+    // Create the normalization jobs queue with error handling
     this.queue = new Queue<NormalizationJobData>('normalization-jobs', {
       connection: redisConnection,
       defaultJobOptions: {
@@ -98,9 +107,18 @@ export class JobQueue {
       },
     });
 
-    // Queue events for monitoring
+    // Queue events for monitoring with error handling
     this.queueEvents = new QueueEvents('normalization-jobs', {
       connection: redisConnection,
+    });
+
+    // Handle queue connection errors gracefully
+    this.queue.on('error', (error) => {
+      console.warn('[JobQueue] Queue error (degraded mode):', error.message);
+    });
+
+    this.queueEvents.on('error', (error) => {
+      console.warn('[JobQueue] QueueEvents error (degraded mode):', error.message);
     });
 
     // Create CRM merge queue
@@ -122,9 +140,18 @@ export class JobQueue {
       },
     });
 
-    // CRM merge queue events
+    // CRM merge queue events with error handling
     this.crmMergeQueueEvents = new QueueEvents('crm-merge-jobs', {
       connection: redisConnection,
+    });
+
+    // Handle CRM merge queue errors gracefully
+    this.crmMergeQueue.on('error', (error) => {
+      console.warn('[JobQueue] CRM merge queue error (degraded mode):', error.message);
+    });
+
+    this.crmMergeQueueEvents.on('error', (error) => {
+      console.warn('[JobQueue] CRM merge QueueEvents error (degraded mode):', error.message);
     });
 
     this.setupEventListeners();
