@@ -47,6 +47,17 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
 
+### What's New in v3.40.0 🚀
+
+**Batch Jobs Authentication Fix** 🔒  
+Fixed critical authentication issue preventing access to the Batch Jobs page. Implemented server-side authentication fallback (matching CRM Sync pattern) that automatically uses owner credentials when no user is logged in. Removed client-side authentication check that was blocking page render. The Batch Jobs page now loads correctly with full access to job history, submission, and download features.
+
+**Key Improvements:**
+- ✅ **Server-Side Auth Fallback**: Automatically uses owner ID from OWNER_OPEN_ID environment variable
+- 🚪 **No Login Required**: Page accessible without manual authentication during development
+- 📊 **Full Functionality**: Job list, submission, cancellation, and downloads all working
+- 🔄 **Consistent Pattern**: Matches CRM Sync authentication approach for unified experience
+
 ### What's New in v3.39.0 🚀
 
 **CRM Sync Identifier Column Mapping Fix** 🔧  

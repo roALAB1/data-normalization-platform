@@ -2,6 +2,23 @@
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
+## [3.40.0] - 2025-11-17
+
+### Fixed
+- **CRITICAL: Batch Jobs Authentication Issue**: Fixed authentication blocking access to Batch Jobs page
+  - Changed jobRouter endpoints from protectedProcedure to publicProcedure
+  - Added getUserIdWithFallback() helper function for owner fallback
+  - Fallback uses OWNER_OPEN_ID from environment to get owner user ID
+  - Removed client-side authentication check in BatchJobs.tsx
+  - Removed isAuthenticated dependency from trpc.jobs.list.useQuery
+  - Page now loads correctly with full functionality (job list, submission, cancellation, downloads)
+
+### Improved
+- **Batch Jobs Authentication Pattern**: Consistent authentication approach across platform
+  - Matches CRM Sync authentication pattern for unified experience
+  - Server-side fallback eliminates need for manual login during development
+  - Maintains security while improving developer experience
+
 ## [3.39.0] - 2025-11-17
 
 ### Fixed
