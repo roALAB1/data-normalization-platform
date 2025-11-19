@@ -2677,3 +2677,162 @@ Make Redis optional with graceful degradation:
 ### Files to Modify
 - server/_core/rateLimit.ts
 - server/queue/JobQueue.ts
+
+
+---
+
+## COMPREHENSIVE STABILITY AUDIT - Pre-Testing Review
+
+**Status:** IN PROGRESS
+
+### Critical Issues Identified
+
+#### 1. CRITICAL: Background Workers Completely Disabled ⚠️
+**Impact:** HIGH - Core functionality broken
+- Both job queue processor AND CRM merge worker are disabled
+- Batch Jobs page will NOT process any jobs (stays pending forever)
+- CRM Sync Mapper will NOT process merge jobs
+- Only client-side normalization works
+
+**Files:**
+- server/_core/index.ts (lines 119-140)
+- Both workers commented out to prevent memory crashes
+
+**Root Cause:**
+- Old CSV-based workers load entire datasets into memory
+- 219k row dataset exhausts 4GB heap
+- Workers disabled in v3.40.2 and v3.40.3 as emergency fix
+
+**Solution Required:**
+- [ ] Enable DuckDBCRMMergeWorker (already implemented but not activated)
+- [ ] Update server/_core/index.ts to use DuckDB worker instead of old worker
+- [ ] Test with 219k row dataset
+- [ ] Re-enable regular job processor with streaming
+
+---
+
+#### 2. CRITICAL: DuckDB Implementation Not Activated ⚠️
+**Impact:** HIGH - New architecture not in use
+- DuckDB code is complete (v3.42.0) but never activated
+- DuckDBCRMMergeWorker exists but is not imported/started
+- Old CRMMergeWorker is disabled but not replaced
+- System is in broken state - no worker running at all
+
+**Files:**
+- server/queue/DuckDBCRMMergeWorker.ts (implemented, not used)
+- server/services/DuckDBMergeEngine.ts (implemented, not used)
+- server/services/DuckDBService.ts (implemented, not used)
+
+**Solution Required:**
+- [ ] Update server/_core/index.ts to import DuckDBCRMMergeWorker
+- [ ] Replace old worker with DuckDB worker
+- [ ] Test initialization and job processing
+- [ ] Verify memory usage stays under 500MB
+
+---
+
+#### 3. HIGH: Regular Batch Jobs Have No Worker ⚠️
+**Impact:** HIGH - Batch normalization broken
+- jobProcessor.ts is disabled (line 119-129)
+- No replacement implemented
+- Users can submit jobs but they never process
+
+**Files:**
+- server/jobProcessor.ts (disabled)
+- server/queue/BatchWorker.ts (exists but not started)
+
+**Solution Required:**
+- [ ] Review BatchWorker.ts for streaming implementation
+- [ ] Enable BatchWorker if streaming is implemented
+- [ ] OR implement streaming in jobProcessor.ts
+- [ ] Test with large datasets (100k+ rows)
+
+---
+
+#### 4. MEDIUM: Missing Upload Endpoint Implementation
+**Impact:** MEDIUM - CRM Sync may have issues
+- crmSyncRouter.ts has TODO for presigned upload URL (line 284)
+- Currently returns placeholder
+- May cause upload failures
+
+**Solution Required:**
+- [ ] Implement proper presigned URL generation
+- [ ] Test file upload flow
+- [ ] Verify S3 integration works
+
+---
+
+#### 5. LOW: Debug Logging Still Active
+**Impact:** LOW - Performance/log noise
+- CRMMergeProcessor.ts has debug console.logs (line 518-519)
+- IntelligentBatchProcessor.ts has debug logs (line 282-283)
+
+**Solution Required:**
+- [ ] Remove or comment out debug logs
+- [ ] Use proper logging levels (info/warn/error)
+
+---
+
+### Audit Phases
+
+#### Phase 1: Client-Side Normalization
+- [ ] Check IntelligentNormalization.tsx for errors
+- [ ] Verify worker loading and execution
+- [ ] Test CSV upload and processing
+- [ ] Check memory usage during processing
+- [ ] Verify download functionality
+
+#### Phase 2: CRM Sync Mapper
+- [ ] Verify DuckDB implementation is complete
+- [ ] Check if DuckDB worker can be safely enabled
+- [ ] Test file upload flow
+- [ ] Verify matching engine works
+- [ ] Test with sample dataset
+
+#### Phase 3: Batch Jobs System
+- [ ] Identify which worker should be used
+- [ ] Check if streaming is implemented
+- [ ] Verify job queue connection
+- [ ] Test job submission and processing
+
+#### Phase 4: Infrastructure
+- [ ] Check database connection pooling
+- [ ] Verify Redis graceful degradation
+- [ ] Check memory limits and monitoring
+- [ ] Review error handling
+
+#### Phase 5: Fix Critical Issues
+- [ ] Enable DuckDB worker for CRM Sync
+- [ ] Enable or fix Batch Jobs worker
+- [ ] Implement missing upload endpoint
+- [ ] Remove debug logging
+- [ ] Test all fixes
+
+#### Phase 6: Final Verification
+- [ ] Test client-side normalization with 10k rows
+- [ ] Test CRM Sync with multiple enrichment files
+- [ ] Test Batch Jobs with 50k+ rows
+- [ ] Monitor memory usage
+- [ ] Create stability report
+
+---
+
+### Success Criteria
+
+✅ Client-side normalization works for files up to 100k rows
+✅ CRM Sync Mapper processes jobs without memory crashes
+✅ Batch Jobs system processes jobs in background
+✅ Memory usage stays under 1GB during processing
+✅ No unhandled errors or crashes
+✅ All workers start successfully
+✅ Jobs complete and produce correct output
+
+---
+
+### Rollback Plan
+
+If fixes cause instability:
+1. Revert to current state (workers disabled)
+2. Keep client-side normalization working
+3. Document issues for future fix
+4. Inform user of limitations

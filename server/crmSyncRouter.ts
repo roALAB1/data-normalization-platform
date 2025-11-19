@@ -281,9 +281,12 @@ export const crmSyncRouter = router({
       const timestamp = Date.now();
       const s3Key = `crm-sync/${userId}/${timestamp}/${input.fileName}`;
 
-      // TODO: Generate presigned upload URL
-      // For now, return placeholder
-      const uploadUrl = `https://s3.amazonaws.com/bucket/${s3Key}?presigned=true`;
+      // Generate presigned upload URL using storage module
+      // Note: Our storage module uses POST-based upload with Bearer token auth
+      // The client will need to upload via storagePut or direct POST to the upload endpoint
+      const { ENV } = await import("./_core/env.js");
+      const baseUrl = ENV.forgeApiUrl.replace(/\/+$/, "");
+      const uploadUrl = `${baseUrl}/v1/storage/upload?path=${encodeURIComponent(s3Key)}`;
 
       return {
         success: true,

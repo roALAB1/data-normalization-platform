@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO apiKeys (userId, `key`, name, permissions, expiresAt) VALUES (1, '1a0d1b016517b5a9c0ff1a9398efa6737f86f836bebfddabc6f057709a2a495b', 'Antigravity Integration', '[\"read\", \"write\"]', DATE_ADD(NOW(), INTERVAL 1 YEAR));",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2RTfe2F36qbNVzX.7e59071c076e --database MRXpdHeBYiqMHHEPvgWa5w --execute INSERT INTO apiKeys (userId, `key`, name, permissions, expiresAt) VALUES (1, '1a0d1b016517b5a9c0ff1a9398efa6737f86f836bebfddabc6f057709a2a495b', 'Antigravity Integration', '[\"read\", \"write\"]', DATE_ADD(NOW(), INTERVAL 1 YEAR));",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 72
+}

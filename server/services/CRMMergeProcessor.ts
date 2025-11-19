@@ -515,31 +515,6 @@ export class CRMMergeProcessor {
 
     // Filter to only selected columns
     const selectedColumns = columnConfigs.filter(c => c.selected).map(c => c.name);
-    console.log(`[CRMMergeProcessor] ========== COLUMN SELECTION DEBUG ==========`);
-    console.log(`[CRMMergeProcessor] Total column configs: ${columnConfigs.length}`);
-    console.log(`[CRMMergeProcessor] Selected columns (${selectedColumns.length}):`, selectedColumns);
-    
-    if (mergedData.length > 0) {
-      const availableColumns = Object.keys(mergedData[0]);
-      console.log(`[CRMMergeProcessor] Available columns in merged data (${availableColumns.length}):`, availableColumns);
-      
-      // Check which selected columns are missing from merged data
-      const missingColumns = selectedColumns.filter(col => !availableColumns.includes(col));
-      if (missingColumns.length > 0) {
-        console.error(`[CRMMergeProcessor] ⚠️ WARNING: ${missingColumns.length} selected columns are MISSING from merged data:`, missingColumns);
-      }
-      
-      // Check first row data for enriched columns
-      const firstRow = mergedData[0];
-      const enrichedColumns = selectedColumns.filter(col => 
-        !this.jobData.originalFile.columns.includes(col)
-      );
-      console.log(`[CRMMergeProcessor] Enriched columns in selection (${enrichedColumns.length}):`, enrichedColumns);
-      console.log(`[CRMMergeProcessor] First row enriched data sample:`);
-      enrichedColumns.slice(0, 5).forEach(col => {
-        console.log(`  ${col}: ${JSON.stringify(firstRow[col])}`);
-      });
-    }
     
     return mergedData.map((row, index) => {
       const filteredRow: Record<string, any> = {};

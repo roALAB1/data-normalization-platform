@@ -4,10 +4,10 @@ import { NormalizationJobData } from './JobQueue';
 import { updateJobStatus, updateJobProgressSimple } from '../jobDb';
 import { storageGet, storagePut } from '../storage';
 import { IntelligentBatchProcessor } from '../services/IntelligentBatchProcessor';
-import { NameEnhanced } from '../../shared/normalization/names/NameEnhanced';
-import { PhoneEnhanced } from '../../shared/normalization/phones/PhoneEnhanced';
-import { EmailEnhanced } from '../../shared/normalization/emails/EmailEnhanced';
-import { AddressFormatter } from '../../shared/normalization/addresses/AddressFormatter';
+import { NameEnhanced } from '../../shared/normalization/names';
+import { PhoneEnhanced } from '../../shared/normalization/phones';
+import { EmailEnhanced } from '../../shared/normalization/emails';
+import { AddressFormatter } from '../../shared/normalization/addresses';
 import Papa from 'papaparse';
 
 /**

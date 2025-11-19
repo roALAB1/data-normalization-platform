@@ -18,7 +18,6 @@ const redisConnection = {
     console.log(`[Redis] Retry attempt ${times}, waiting ${delay}ms`);
     return delay;
   },
-  maxRetriesPerRequest: null,
   enableReadyCheck: true,
   connectTimeout: 10000, // 10 second connection timeout
 };

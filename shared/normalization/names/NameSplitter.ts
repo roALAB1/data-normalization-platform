@@ -10,7 +10,7 @@
  * - Single names: "Madonna" → { first: "Madonna", last: "" }
  */
 
-import { NameEnhanced } from './NameEnhanced';
+import { NameEnhanced } from '../../../client/src/lib/NameEnhanced';
 
 export interface SplitNameResult {
   firstName: string;

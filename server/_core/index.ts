@@ -115,29 +115,25 @@ async function startServer() {
     console.log(`Server running on http://localhost:${port}/`);
     console.log(`[Health] Health check available at http://localhost:${port}/api/health`);
     
-    // Start job queue processor with error handling
-    // DISABLED: Job processor can cause memory issues with large datasets
-    // TODO: Implement proper queue management before re-enabling
-    // try {
-    //   const { startJobQueue } = await import("../jobProcessor.js");
-    //   startJobQueue();
-    //   console.log("[JobQueue] Background job processor started");
-    // } catch (error) {
-    //   console.error("[JobQueue] Failed to start job processor:", error);
-    //   // Continue without job processor rather than crashing
-    // }
-    console.log("[JobQueue] Job queue processor DISABLED (prevents memory issues)");
+    // Start batch jobs worker (uses IntelligentBatchProcessor with streaming)
+    try {
+      const { BatchWorker } = await import("../queue/BatchWorker.js");
+      BatchWorker.getInstance();
+      console.log("[BatchWorker] Batch jobs worker started successfully");
+    } catch (error) {
+      console.warn("[BatchWorker] Failed to start batch jobs worker:", error);
+      // Continue without worker rather than crashing
+    }
 
-    // Start CRM merge worker
-    // DISABLED: CRM worker causes memory crashes with large datasets (200k+ rows)
-    // TODO: Implement streaming/chunking before re-enabling
-    // try {
-    //   const { crmMergeWorker } = await import("../queue/CRMMergeWorker.js");
-    //   console.log("[CRMMergeWorker] CRM merge worker started");
-    // } catch (error) {
-    //   console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
-    // }
-    console.log("[CRMMergeWorker] CRM merge worker DISABLED (prevents memory crashes)");
+    // Start DuckDB CRM merge worker (replaces old CSV-based worker)
+    try {
+      const { DuckDBCRMMergeWorker } = await import("../queue/DuckDBCRMMergeWorker.js");
+      DuckDBCRMMergeWorker.getInstance();
+      console.log("[DuckDBCRMMergeWorker] DuckDB CRM merge worker started successfully");
+    } catch (error) {
+      console.warn("[DuckDBCRMMergeWorker] Failed to start DuckDB CRM merge worker:", error);
+      // Continue without worker rather than crashing
+    }
 
     // Start connection pool metrics collection
     try {
@@ -146,6 +142,15 @@ async function startServer() {
       console.log("[Monitoring] Connection pool metrics collection started");
     } catch (error) {
       console.warn("[Monitoring] Failed to start connection pool metrics:", error);
+    }
+
+    // Start polling-based job queue as fallback when Redis is unavailable
+    try {
+      const { startJobQueue } = await import("../jobProcessor.js");
+      startJobQueue();
+      console.log("[JobQueue] Polling-based job queue started (Redis fallback)");
+    } catch (error) {
+      console.warn("[JobQueue] Failed to start polling job queue:", error);
     }
   });
 }

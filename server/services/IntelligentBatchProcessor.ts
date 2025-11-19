@@ -1,10 +1,10 @@
 // @ts-nocheck
 import Papa from 'papaparse';
-import { NameEnhanced } from '../../shared/normalization/names/NameEnhanced';
+import { NameEnhanced } from '../../shared/normalization/names';
 import { NameSplitter } from '../../shared/normalization/names/NameSplitter';
-import { PhoneEnhanced } from '../../shared/normalization/phones/PhoneEnhanced';
-import { EmailEnhanced } from '../../shared/normalization/emails/EmailEnhanced';
-import { AddressFormatter } from '../../shared/normalization/addresses/AddressFormatter';
+import { PhoneEnhanced } from '../../shared/normalization/phones';
+import { EmailEnhanced } from '../../shared/normalization/emails';
+import { AddressFormatter } from '../../shared/normalization/addresses';
 
 /**
  * Column type detection result
