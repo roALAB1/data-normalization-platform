@@ -61,7 +61,12 @@ export async function processJob(jobId: number): Promise<void> {
       const chunk = lines.slice(i, i + chunkSize);
       const chunkResults = await processChunk(chunk, i, job);
 
-      results.push(...chunkResults.map(r => r.result));
+      // Map to include input/output at top level for CSV generation
+      results.push(...chunkResults.map(r => ({
+        ...r.result,
+        input: r.input,
+        output: r.output
+      })));
       processedRows += chunk.length;
       validRows += chunkResults.filter(r => r.result.isValid).length;
       invalidRows += chunkResults.filter(r => !r.result.isValid).length;

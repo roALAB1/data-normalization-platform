@@ -2836,3 +2836,27 @@ If fixes cause instability:
 2. Keep client-side normalization working
 3. Document issues for future fix
 4. Inform user of limitations
+
+
+---
+
+## v3.40.4 - Job Processing Fixes (Antigravity Integration)
+
+**Status:** IN PROGRESS
+
+### Critical Bugs
+- [x] Fix CSV output bug - original and normalized columns are empty
+- [x] Fix slow job pickup (100 seconds instead of 5-10 seconds)
+- [x] Test end-to-end job processing after fixes
+- [x] Verify output CSV has correct data
+
+### Root Causes Identified
+1. **CSV Output Bug**: processChunk() returns result object with `input` and `output` fields, but generateOutputCsv() expects `r.input` and `r.output` to exist at the result level
+2. **Slow Job Pickup**: Job processor may be restarting frequently or deployment environment is slow
+
+### Tasks
+- [ ] Fix generateOutputCsv() to correctly access input/output from result objects
+- [ ] Restart dev server to clear any job processor issues
+- [ ] Submit test job and verify completion time < 15 seconds
+- [ ] Verify output CSV has correct original and normalized values
+- [ ] Create checkpoint v3.40.4
