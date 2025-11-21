@@ -129,7 +129,7 @@ export const crmSyncRouter = router({
         // Prepare job data
         const jobData: CRMMergeJobData = {
           jobId: job.id,
-          userId: ctx.user.id,
+          userId: userId,
           originalFile: input.originalFile,
           enrichedFiles: input.enrichedFiles,
           selectedIdentifiers: input.selectedIdentifiers,

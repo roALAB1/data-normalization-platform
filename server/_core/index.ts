@@ -125,10 +125,15 @@ async function startServer() {
       // Continue without worker rather than crashing
     }
 
-    // DuckDB CRM merge worker disabled - removed in v3.40.5 to fix deployment
-    // The DuckDB dependency requires native bindings that aren't available in all environments
-    // CRM merge functionality is disabled until a pure JavaScript solution is implemented
-    console.log("[CRMMergeWorker] DuckDB worker disabled - CRM merge feature unavailable");
+    // Start CSV-based CRM merge worker (DuckDB version was removed in v3.40.5)
+    try {
+      const { CRMMergeWorker } = await import("../queue/CRMMergeWorker.js");
+      CRMMergeWorker.getInstance();
+      console.log("[CRMMergeWorker] CSV-based CRM merge worker started successfully");
+    } catch (error) {
+      console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
+      // Continue without worker rather than crashing
+    }
 
     // Start connection pool metrics collection
     try {

@@ -2860,3 +2860,27 @@ If fixes cause instability:
 - [ ] Submit test job and verify completion time < 15 seconds
 - [ ] Verify output CSV has correct original and normalized values
 - [ ] Create checkpoint v3.40.4
+
+
+## v3.40.6 - CRITICAL BUG: CRM Sync Jobs Not Being Created
+
+**Status:** IN PROGRESS
+
+**Problem:** 
+- User completes all CRM Sync steps (connect Airtable, map fields, configure merge)
+- Clicks final submit button to create merge job
+- Job is NOT created in database
+- Job does NOT appear in Batch Jobs page
+- No processing happens
+
+**Root Cause:** TBD - investigating submission flow
+
+**Tasks:**
+- [ ] Investigate CRM Sync submission API endpoint
+- [ ] Check if API call is being made from frontend
+- [ ] Check if backend is receiving the request
+- [ ] Check if job is being created in database
+- [ ] Fix the broken submission flow
+- [ ] Test end-to-end CRM Sync workflow
+- [ ] Verify job appears in Batch Jobs page
+- [ ] Create checkpoint v3.40.6
