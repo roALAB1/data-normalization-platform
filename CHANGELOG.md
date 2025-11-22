@@ -2,6 +2,22 @@
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
+## [3.40.6] - 2025-11-21
+
+### Changed
+- **Version Update**: Updated all footer versions across application pages to v3.40.6
+  - Updated BatchJobs.tsx footer to v3.40.6
+  - Updated CRMSyncMapper.tsx footer to v3.40.6
+  - Updated Home.tsx footer to v3.40.6
+  - Updated IntelligentNormalization.tsx footer to v3.40.6
+  - Updated MemoryMonitoringDashboard.tsx footer to v3.40.6
+  - Updated README.md overview version to v3.40.6
+  - Updated package.json version to 3.40.6
+
+### Improved
+- **Documentation**: Updated README and CHANGELOG with v3.40.6 release information
+- **GitHub Integration**: Complete release workflow with commits, tags, and release notes
+
 ## [3.40.0] - 2025-11-17
 
 ### Fixed

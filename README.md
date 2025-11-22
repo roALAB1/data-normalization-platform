@@ -4,7 +4,7 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with batch processing API, real-time monitoring, and Redis caching (v3.24.0):
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with batch processing API, real-time monitoring, and Redis caching (v3.40.6):
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
