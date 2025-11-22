@@ -43,11 +43,14 @@ jobs:
             COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --reverse)
           fi
           
-          # Create changelog content
-          CHANGELOG="## What's New in ${{ steps.version.outputs.tag }} 🚀
+          # Create changelog content using heredoc to avoid YAML escaping issues
+          cat > release-notes.md << 'RELEASE_NOTES_EOF'
+## What's New in ${{ steps.version.outputs.tag }} 🚀
 
 ### Changes
-$COMMITS
+RELEASE_NOTES_EOF
+          echo "$COMMITS" >> release-notes.md
+          cat >> release-notes.md << 'RELEASE_NOTES_EOF'
 
 ---
 
@@ -55,20 +58,19 @@ $COMMITS
 See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for complete version history.
 
 ## Installation
-\`\`\`bash
+```bash
 git clone https://github.com/${{ github.repository }}.git
 cd data-normalization-platform
 pnpm install
 pnpm run dev
-\`\`\`
+```
 
 ## Documentation
 - [README.md](https://github.com/${{ github.repository }}/blob/main/README.md)
 - [VERSION_HISTORY.md](https://github.com/${{ github.repository }}/blob/main/VERSION_HISTORY.md)
-- [API Documentation](https://github.com/${{ github.repository }}/blob/main/API_DOCUMENTATION.md)"
+- [API Documentation](https://github.com/${{ github.repository }}/blob/main/API_DOCUMENTATION.md)
+RELEASE_NOTES_EOF
           
-          # Save to file and output
-          echo "$CHANGELOG" > release-notes.md
           echo "Generated changelog for ${{ steps.version.outputs.tag }}"
       
       - name: Create GitHub Release
