@@ -8,15 +8,15 @@ A production-ready web application for normalizing and cleaning messy data at sc
 
 ## 🎯 Overview
 
-A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with batch processing API, real-time monitoring, and Redis caching (v3.40.6):
+A unified, enterprise-scale data normalization platform that automatically detects and normalizes multiple data types in a single workflow with batch processing API, real-time monitoring, and Redis caching (v3.41.0):
 
 - **Intelligent Auto-Detection**: Automatically identifies column types (name, email, phone, address, city, state, zip, country, company) with 95%+ accuracy
 - **Multi-Column Processing**: Normalize all columns simultaneously with real-time progress tracking
-- **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v2.1.0)
+- **Enterprise Streaming**: Process 100k+ rows with memory-efficient streaming architecture (v3.41.0)
 - **Parallel Processing**: Web Worker pool (4-8 workers) for maximum performance
-- **Real-Time Memory Monitoring** (v3.19.1): Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics
-- **Company Name Detection** (v3.19.2): Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation
-- **Results Preservation** (v3.19.2): Seamless navigation between results and monitoring dashboard without data loss
+- **Real-Time Memory Monitoring** (v3.41.0): Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics
+- **Company Name Detection** (v3.41.0): Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation
+- **Results Preservation** (v3.41.0): Seamless navigation between results and monitoring dashboard without data loss
 - **Specialized Normalizers**:
   - **Names**: 750+ credentials, Asian name detection, context-aware parsing
   - **Phones**: 250+ countries, type detection, multiple formats
@@ -26,16 +26,16 @@ A unified, enterprise-scale data normalization platform that automatically detec
 
 ### Key Features
 
-✅ **Intelligent Multi-Type Platform** 🤖: Auto-detect data types (name, email, phone, address) with 95%+ accuracy and normalize multiple columns (v2.0.0)  
-✅ **Address Normalization** 🏠: Title Case conversion, 27+ street suffix abbreviations, 10,000+ addresses/second (v1.5.0)  
+✅ **Intelligent Multi-Type Platform** 🤖: Auto-detect data types (name, email, phone, address) with 95%+ accuracy and normalize multiple columns (v3.41.0)  
+✅ **Address Normalization** 🏠: Title Case conversion, 27+ street suffix abbreviations, 10,000+ addresses/second (v3.41.0)  
 ✅ **750+ Professional Credentials**: Comprehensive coverage across healthcare, finance, IT, engineering, supply chain, legal, education, and more  
-✅ **Enterprise Email Verification** 📧: MX record validation, SMTP testing, disposable detection, reputation scoring (v1.4.0)  
-✅ **Email CSV Batch Processing** 📊: Upload CSV files with up to 10,000 emails for bulk normalization (v1.3.1)  
-✅ **Phone Normalization Enhanced** 📱: Google libphonenumber integration with 250+ countries, type detection, multiple formats (v1.2.0)  
-✅ **WebSocket Progress Tracking** ⚡: Real-time batch job updates with <100ms latency (v1.1.0)  
-✅ **Asian Name Detection** 🌏: Intelligent detection of family-name-first patterns for 400+ Chinese/Korean/Japanese/Vietnamese surnames (v1.1.0)  
-✅ **Context-Aware Parsing** 🧠: Uses email/phone/company context to boost parsing accuracy (v1.1.0)  
-✅ **Cross-Page Navigation** 🧭: Seamless navigation between all demo pages (v1.4.1)  
+✅ **Enterprise Email Verification** 📧: MX record validation, SMTP testing, disposable detection, reputation scoring (v3.41.0)  
+✅ **Email CSV Batch Processing** 📊: Upload CSV files with up to 10,000 emails for bulk normalization (v3.41.0)  
+✅ **Phone Normalization Enhanced** 📱: Google libphonenumber integration with 250+ countries, type detection, multiple formats (v3.41.0)  
+✅ **WebSocket Progress Tracking** ⚡: Real-time batch job updates with <100ms latency (v3.41.0)  
+✅ **Asian Name Detection** 🌏: Intelligent detection of family-name-first patterns for 400+ Chinese/Korean/Japanese/Vietnamese surnames (v3.41.0)  
+✅ **Context-Aware Parsing** 🧠: Uses email/phone/company context to boost parsing accuracy (v3.41.0)  
+✅ **Cross-Page Navigation** 🧭: Seamless navigation between all demo pages (v3.41.0)  
 ✅ **Intelligent CSV Parsing**: Auto-detects column structure (single full name, first/last split, multi-column)  
 ✅ **Batch Processing**: Server-side job queue handles unlimited dataset sizes  
 ✅ **Real-time Processing**: Interactive demo for testing individual records  
@@ -47,9 +47,9 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Statistics Dashboard**: Track valid/invalid ratios, processing time, data quality metrics  
 ✅ **Authentication**: Secure user accounts with job history  
 ✅ **S3 Storage**: Scalable file storage for uploads and results  
-✅ **Real-Time Memory Monitoring** 📊: Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics (v3.19.1)  
-✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.19.2)  
-✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.19.2)
+✅ **Real-Time Memory Monitoring** 📊: Live dashboard tracking worker pool performance, memory usage, recycling events, retry statistics (v3.41.0)  
+✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.41.0)  
+✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.41.0)
 
 ### What's New in v3.40.1 🚀
 
@@ -291,7 +291,7 @@ Real-time batch job updates with instant feedback (<100ms latency vs 5-second po
 **Context-Aware Parsing** 🧠  
 Analyzes email domains, phone country codes, and company names to boost parsing accuracy. Uses weighted voting to detect cultural patterns and improve confidence scores.
 
-### Recent Improvements (v1.0.0)
+### Recent Improvements (v3.41.0)
 
 - **750+ Credentials**: Expanded from ~100 to 750+ professional credentials across all industries
 - **Hybrid Monorepo**: Refactored into publishable `@normalization/core` package
@@ -576,7 +576,7 @@ Edit configuration files in `shared/normalization/`:
 - Case normalization
 - Batch CSV processing (up to 10,000 emails)
 
-**Enterprise Verification** (v1.4.0):
+**Enterprise Verification** (v3.41.0):
 - MX record validation (DNS lookup for mail exchange servers)
 - SMTP connection testing (verify server reachability)
 - Mailbox verification (RCPT TO command)
@@ -711,8 +711,8 @@ All critical bugs have been fixed:
 - ✅ Multiple parentheses handling ("John Doe (he/him) (Ph.D.)" works correctly)
 - ✅ Vite HMR WebSocket configuration (no console errors)
 - ✅ Deployment path mappings (all imports resolved correctly)
-- ✅ Phone Demo old version button removed (v1.4.1)
-- ✅ Cross-page navigation implemented (v1.4.1)
+- ✅ Phone Demo old version button removed (v3.41.0)
+- ✅ Cross-page navigation implemented (v3.41.0)
 
 ## 📚 Documentation
 

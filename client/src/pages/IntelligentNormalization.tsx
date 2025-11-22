@@ -1297,11 +1297,11 @@ headers.forEach(header => {
                             <ReportIssueButton
                               originalInput={Object.values(result.originalRow).join(' ')}
                               actualOutput={{
-                                full: null, // v3.10.0: Full name no longer in output
+                                full: null, // v3.41.0: Full name no longer in output
                                 first: result.normalizedRow['First Name'] || null,
-                                middle: null, // v3.10.0: Middle name no longer in output
+                                middle: null, // v3.41.0: Middle name no longer in output
                                 last: result.normalizedRow['Last Name'] || null,
-                                suffix: null, // v3.10.0: Suffix no longer in output
+                                suffix: null, // v3.41.0: Suffix no longer in output
                               }}
                             />
                           </td>
@@ -1348,7 +1348,7 @@ headers.forEach(header => {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.40.6</span>
+          <span>v3.41.0</span>
           <span>•</span>
           <a
             href="https://github.com/roALAB1/data-normalization-platform"

@@ -710,7 +710,7 @@ export default function CRMSyncMapper() {
       {/* Footer */}
       <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>v3.40.6 • CRM Sync Mapper - Identifier Column Mapping Fixed</p>
+          <p>v3.41.0 • CRM Sync Mapper - Identifier Column Mapping Fixed</p>
         </div>
       </footer>
     </div>

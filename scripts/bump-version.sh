@@ -116,8 +116,12 @@ CHANGELOG_ENTRY="## [${NEW_VERSION}] - ${DATE}
 "
 
 # Insert after the first line (# Changelog)
-sed -i "2i\\
-$CHANGELOG_ENTRY" CHANGELOG.md
+# Use printf to avoid issues with multiline sed
+TEMP_FILE=$(mktemp)
+head -n 1 CHANGELOG.md > "$TEMP_FILE"
+printf "%s\n" "$CHANGELOG_ENTRY" >> "$TEMP_FILE"
+tail -n +2 CHANGELOG.md >> "$TEMP_FILE"
+mv "$TEMP_FILE" CHANGELOG.md
 
 echo -e "${GREEN}✓ CHANGELOG.md updated${NC}"
 

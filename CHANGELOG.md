@@ -1,4 +1,10 @@
 # Changelog
+## [3.41.0] - 2025-11-21
+
+### Changed
+- Version bump to 3.41.0
+
+
 
 All notable changes to the Data Normalization Platform are documented in this file.
 
