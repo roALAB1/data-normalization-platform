@@ -1,0 +1,148 @@
+{
+  "totalAddresses": 200,
+  "secondaryAddressesStripped": 12,
+  "runOnAddressesParsed": 20,
+  "unchanged": 104,
+  "examples": [
+    {
+      "type": "secondary",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 13,
+      "original": "2833 s 115th E. Ave. Apt G",
+      "normalized": "2833 S 115th E. Ave."
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 33,
+      "original": "15535 Rancho Tehama Road",
+      "normalized": "15535 Rancho Tehama Rd"
+    },
+    {
+      "type": "secondary",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 36,
+      "original": "1421 sw 27th ave apt 402 Ocala fl",
+      "normalized": "1421 Sw 27th Ave"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 39,
+      "original": "67115 Mission Dr67115 mission drive",
+      "normalized": "67115 Mission Dr67115 Mission Dr"
+    },
+    {
+      "type": "secondary",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 54,
+      "original": "100 E Vaughn Rd Apt. 2111. Apt 2111",
+      "normalized": "100 E Vaughn Rd"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 62,
+      "original": "14505 Stetson road Los Gatos California 95033",
+      "normalized": "14505 Rd"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 71,
+      "original": "11087 Robinson Dr Nw. 229",
+      "normalized": "11087 Robinson Dr"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 76,
+      "original": "6655 n highway 35 Rockport TX",
+      "normalized": "6655 N Hwy"
+    },
+    {
+      "type": "secondary",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 77,
+      "original": "4929 York St#1124",
+      "normalized": "4929 York St"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 78,
+      "original": "175 2nd St SE oldtown/",
+      "normalized": "175 2nd St"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 80,
+      "original": "112 Larkspur Dr. Searcy.AR",
+      "normalized": "112 Larkspur Dr."
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 84,
+      "original": "183 Confederate Wy. Rocky Face. GA. USA",
+      "normalized": "183 Confederate Wy. Rocky Face. Ga."
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 92,
+      "original": "9400 SE 187th Terrace",
+      "normalized": "9400 Se 187th Ter"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-1900-a-scores-carter-1_xvxe56.csv",
+      "row": 99,
+      "original": "10522 Chicken Hollow Trl",
+      "normalized": "10522 Chicken Hollow"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-results-3000-b-to-f-ca_1d54rwg.csv",
+      "row": 3,
+      "original": "815 S West St Green City MO 63545",
+      "normalized": "815 S West St"
+    },
+    {
+      "type": "secondary",
+      "file": "cleaned-results-3000-b-to-f-ca_1d54rwg.csv",
+      "row": 10,
+      "original": "301 w6th st. ste 108",
+      "normalized": "301 W6th St."
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-results-3000-b-to-f-ca_1d54rwg.csv",
+      "row": 12,
+      "original": "44205 Highway 105",
+      "normalized": "44205 Hwy"
+    },
+    {
+      "type": "secondary",
+      "file": "cleaned-results-3000-b-to-f-ca_1d54rwg.csv",
+      "row": 13,
+      "original": "4426 E Lee St Unit 2",
+      "normalized": "4426 E Lee St"
+    },
+    {
+      "type": "secondary",
+      "file": "cleaned-results-3000-b-to-f-ca_1d54rwg.csv",
+      "row": 23,
+      "original": "100 riverbend dr apt i11",
+      "normalized": "100 Riverbend Dr"
+    },
+    {
+      "type": "runon",
+      "file": "cleaned-results-3000-b-to-f-ca_1d54rwg.csv",
+      "row": 24,
+      "original": "11133 ellis lane parks ar 72950",
+      "normalized": "11133 Ellis Ln"
+    }
+  ]
+}

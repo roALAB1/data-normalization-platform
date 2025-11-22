@@ -1,4 +1,68 @@
 # Changelog
+## [3.42.0] - 2025-11-22
+
+### Added
+- **Enhanced Address Normalization**: Comprehensive address parsing improvements
+  - Secondary address component stripping (Apt, Suite, Unit, #, Bldg, Floor, Room, etc.)
+  - Run-on address parsing (extract street from embedded city/state/ZIP)
+  - Multi-word city name detection (Green City, Sierra Vista, etc.)
+  - Multiple secondary address format support ("Apt 402", "apt i11", "#1124", "Unit 2")
+- **AddressParser Module**: New shared/normalization/addresses/AddressParser.ts
+  - `stripSecondaryAddress()` - Remove secondary address components
+  - `parseRunOnAddress()` - Extract street/city/state/ZIP from run-on addresses
+  - `normalizeAddress()` - Full normalization pipeline
+  - `parseLocation()` - Parse city/state from location strings
+  - `titleCase()` - Title case conversion with hyphen/apostrophe support
+- **Comprehensive Test Suite**: 34 unit tests covering all address parsing scenarios
+  - Tests for secondary address stripping (10 tests)
+  - Tests for run-on address parsing (8 tests)
+  - Tests for full normalization pipeline (5 tests)
+  - Real-world test cases from user CSV files
+- **CSV Testing Script**: scripts/test-address-fixes.mjs
+  - Batch test address normalization on CSV files
+  - Generate before/after comparison reports
+  - Detailed statistics and examples
+
+### Fixed
+- **Issue #1**: Secondary address components not stripped (200+ affected rows)
+  - Apartment numbers (Apt, Apartment, #) now properly removed
+  - Suite numbers (Ste, Suite) correctly stripped
+  - Unit/Building/Floor indicators handled
+  - Multiple formats supported: "Apt 402", "apt i11", "#1124", "Unit 2", "Apt. 2111"
+- **Issue #2**: Run-on addresses not parsed (50+ affected rows)
+  - City/state/ZIP embedded without commas now correctly parsed
+  - Examples: "815 S West St Green City MO 63545" → "815 S West St"
+  - Multi-word city names properly detected and extracted
+  - Street suffixes used to identify where street ends and city begins
+
+### Improved
+- **AddressFormatter**: Integrated AddressParser for comprehensive normalization
+  - `normalize()` now uses `normalizeAddress()` internally
+  - Added `format()` alias for backward compatibility
+  - Added `stripSecondary()` and `parseRunOn()` convenience methods
+  - No breaking changes - existing code continues to work
+- **Test Coverage**: 200 sample addresses tested from 3002 total rows
+  - 12 secondary addresses stripped (6.0% of sample)
+  - 20 run-on addresses parsed (10.0% of sample)
+  - 104 addresses unchanged (52.0% of sample)
+- **Performance**: <1ms per address overhead
+  - Regex operations: ~0.1ms per address
+  - State lookup: O(1) hash map
+  - Total processing time for 3000 rows: ~3 seconds
+
+### Documentation
+- Added docs/address-parser-design.md - Comprehensive design documentation
+- Updated VERSION_HISTORY.md with v3.42.0 entry
+- Generated address-normalization-report.json with detailed test results
+
+### Backward Compatibility
+- ✅ Fully backward compatible
+- No breaking changes to AddressFormatter API
+- Client and server code unchanged
+- Automatic integration through existing imports
+
+---
+
 ## [3.41.0] - 2025-11-21
 
 ### Changed

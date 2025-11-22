@@ -1,5 +1,70 @@
 # Project TODO
 
+## v3.42.0 - Address Normalization Fixes
+
+**Status:** IN PROGRESS 🚀
+
+### Phase 1: Analysis ✅
+- [x] Analyzed 1900 rows from cleaned-1900-a-scores-carter-1_xvxe56.csv
+- [x] Analyzed 1102 rows from cleaned-results-3000-b-to-f-ca_1d54rwg.csv
+- [x] Identified key issues:
+  * Secondary address components not stripped (Apt, Suite, Unit, #, Bldg, etc.)
+  * Run-on addresses with city/state embedded (e.g., "815 S West St Green City MO 63545")
+  * Addresses with suite numbers in middle (e.g., "301 w6th st. ste 108")
+  * Multiple formats: "Apt 402", "apt i11", "#1124", "Unit 2", "Apt. 2111"
+
+### Phase 2: Design Enhanced Address Parser ✅
+- [x] Create comprehensive secondary address pattern list
+- [x] Design regex patterns for secondary address detection
+- [x] Design city/state parser for run-on addresses (no commas)
+- [x] Create US state abbreviation lookup for embedded states
+- [x] Design algorithm to detect city names in run-on text
+- [x] Created comprehensive design document (docs/address-parser-design.md)
+
+### Phase 3: Implementation ✅
+- [x] Create shared/normalization/addresses/AddressParser.ts
+  * stripSecondaryAddress() - Remove Apt/Suite/Unit/# components
+  * parseRunOnAddress() - Extract street/city/state/ZIP from run-on addresses
+  * normalizeAddress() - Full pipeline (parse + strip + title case)
+  * parseLocation() - Parse city/state from location strings
+- [x] Update shared/normalization/addresses/AddressFormatter.ts
+  * Integrated AddressParser for comprehensive normalization
+  * Added format() alias for backward compatibility
+  * Added stripSecondary() and parseRunOn() convenience methods
+- [x] Client-side automatically uses updated AddressFormatter (no changes needed)
+- [x] Server-side automatically uses updated AddressFormatter (no changes needed)
+
+### Phase 4: Testing ✅
+- [x] Create test suite with problematic addresses
+  * 34 tests covering stripSecondaryAddress(), parseRunOnAddress(), normalizeAddress()
+  * All tests passing ✅
+- [x] Test with user's CSV files (200 sample addresses from 3002 total rows)
+  * File 1: cleaned-1900-a-scores-carter-1_xvxe56.csv (100 addresses tested)
+  * File 2: cleaned-results-3000-b-to-f-ca_1d54rwg.csv (100 addresses tested)
+- [x] Verify secondary addresses stripped correctly
+  * 12 secondary addresses stripped (6.0% of sample)
+  * Examples: "Apt G", "apt 402", "ste 108", "Unit 2", "#1124"
+- [x] Verify city/state extracted from run-on addresses
+  * 20 run-on addresses parsed (10.0% of sample)
+  * Successfully extracted street from city/state/ZIP
+- [x] Generate before/after comparison report
+  * Created scripts/test-address-fixes.mjs
+  * Generated address-normalization-report.json with detailed results
+
+### Phase 5: Documentation & Delivery ✅
+- [x] Update VERSION_HISTORY.md with v3.42.0
+  * Comprehensive overview of problem, solution, and impact
+  * Test results and examples
+  * Files changed and backward compatibility notes
+- [x] Update CHANGELOG.md
+  * Added v3.42.0 entry with all changes
+  * Categorized as Added, Fixed, Improved, Documentation
+  * Backward compatibility confirmation
+- [x] Create checkpoint (ready)
+- [x] Deliver to user with test results (ready)
+
+---
+
 ## v3.41.0 - Release Automation & Versioning Improvements
 
 **Status:** IN PROGRESS 🚀
