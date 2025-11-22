@@ -186,3 +186,48 @@
 ### v3.13.9 - Systematic Credential Scan
 **Status:** COMPLETED ✅
 - Added 314 missing credentials (682 → 996)
+
+## v3.46.0 - Dynamic Versioning & Shared Footer Component
+
+**Status:** COMPLETED ✅
+
+**Goal:** Implement dynamic version fetching from package.json with caching, create reusable Footer component, and add GitHub releases link with hover preview
+
+### Phase 1: Create version management utilities and shared Footer component
+- [x] Create shared/versionManager.ts utility
+  - [x] readVersionFromPackageJson() function
+  - [x] getVersionWithCache() function (cache in localStorage)
+  - [x] Cache expiration (1 hour)
+- [x] Create client/src/components/Footer.tsx shared component
+  - [x] Accept version prop
+  - [x] Display version number
+  - [x] GitHub link with icon
+  - [x] Hover preview for releases link
+  - [x] Responsive design
+
+### Phase 2: Implement dynamic version fetching with caching
+- [x] Update versionManager.ts with caching logic
+  - [x] localStorage key: "app_version_cache"
+  - [x] Cache timestamp tracking
+  - [x] Automatic cache invalidation after 1 hour
+  - [x] Fallback to hardcoded version if fetch fails
+
+### Phase 3: Refactor all pages to use shared Footer component (PARALLEL)
+- [x] Home.tsx - Replace footer with shared component
+- [x] IntelligentNormalization.tsx - Replace footer with shared component
+- [x] BatchJobs.tsx - Replace footer with shared component
+- [x] CRMSyncMapper.tsx - Replace footer with shared component
+- [x] MemoryMonitoringDashboard.tsx - Replace footer with shared component
+
+### Phase 4: Add GitHub releases link with hover preview
+- [x] Add hover tooltip to releases link
+  - [x] Show "View releases on GitHub" on hover
+  - [x] Link to https://github.com/roALAB1/data-normalization-platform/releases
+  - [x] Simple link styling (no complex preview needed)
+
+### Phase 5: Test and save checkpoint
+- [x] Test version fetching on all pages
+- [x] Verify caching works correctly
+- [x] Test hover preview on GitHub link
+- [x] Create and run unit tests (21/21 tests passing)
+- [x] Save checkpoint with all changes

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Link } from 'wouter';
+import Footer from '@/components/Footer';
 
 export default function MemoryMonitoringDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -389,20 +390,7 @@ export default function MemoryMonitoringDashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-white/80 backdrop-blur-sm mt-12">
-        <div className="container mx-auto px-4 py-6 flex justify-center items-center gap-4 text-sm text-muted-foreground">
-          <span>v3.45.0 - Memory Monitoring Dashboard</span>
-          <span>•</span>
-          <a
-            href="https://github.com/roALAB1/data-normalization-platform"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground transition-colors"
-          >
-            GitHub
-          </a>
-        </div>
-      </footer>
+      <Footer description="Memory Monitoring Dashboard" />
     </div>
   );
 }
