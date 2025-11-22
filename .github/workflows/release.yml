@@ -1,0 +1,88 @@
+name: Release Automation
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          # Generate changelog from commits
+          if [ -z "$PREV_TAG" ]; then
+            # First release - get all commits
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --reverse)
+          else
+            # Get commits since previous tag
+            COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --reverse)
+          fi
+          
+          # Create changelog content
+          CHANGELOG="## What's New in ${{ steps.version.outputs.tag }} 🚀
+
+### Changes
+$COMMITS
+
+---
+
+## Full Changelog
+See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for complete version history.
+
+## Installation
+\`\`\`bash
+git clone https://github.com/${{ github.repository }}.git
+cd data-normalization-platform
+pnpm install
+pnpm run dev
+\`\`\`
+
+## Documentation
+- [README.md](https://github.com/${{ github.repository }}/blob/main/README.md)
+- [VERSION_HISTORY.md](https://github.com/${{ github.repository }}/blob/main/VERSION_HISTORY.md)
+- [API Documentation](https://github.com/${{ github.repository }}/blob/main/API_DOCUMENTATION.md)"
+          
+          # Save to file and output
+          echo "$CHANGELOG" > release-notes.md
+          echo "Generated changelog for ${{ steps.version.outputs.tag }}"
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.tag }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Summary
+        run: |
+          echo "✅ Release ${{ steps.version.outputs.tag }} created successfully!"
+          echo "📦 View release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"

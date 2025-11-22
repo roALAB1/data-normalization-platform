@@ -1,6 +1,46 @@
-# CHANGELOG
+# Changelog
 
 All notable changes to the Data Normalization Platform are documented in this file.
+
+## [3.41.0] - 2025-11-21
+
+### Added
+- **GitHub Actions Release Automation**: Automatic release creation when version tags are pushed
+  - Workflow triggers on `v*.*.*` tag push
+  - Generates changelog from commits since previous tag
+  - Creates GitHub release with automated release notes
+  - Includes installation instructions and documentation links
+- **Dynamic Version Badge**: Added GitHub release badge to README.md header
+  - Shows latest release version automatically
+  - Includes license and build status badges
+  - Professional shields.io styling
+- **Semantic Versioning Scripts**: Automated version bump commands
+  - `pnpm run version:patch` - Bump patch version (3.40.6 → 3.40.7)
+  - `pnpm run version:minor` - Bump minor version (3.40.6 → 3.41.0)
+  - `pnpm run version:major` - Bump major version (3.40.6 → 4.0.0)
+  - Auto-updates package.json, all footer versions, README.md, CHANGELOG.md
+  - Auto-creates git commit and tag with descriptive messages
+  - Interactive confirmation before applying changes
+
+### Improved
+- **Release Workflow**: Complete automation from version bump to GitHub release
+  - Single command to bump version and update all files
+  - Automatic git operations (commit + tag)
+  - Push to GitHub triggers automated release creation
+- **Documentation**: Added comprehensive VERSIONING.md guide
+  - Quick start instructions
+  - Complete release workflow
+  - Best practices for version bumping
+  - Troubleshooting guide
+- **Developer Experience**: Streamlined release process
+  - No manual file editing required
+  - Consistent version updates across all files
+  - Reduced human error in release process
+
+### Files Created
+- `.github/workflows/release.yml` - GitHub Actions release automation workflow
+- `scripts/bump-version.sh` - Automated version bump script
+- `VERSIONING.md` - Complete versioning and release documentation
 
 ## [3.40.6] - 2025-11-21
 

@@ -1,5 +1,9 @@
 # Data Normalization Platform
 
+[![GitHub Release](https://img.shields.io/github/v/release/roALAB1/data-normalization-platform?style=for-the-badge&logo=github&color=blue)](https://github.com/roALAB1/data-normalization-platform/releases/latest)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)](https://github.com/roALAB1/data-normalization-platform)
+
 A production-ready web application for normalizing and cleaning messy data at scale. Built to handle tens to hundreds of thousands of rows with intelligent parsing, validation, and formatting.
 
 ## 🎯 Overview
@@ -630,6 +634,49 @@ pnpm start
 ```
 
 Ensure environment variables are set in your production environment.
+
+## 🔄 Versioning & Releases
+
+The project uses **automated semantic versioning** with GitHub Actions for releases.
+
+### Quick Version Bump
+
+```bash
+# Patch version (bug fixes: 3.40.6 → 3.40.7)
+pnpm run version:patch
+
+# Minor version (new features: 3.40.6 → 3.41.0)
+pnpm run version:minor
+
+# Major version (breaking changes: 3.40.6 → 4.0.0)
+pnpm run version:major
+```
+
+### What Happens Automatically
+
+When you run a version bump:
+1. ✅ Updates `package.json` version
+2. ✅ Updates all footer versions across 5 pages
+3. ✅ Updates README.md overview version
+4. ✅ Adds CHANGELOG.md entry
+5. ✅ Creates git commit with descriptive message
+6. ✅ Creates git tag (e.g., `v3.40.7`)
+
+### Automated GitHub Releases
+
+After pushing the tag to GitHub:
+```bash
+git push origin main && git push origin v3.40.7
+```
+
+GitHub Actions automatically:
+- Generates changelog from commits
+- Creates GitHub release with release notes
+- Publishes release (visible at [Releases](https://github.com/roALAB1/data-normalization-platform/releases))
+
+**See [VERSIONING.md](VERSIONING.md) for complete documentation.**
+
+---
 
 ## 📝 Contributing
 
