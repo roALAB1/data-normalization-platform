@@ -25,6 +25,9 @@ importers:
       '@devmehq/email-validator-js':
         specifier: ^2.10.2
         version: 2.10.2
+      '@mardillu/us-cities-utils':
+        specifier: ^1.2.7
+        version: 1.2.7
       '@normalization/core':
         specifier: workspace:*
         version: link:packages/normalization-core
@@ -1131,6 +1134,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@mardillu/us-cities-utils@1.2.7':
+    resolution: {integrity: sha512-dCgN2ub5df6bN2F/vxAr7NcPpmBmf7frTil7PSGbEVGwjsCfbCmzeiCtavxCqParez9FWReb7wz4aWXOUXQO3w==}
 
   '@medv/finder@4.0.2':
     resolution: {integrity: sha512-RraNY9SCcx4KZV0Dh6BEW6XEW2swkqYca74pkFFRw6hHItSHiy+O/xMnpbofjYbzXj0tSpBGthUF1hHTsr3vIQ==}
@@ -6183,6 +6189,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@mardillu/us-cities-utils@1.2.7': {}
 
   '@medv/finder@4.0.2': {}
 

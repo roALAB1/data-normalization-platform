@@ -9,7 +9,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
   describe('ZIP+4 extraction', () => {
     it('should extract ZIP+4 format (12345-6789)', () => {
       const result = normalizeAddress('123 Main St Durham NC 27701-1234');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '123 Main St',
         city: 'Durham',
         state: 'NC',
@@ -19,7 +19,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should extract ZIP+4 from run-on address', () => {
       const result = normalizeAddress('456 Oak Ave Portland OR 97201-5678');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '456 Oak Ave',
         city: 'Portland',
         state: 'OR',
@@ -29,7 +29,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should handle ZIP+4 with secondary address', () => {
       const result = normalizeAddress('789 Elm St Apt 402 Seattle WA 98101-2345');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '789 Elm St',
         city: 'Seattle',
         state: 'WA',
@@ -39,7 +39,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should handle ZIP+4 without street suffix', () => {
       const result = normalizeAddress('321 Broadway Austin TX 78701-9876');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '321 Broadway',
         city: 'Austin',
         state: 'TX',
@@ -49,7 +49,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should still handle 5-digit ZIP codes', () => {
       const result = normalizeAddress('555 Pine St Boston MA 02101');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '555 Pine St',
         city: 'Boston',
         state: 'MA',
@@ -59,7 +59,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should handle addresses without ZIP', () => {
       const result = normalizeAddress('777 Maple Dr Chicago IL');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '777 Maple Dr',
         city: 'Chicago',
         state: 'IL',
@@ -69,7 +69,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should handle ZIP+4 with hyphenated street names', () => {
       const result = normalizeAddress('123 North-South Blvd Durham NC 27701-1111');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '123 North-South Blvd',
         city: 'Durham',
         state: 'NC',
@@ -79,7 +79,7 @@ describe('AddressParser v3.44.0 - ZIP+4 Support', () => {
 
     it('should handle ZIP+4 with periods in street names', () => {
       const result = normalizeAddress('301 w. 6th st. Austin TX 78701-2222');
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         street: '301 W 6th St',
         city: 'Austin',
         state: 'TX',

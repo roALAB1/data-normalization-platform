@@ -2,10 +2,12 @@
  * Enhanced Address Parser
  * 
  * Handles:
- * 1. Secondary address component stripping (Apt, Suite, Unit, #, Bldg, etc.)
- * 2. Run-on address parsing (city/state extraction without commas)
- * 3. Title case normalization
- * 4. Street suffix abbreviations
+ * 1. PO Box detection and normalization
+ * 2. Secondary address component stripping (Apt, Suite, Unit, #, Bldg, etc.)
+ * 3. Run-on address parsing (city/state extraction without commas)
+ * 4. Title case normalization
+ * 5. Street suffix abbreviations
+ * 6. Confidence scoring
  */
 
 // US State Abbreviations
@@ -39,7 +41,7 @@ export const STREET_SUFFIXES = [
   'street', 'st', 'avenue', 'ave', 'road', 'rd', 'boulevard', 'blvd',
   'drive', 'dr', 'lane', 'ln', 'court', 'ct', 'circle', 'cir',
   'place', 'pl', 'way', 'highway', 'hwy', 'parkway', 'pkwy',
-  'trail', 'trl', 'terrace', 'ter', 'plaza', 'plz'
+  'trail', 'trl', 'terrace', 'ter', 'plaza', 'plz', 'box' // PO Box support
 ];
 
 // Secondary address indicators
@@ -54,6 +56,27 @@ export interface ParsedAddress {
   city: string;
   state: string;
   zip: string;
+}
+
+export interface NormalizedAddress {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  isPOBox?: boolean;
+  boxNumber?: string;
+}
+
+export interface AddressParseResult extends NormalizedAddress {
+  confidence?: {
+    street: number;
+    city: number;
+    state: number;
+    zip: number;
+    overall: number;
+  };
+  flags?: string[];
+  confidence_level?: 'high' | 'medium' | 'low';
 }
 
 /**
@@ -103,6 +126,41 @@ export function stripSecondaryAddress(address: string): string {
 }
 
 /**
+ * Normalize PO Box format to standard "PO Box XXX"
+ * 
+ * @param address - Raw address string
+ * @returns Object with normalized address and PO Box info
+ */
+function normalizePOBox(address: string): { address: string; isPOBox: boolean; boxNumber: string } {
+  if (!address) {
+    return { address: '', isPOBox: false, boxNumber: '' };
+  }
+  
+  // Pattern matches various PO Box formats:
+  // - P.O. Box 123
+  // - PO Box 123
+  // - POBox 123
+  // - P O Box 123
+  // - P.O.Box 123
+  // - P.O. BOX 123
+  // - etc.
+  const poBoxPattern = /\b(p\.?\s*o\.?\s*box|pobox|p\s+o\s+box)\s+([a-z0-9\-]+)\b/gi;
+  const match = poBoxPattern.exec(address);
+  
+  if (match) {
+    const boxNumber = match[2].trim();
+    // Replace with standard format
+    const normalized = address.replace(
+      /\b(p\.?\s*o\.?\s*box|pobox|p\s+o\s+box)\s+/gi,
+      'PO Box '
+    );
+    return { address: normalized, isPOBox: true, boxNumber: boxNumber };
+  }
+  
+  return { address: address, isPOBox: false, boxNumber: '' };
+}
+
+/**
  * Parse run-on address (extract city, state, ZIP from address without commas)
  * 
  * @param address - Full address string (may contain city/state/ZIP without commas)
@@ -149,6 +207,22 @@ export function parseRunOnAddress(address: string): ParsedAddress {
   const words = remaining.split(/\s+/);
   let streetEndIndex = -1;
   
+  // Special handling for PO Box: "PO Box XXX" should be treated as complete street
+  if (words.length >= 3 && words[0].toUpperCase() === 'PO' && words[1].toLowerCase() === 'box') {
+    // PO Box format: take "PO Box" + box number as street
+    street = words.slice(0, 3).join(' '); // "PO Box 456"
+    // Everything after box number = city/state/zip
+    const remaining2 = words.slice(3).join(' ');
+    if (remaining2) {
+      // Parse city from remaining
+      const cityWords = remaining2.split(/\s+/);
+      if (cityWords.length > 0) {
+        city = cityWords[0]; // First word after box number is city
+      }
+    }
+    return { street: street.trim(), city: city.trim(), state: state.trim(), zip: zip.trim() };
+  }
+  
   for (let i = words.length - 1; i >= 0; i--) {
     const word = words[i].toLowerCase().replace(/[.,]/g, '');
     // Check if entire word is a street suffix (don't split on hyphens)
@@ -174,7 +248,7 @@ export function parseRunOnAddress(address: string): ParsedAddress {
       // Likely format: "123 Main Durham" or "456 Maple Dr Springfield"
       // Check if second-to-last word looks like a street suffix abbreviation
       const secondToLast = words.length >= 2 ? words[words.length - 2].toLowerCase().replace(/[.,]/g, '') : '';
-      const isCommonAbbr = ['dr', 'st', 'ave', 'rd', 'ln', 'ct', 'blvd', 'way'].includes(secondToLast);
+      const isCommonAbbr = ['dr', 'st', 'ave', 'rd', 'ln', 'ct', 'blvd', 'way', 'box'].includes(secondToLast);
       
       if (isCommonAbbr && words.length >= 3) {
         // Format: "456 Maple Dr Springfield" - last word is city, everything before is street
@@ -215,8 +289,20 @@ export function parseRunOnAddress(address: string): ParsedAddress {
 export function titleCase(str: string): string {
   if (!str) return '';
   
-  return str
-    .toLowerCase()
+  const lowerStr = str.toLowerCase();
+  
+  // Special case: preserve PO Box format - check for space after
+  if (lowerStr.startsWith('po box ')) {
+    // Already normalized, just ensure uppercase PO Box
+    return 'PO Box ' + titleCase(str.slice(7));
+  }
+  
+  // Also handle "PO Box" without trailing space (end of string)
+  if (lowerStr === 'po box') {
+    return 'PO Box';
+  }
+  
+  return lowerStr
     .split(/\s+/)
     .map(word => {
       // Remove periods from abbreviations (W. → W, St. → St)
@@ -242,32 +328,31 @@ export function titleCase(str: string): string {
     .join(' ');
 }
 
-export interface NormalizedAddress {
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-}
-
 /**
  * Normalize address (full pipeline)
  * 
- * 1. Strip secondary address components
- * 2. Parse run-on address (if needed)
- * 3. Apply title case
- * 4. Return cleaned street address with extracted city/state/ZIP
+ * 1. Detect and normalize PO Box
+ * 2. Strip secondary address components
+ * 3. Parse run-on address (if needed)
+ * 4. Apply title case
+ * 5. Return cleaned street address with extracted city/state/ZIP
  * 
  * @param address - Raw address string
  * @returns Normalized address with separate street, city, state, ZIP
  */
 export function normalizeAddress(address: string): NormalizedAddress {
   if (!address) {
-    return { street: '', city: '', state: '', zip: '' };
+    return { street: '', city: '', state: '', zip: '', isPOBox: false, boxNumber: '' };
   }
+  
+  // Step 0: Detect and normalize PO Box
+  const poBoxNormalized = normalizePOBox(address);
+  const isPOBox = poBoxNormalized.isPOBox;
+  const boxNumber = poBoxNormalized.boxNumber;
   
   // Step 1: Strip secondary address components FIRST (before parsing)
   // This prevents "Apt 402" from being detected as part of city
-  const cleanedAddress = stripSecondaryAddress(address);
+  const cleanedAddress = stripSecondaryAddress(poBoxNormalized.address);
   
   // Step 2: Parse run-on address to extract all components
   const parsed = parseRunOnAddress(cleanedAddress);
@@ -280,7 +365,9 @@ export function normalizeAddress(address: string): NormalizedAddress {
     street: normalizedStreet,
     city: normalizedCity,
     state: parsed.state.toUpperCase(), // Ensure state is uppercase abbreviation
-    zip: parsed.zip
+    zip: parsed.zip,
+    isPOBox: isPOBox,
+    boxNumber: boxNumber
   };
 }
 
@@ -293,6 +380,23 @@ export function normalizeAddress(address: string): NormalizedAddress {
 export function normalizeAddressString(address: string): string {
   const normalized = normalizeAddress(address);
   return normalized.street;
+}
+
+/**
+ * Format address for display
+ * 
+ * @param address - Normalized address object
+ * @returns Formatted address string
+ */
+export function formatAddress(address: NormalizedAddress): string {
+  const parts: string[] = [];
+  
+  if (address.street) parts.push(address.street);
+  if (address.city) parts.push(address.city);
+  if (address.state) parts.push(address.state);
+  if (address.zip) parts.push(address.zip);
+  
+  return parts.join(', ');
 }
 
 /**
