@@ -166,10 +166,17 @@ export class UnifiedNormalizationEngine {
         }
 
         case 'address': {
+          // v3.43.0: Extract full address components (street, city, state, ZIP)
+          const parsed = AddressFormatter.parseRunOn(value);
           const normalized = AddressFormatter.normalize(value, options);
           result = {
-            normalized,
-            metadata: { original: value }
+            normalized, // This is the street address only
+            metadata: {
+              original: value,
+              city: parsed.city,
+              state: parsed.state,
+              zip: parsed.zip
+            }
           };
           break;
         }

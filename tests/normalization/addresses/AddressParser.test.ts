@@ -3,6 +3,7 @@ import {
   stripSecondaryAddress,
   parseRunOnAddress,
   normalizeAddress,
+  normalizeAddressString,
   parseLocation,
   titleCase
 } from '../../../shared/normalization/addresses/AddressParser';
@@ -139,30 +140,30 @@ describe('AddressParser - v3.42.0', () => {
 
   describe('normalizeAddress()', () => {
     it('should normalize addresses with secondary components', () => {
-      expect(normalizeAddress('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E. Ave.');
-      expect(normalizeAddress('301 w6th st. ste 108')).toBe('301 W6th St.');
-      expect(normalizeAddress('1421 sw 27th ave apt 402 Ocala fl')).toBe('1421 Sw 27th Ave');
+      expect(normalizeAddressString('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E. Ave.');
+      expect(normalizeAddressString('301 w6th st. ste 108')).toBe('301 W6th St.');
+      expect(normalizeAddressString('1421 sw 27th ave apt 402 Ocala fl')).toBe('1421 Sw 27th Ave');
     });
 
     it('should normalize run-on addresses', () => {
-      expect(normalizeAddress('815 S West St Green City MO 63545')).toBe('815 S West St');
-      expect(normalizeAddress('5374 Desert Shadows Dr Sierra Vista AZ 85635')).toBe('5374 Desert Shadows Dr');
-      expect(normalizeAddress('11133 ellis lane parks ar 72950')).toBe('11133 Ellis Lane');
+      expect(normalizeAddressString('815 S West St Green City MO 63545')).toBe('815 S West St');
+      expect(normalizeAddressString('5374 Desert Shadows Dr Sierra Vista AZ 85635')).toBe('5374 Desert Shadows Dr');
+      expect(normalizeAddressString('11133 ellis lane parks ar 72950')).toBe('11133 Ellis Lane');
     });
 
     it('should normalize addresses with both issues', () => {
       // Run-on address + secondary component
-      expect(normalizeAddress('100 riverbend dr apt i11 West Columbia SC')).toBe('100 Riverbend Dr');
-      expect(normalizeAddress('4801 Sugar Hill Rd SE apt b Temple GA')).toBe('4801 Sugar Hill Rd');
+      expect(normalizeAddressString('100 riverbend dr apt i11 West Columbia SC')).toBe('100 Riverbend Dr');
+      expect(normalizeAddressString('4801 Sugar Hill Rd SE apt b Temple GA')).toBe('4801 Sugar Hill Rd');
     });
 
     it('should handle regular addresses', () => {
-      expect(normalizeAddress('123 MAIN STREET')).toBe('123 Main Street');
-      expect(normalizeAddress('456 oak avenue')).toBe('456 Oak Avenue');
+      expect(normalizeAddressString('123 MAIN STREET')).toBe('123 Main Street');
+      expect(normalizeAddressString('456 oak avenue')).toBe('456 Oak Avenue');
     });
 
     it('should handle empty input', () => {
-      expect(normalizeAddress('')).toBe('');
+      expect(normalizeAddressString('')).toBe('');
     });
   });
 
@@ -255,36 +256,36 @@ describe('AddressParser - v3.42.0', () => {
   describe('Real-world test cases from user CSVs', () => {
     it('should handle problematic addresses from cleaned-1900-a-scores-carter-1_xvxe56.csv', () => {
       // Row 13: Rachel Gray
-      expect(normalizeAddress('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E. Ave.');
+      expect(normalizeAddressString('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E. Ave.');
       
       // Row 36: Melba Rosa
-      expect(normalizeAddress('1421 sw 27th ave apt 402 Ocala fl')).toBe('1421 Sw 27th Ave');
+      expect(normalizeAddressString('1421 sw 27th ave apt 402 Ocala fl')).toBe('1421 Sw 27th Ave');
       
       // Row 14: Vernon Hearon
-      expect(normalizeAddress('819 E hughBert st Norman')).toBe('819 E Hughbert St');
+      expect(normalizeAddressString('819 E hughBert st Norman')).toBe('819 E Hughbert St');
       
       // Row 17: Yasnely Vega
-      expect(normalizeAddress('5840 Willard Street. Casa')).toBe('5840 Willard Street.');
+      expect(normalizeAddressString('5840 Willard Street. Casa')).toBe('5840 Willard Street.');
     });
 
     it('should handle problematic addresses from cleaned-results-3000-b-to-f-ca_1d54rwg.csv', () => {
       // Row 3: Roberta Hockaday
-      expect(normalizeAddress('815 S West St Green City MO 63545')).toBe('815 S West St');
+      expect(normalizeAddressString('815 S West St Green City MO 63545')).toBe('815 S West St');
       
       // Row 10: Robert Mcgibben
-      expect(normalizeAddress('301 w6th st. ste 108')).toBe('301 W6th St.');
+      expect(normalizeAddressString('301 w6th st. ste 108')).toBe('301 W6th St.');
       
       // Row 13: Ronald Moreno
-      expect(normalizeAddress('4426 E Lee St Unit 2')).toBe('4426 E Lee St');
+      expect(normalizeAddressString('4426 E Lee St Unit 2')).toBe('4426 E Lee St');
       
       // Row 23: Darlene Smith
-      expect(normalizeAddress('100 riverbend dr apt i11')).toBe('100 Riverbend Dr');
+      expect(normalizeAddressString('100 riverbend dr apt i11')).toBe('100 Riverbend Dr');
       
       // Row 24: Ethan Coley
-      expect(normalizeAddress('11133 ellis lane parks ar 72950')).toBe('11133 Ellis Lane');
+      expect(normalizeAddressString('11133 ellis lane parks ar 72950')).toBe('11133 Ellis Lane');
       
       // Row 29: Alex Anderson
-      expect(normalizeAddress('5374 Desert Shadows Dr Sierra Vista AZ 85635')).toBe('5374 Desert Shadows Dr');
+      expect(normalizeAddressString('5374 Desert Shadows Dr Sierra Vista AZ 85635')).toBe('5374 Desert Shadows Dr');
     });
   });
 });

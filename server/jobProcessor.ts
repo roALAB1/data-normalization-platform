@@ -270,6 +270,20 @@ function generateOutputCsv(results: any[], type: string): string {
       ].join(",");
     });
     return [header, ...rows].join("\n");
+  } else if (type === "address") {
+    // v3.43.0: Address normalization with city/state extraction
+    const header = "original,normalized,city,state,zip";
+    const rows = results.map(r => {
+      const meta = r.metadata || {};
+      return [
+        `"${r.input || ""}"`,
+        `"${r.output || ""}"`, // This is the street address
+        `"${meta.city || ""}"`,
+        `"${meta.state || ""}"`,
+        `"${meta.zip || ""}"`,
+      ].join(",");
+    });
+    return [header, ...rows].join("\n");
   }
   
   // Default CSV format

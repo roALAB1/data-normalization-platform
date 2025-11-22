@@ -25,7 +25,7 @@
  * - International address parsing
  */
 
-import { stripSecondaryAddress, parseRunOnAddress, normalizeAddress } from './AddressParser';
+import { stripSecondaryAddress, parseRunOnAddress, normalizeAddress, normalizeAddressString } from './AddressParser';
 
 export interface AddressFormatterOptions {
   /**
@@ -256,7 +256,7 @@ export class AddressFormatter {
     // 1. Run-on address parsing (extract street from city/state/ZIP)
     // 2. Secondary address stripping (Apt, Suite, Unit, etc.)
     // 3. Title case conversion
-    let normalized = normalizeAddress(address);
+    let normalized = normalizeAddressString(address);
 
     // Step 2: Abbreviate street suffixes
     normalized = this.abbreviateSuffixes(normalized, options?.customSuffixMap);

@@ -1,0 +1,137 @@
+================================================================================
+v3.43.0 - City/State Extraction Test
+================================================================================
+
+[1/20] 2833 s 115th E. Ave. Apt G
+  Street: "2833 S 115th E. Ave."
+  City:   "Apt G"
+  State:  ""
+  ZIP:    ""
+
+[2/20] 1421 sw 27th ave apt 402 Ocala fl
+  Street: "1421 Sw 27th Ave"
+  City:   "Apt 402 Ocala"
+  State:  "FL"
+  ZIP:    ""
+
+[3/20] 819 E hughBert st Norman
+  Street: "819 E Hughbert St"
+  City:   "Norman"
+  State:  ""
+  ZIP:    ""
+
+[4/20] 5840 Willard Street. Casa
+  Street: "5840 Willard Street."
+  City:   "Casa"
+  State:  ""
+  ZIP:    ""
+
+[5/20] 100 E Vaughn Rd Apt. 2111
+  Street: "100 E Vaughn Rd"
+  City:   "Apt. 2111"
+  State:  ""
+  ZIP:    ""
+
+[6/20] 815 S West St Green City MO 63545
+  Street: "815 S West St"
+  City:   "Green City"
+  State:  "MO"
+  ZIP:    "63545"
+
+[7/20] 301 w6th st. ste 108
+  Street: "301 W6th St."
+  City:   "Ste 108"
+  State:  ""
+  ZIP:    ""
+
+[8/20] 4426 E Lee St Unit 2
+  Street: "4426 E Lee St"
+  City:   "Unit 2"
+  State:  ""
+  ZIP:    ""
+
+[9/20] 100 riverbend dr apt i11 West Columbia SC
+  Street: "100 Riverbend Dr"
+  City:   "Apt I11 West Columbia"
+  State:  "SC"
+  ZIP:    ""
+
+[10/20] 4801 Sugar Hill Rd SE apt b Temple GA
+  Street: "4801 Sugar Hill Rd"
+  City:   "Se Apt B Temple"
+  State:  "GA"
+  ZIP:    ""
+
+[11/20] 11133 ellis lane parks ar 72950
+  Street: "11133 Ellis Lane"
+  City:   "Parks"
+  State:  "AR"
+  ZIP:    "72950"
+
+[12/20] 5374 Desert Shadows Dr Sierra Vista AZ 85635
+  Street: "5374 Desert Shadows Dr"
+  City:   "Sierra Vista"
+  State:  "AZ"
+  ZIP:    "85635"
+
+[13/20] 123 Main St Durham NC 27701
+  Street: "123 Main St"
+  City:   "Durham"
+  State:  "NC"
+  ZIP:    "27701"
+
+[14/20] 456 Oak Ave Rancho Santa Fe CA 92067
+  Street: "456 Oak Ave"
+  City:   "Rancho Santa Fe"
+  State:  "CA"
+  ZIP:    "92067"
+
+[15/20] 789 Elm St Apt 402 Portland OR 97201
+  Street: "789 Elm St"
+  City:   "Apt 402 Portland"
+  State:  "OR"
+  ZIP:    "97201"
+
+[16/20] 321 Pine Blvd #1124 Austin TX 78701
+  Street: "321 Pine Blvd"
+  City:   "#1124 Austin"
+  State:  "TX"
+  ZIP:    "78701"
+
+[17/20] 654 Maple Dr Springfield IL 62701
+  Street: "654 Maple Dr"
+  City:   "Springfield"
+  State:  "IL"
+  ZIP:    "62701"
+
+[18/20] 987 Cedar Ln Kansas City MO 64101
+  Street: "987 Cedar Ln"
+  City:   "Kansas City"
+  State:  "MO"
+  ZIP:    "64101"
+
+[19/20] 147 Birch Ave New York NY 10001
+  Street: "147 Birch Ave"
+  City:   "New York"
+  State:  "NY"
+  ZIP:    "10001"
+
+[20/20] 258 Willow St Los Angeles CA 90001
+  Street: "258 Willow St"
+  City:   "Los Angeles"
+  State:  "CA"
+  ZIP:    "90001"
+
+================================================================================
+Summary Statistics
+================================================================================
+Total addresses tested: 20
+Addresses with city extracted: 20 (100.0%)
+Addresses with state extracted: 14 (70.0%)
+Addresses with ZIP extracted: 11 (55.0%)
+
+Results saved to: /home/ubuntu/name-normalization-demo/city-state-extraction-test-results.csv
+
+================================================================================
+Test Complete
+================================================================================

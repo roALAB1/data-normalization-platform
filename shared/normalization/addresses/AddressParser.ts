@@ -199,30 +199,57 @@ export function titleCase(str: string): string {
     .join(' ');
 }
 
+export interface NormalizedAddress {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
 /**
  * Normalize address (full pipeline)
  * 
  * 1. Strip secondary address components
  * 2. Parse run-on address (if needed)
  * 3. Apply title case
- * 4. Return cleaned street address
+ * 4. Return cleaned street address with extracted city/state/ZIP
  * 
  * @param address - Raw address string
- * @returns Normalized street address (without city/state/ZIP)
+ * @returns Normalized address with separate street, city, state, ZIP
  */
-export function normalizeAddress(address: string): string {
-  if (!address) return '';
+export function normalizeAddress(address: string): NormalizedAddress {
+  if (!address) {
+    return { street: '', city: '', state: '', zip: '' };
+  }
   
-  // Step 1: Parse run-on address to extract street component
-  const parsed = parseRunOnAddress(address);
+  // Step 1: Strip secondary address components FIRST (before parsing)
+  // This prevents "Apt 402" from being detected as part of city
+  const cleanedAddress = stripSecondaryAddress(address);
   
-  // Step 2: Strip secondary address components from street
-  const cleanStreet = stripSecondaryAddress(parsed.street || address);
+  // Step 2: Parse run-on address to extract all components
+  const parsed = parseRunOnAddress(cleanedAddress);
   
-  // Step 3: Apply title case
-  const normalized = titleCase(cleanStreet);
+  // Step 3: Apply title case to street and city
+  const normalizedStreet = titleCase(parsed.street);
+  const normalizedCity = titleCase(parsed.city);
   
-  return normalized;
+  return {
+    street: normalizedStreet,
+    city: normalizedCity,
+    state: parsed.state.toUpperCase(), // Ensure state is uppercase abbreviation
+    zip: parsed.zip
+  };
+}
+
+/**
+ * Normalize address (legacy string output for backward compatibility)
+ * 
+ * @param address - Raw address string
+ * @returns Normalized street address only (without city/state/ZIP)
+ */
+export function normalizeAddressString(address: string): string {
+  const normalized = normalizeAddress(address);
+  return normalized.street;
 }
 
 /**
