@@ -260,12 +260,56 @@ The `bump-version.sh` script modifies these files:
 
 ---
 
+## Release Template
+
+For creating detailed, professional release notes, use the release template:
+
+**Template Location:** `.github/RELEASE_TEMPLATE.md`
+
+### When to Use the Template
+
+1. **Manual Releases:** Copy the template and fill in all sections
+2. **Enhancing Automated Releases:** After GitHub Actions creates a release, edit it and add sections from the template
+3. **Major Releases:** Use the full template with all sections (features, breaking changes, migration guides)
+4. **Patch Releases:** Use a simplified version focusing on bug fixes
+
+### Template Sections
+
+The template includes:
+- ✨ Features - New functionality with usage examples
+- 🐛 Bug Fixes - Problems solved and their impact
+- 💥 Breaking Changes - Migration guides for incompatible changes
+- 📚 Documentation - Updated and new documentation
+- 🔧 Technical Details - Performance, dependencies, database changes
+- 🧪 Testing - Coverage and manual testing checklist
+- 📦 Installation - New installation and upgrade instructions
+
+### Example Usage
+
+```bash
+# 1. Create automated release
+pnpm run version:minor
+git push origin main && git push origin v3.41.0
+
+# 2. Wait for GitHub Actions to create release
+
+# 3. Edit release on GitHub
+# - Click "Edit" on the release
+# - Copy relevant sections from .github/RELEASE_TEMPLATE.md
+# - Fill in details about features, bug fixes, breaking changes
+# - Add migration guides if needed
+# - Save the enhanced release notes
+```
+
+---
+
 ## Related Documentation
 
 - [CHANGELOG.md](CHANGELOG.md) - Complete version history
 - [VERSION_HISTORY.md](VERSION_HISTORY.md) - Detailed version notes
 - [README.md](README.md) - Project overview
 - [.github/workflows/release.yml](.github/workflows/release.yml) - GitHub Actions workflow
+- [.github/RELEASE_TEMPLATE.md](.github/RELEASE_TEMPLATE.md) - Release notes template
 
 ---
 

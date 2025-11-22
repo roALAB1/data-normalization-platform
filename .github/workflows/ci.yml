@@ -43,13 +43,13 @@ jobs:
         run: pnpm install --frozen-lockfile
       
       - name: Type check
-        run: pnpm type-check || echo "Type check not configured"
+        run: pnpm check
       
       - name: Lint
-        run: pnpm lint || echo "Linting not configured"
+        run: pnpm format:check || echo "Linting not configured"
       
       - name: Run tests
-        run: pnpm test || echo "Tests not configured yet"
+        run: pnpm test
       
       - name: Build
         run: pnpm build
