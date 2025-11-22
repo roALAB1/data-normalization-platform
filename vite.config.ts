@@ -44,5 +44,11 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    watch: {
+      // Prevent file descriptor leaks by limiting concurrent file operations
+      usePolling: false,
+      // Reduce file watcher overhead
+      ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
+    },
   },
 });

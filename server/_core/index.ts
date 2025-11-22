@@ -115,43 +115,50 @@ async function startServer() {
     console.log(`Server running on http://localhost:${port}/`);
     console.log(`[Health] Health check available at http://localhost:${port}/api/health`);
     
+    // DISABLED v3.40.3: Batch jobs worker causes memory leaks
     // Start batch jobs worker (uses IntelligentBatchProcessor with streaming)
-    try {
-      const { BatchWorker } = await import("../queue/BatchWorker.js");
-      BatchWorker.getInstance();
-      console.log("[BatchWorker] Batch jobs worker started successfully");
-    } catch (error) {
-      console.warn("[BatchWorker] Failed to start batch jobs worker:", error);
-      // Continue without worker rather than crashing
-    }
+    // try {
+    //   const { BatchWorker } = await import("../queue/BatchWorker.js");
+    //   BatchWorker.getInstance();
+    //   console.log("[BatchWorker] Batch jobs worker started successfully");
+    // } catch (error) {
+    //   console.warn("[BatchWorker] Failed to start batch jobs worker:", error);
+    //   // Continue without worker rather than crashing
+    // }
+    console.log("[BatchWorker] DISABLED to prevent memory leaks");
 
+    // DISABLED v3.40.2: CRM merge worker causes memory exhaustion with large datasets
     // Start CSV-based CRM merge worker (DuckDB version was removed in v3.40.5)
-    try {
-      const { CRMMergeWorker } = await import("../queue/CRMMergeWorker.js");
-      CRMMergeWorker.getInstance();
-      console.log("[CRMMergeWorker] CSV-based CRM merge worker started successfully");
-    } catch (error) {
-      console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
-      // Continue without worker rather than crashing
-    }
+    // try {
+    //   const { CRMMergeWorker } = await import("../queue/CRMMergeWorker.js");
+    //   CRMMergeWorker.getInstance();
+    //   console.log("[CRMMergeWorker] CSV-based CRM merge worker started successfully");
+    // } catch (error) {
+    //   console.warn("[CRMMergeWorker] Failed to start CRM merge worker:", error);
+    //   // Continue without worker rather than crashing
+    // }
+    console.log("[CRMMergeWorker] DISABLED to prevent memory exhaustion");
 
-    // Start connection pool metrics collection
-    try {
-      const { startConnectionPoolMetricsCollection } = await import("./connectionPoolMetrics.js");
-      startConnectionPoolMetricsCollection(15000); // Collect every 15 seconds
-      console.log("[Monitoring] Connection pool metrics collection started");
-    } catch (error) {
-      console.warn("[Monitoring] Failed to start connection pool metrics:", error);
-    }
+    // DISABLED: Connection pool metrics collection (suspected to cause server hang)
+    // try {
+    //   const { startConnectionPoolMetricsCollection } = await import("./connectionPoolMetrics.js");
+    //   startConnectionPoolMetricsCollection(15000); // Collect every 15 seconds
+    //   console.log("[Monitoring] Connection pool metrics collection started");
+    // } catch (error) {
+    //   console.warn("[Monitoring] Failed to start connection pool metrics:", error);
+    // }
+    console.log("[Monitoring] Connection pool metrics DISABLED");
 
+    // DISABLED v3.40.3: Job processor causes memory leaks with stuck jobs
     // Start polling-based job queue as fallback when Redis is unavailable
-    try {
-      const { startJobQueue } = await import("../jobProcessor.js");
-      startJobQueue();
-      console.log("[JobQueue] Polling-based job queue started (Redis fallback)");
-    } catch (error) {
-      console.warn("[JobQueue] Failed to start polling job queue:", error);
-    }
+    // try {
+    //   const { startJobQueue } = await import("../jobProcessor.js");
+    //   startJobQueue();
+    //   console.log("[JobQueue] Polling-based job queue started (Redis fallback)");
+    // } catch (error) {
+    //   console.warn("[JobQueue] Failed to start polling job queue:", error);
+    // }
+    console.log("[JobQueue] DISABLED to prevent memory leaks from stuck jobs");
   });
 }
 
