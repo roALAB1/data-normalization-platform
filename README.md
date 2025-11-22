@@ -51,6 +51,19 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.41.0)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.41.0)
 
+### What's New in v3.45.0 🚀
+
+**PO Box Normalization, ZIP Validation & Confidence Scoring** 📮  
+Comprehensive address quality improvements with intelligent PO Box detection and normalization, ZIP code validation against state data, and confidence scoring for all address components. Introduced data quality flags to identify missing fields, ZIP/state mismatches, and ambiguous cities. All 37 v3.45.0 tests passing with full backward compatibility verified.
+
+**Key Features:**
+- 📮 **PO Box Normalization**: Detects and normalizes P.O. Box, POBox, PO Box, etc. to standard "PO Box" format
+- ✅ **ZIP Code Validation**: Validates ZIP codes against state data using @mardillu/us-cities-utils package
+- 🎯 **Confidence Scoring**: 0-1 confidence scores for each address component (street, city, state, zip)
+- 🚩 **Data Quality Flags**: Identifies missing fields, ZIP/state mismatches, ambiguous cities, and other issues
+- 🔄 **Backward Compatible**: All existing address normalization features preserved with enhanced validation
+- 📊 **37 Tests Passing**: Comprehensive test coverage for all new features and edge cases
+
 ### What's New in v3.40.1 🚀
 
 **CRM Merge Jobs Database Fix** 🔧  
