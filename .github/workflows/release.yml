@@ -30,6 +30,9 @@ jobs:
       
       - name: Generate changelog
         id: changelog
+        env:
+          TAG_NAME: ${{ steps.version.outputs.tag }}
+          REPO_NAME: ${{ github.repository }}
         run: |
           # Get previous tag
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
@@ -43,35 +46,33 @@ jobs:
             COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --reverse)
           fi
           
-          # Create changelog content using heredoc to avoid YAML escaping issues
-          cat > release-notes.md << 'RELEASE_NOTES_EOF'
-## What's New in ${{ steps.version.outputs.tag }} 🚀
-
-### Changes
-RELEASE_NOTES_EOF
-          echo "$COMMITS" >> release-notes.md
-          cat >> release-notes.md << 'RELEASE_NOTES_EOF'
-
----
-
-## Full Changelog
-See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for complete version history.
-
-## Installation
-```bash
-git clone https://github.com/${{ github.repository }}.git
-cd data-normalization-platform
-pnpm install
-pnpm run dev
-```
-
-## Documentation
-- [README.md](https://github.com/${{ github.repository }}/blob/main/README.md)
-- [VERSION_HISTORY.md](https://github.com/${{ github.repository }}/blob/main/VERSION_HISTORY.md)
-- [API Documentation](https://github.com/${{ github.repository }}/blob/main/API_DOCUMENTATION.md)
-RELEASE_NOTES_EOF
+          # Create release notes file
+          {
+            echo "## What's New in ${TAG_NAME} 🚀"
+            echo ""
+            echo "### Changes"
+            echo "$COMMITS"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Full Changelog"
+            echo "See [CHANGELOG.md](https://github.com/${REPO_NAME}/blob/main/CHANGELOG.md) for complete version history."
+            echo ""
+            echo "## Installation"
+            echo '```bash'
+            echo "git clone https://github.com/${REPO_NAME}.git"
+            echo "cd data-normalization-platform"
+            echo "pnpm install"
+            echo "pnpm run dev"
+            echo '```'
+            echo ""
+            echo "## Documentation"
+            echo "- [README.md](https://github.com/${REPO_NAME}/blob/main/README.md)"
+            echo "- [VERSION_HISTORY.md](https://github.com/${REPO_NAME}/blob/main/VERSION_HISTORY.md)"
+            echo "- [API Documentation](https://github.com/${REPO_NAME}/blob/main/API_DOCUMENTATION.md)"
+          } > release-notes.md
           
-          echo "Generated changelog for ${{ steps.version.outputs.tag }}"
+          echo "Generated changelog for ${TAG_NAME}"
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
