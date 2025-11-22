@@ -140,8 +140,8 @@ describe('AddressParser - v3.42.0', () => {
 
   describe('normalizeAddress()', () => {
     it('should normalize addresses with secondary components', () => {
-      expect(normalizeAddressString('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E. Ave.');
-      expect(normalizeAddressString('301 w6th st. ste 108')).toBe('301 W6th St.');
+      expect(normalizeAddressString('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E Ave');
+      expect(normalizeAddressString('301 w6th st. ste 108')).toBe('301 W6th St');
       expect(normalizeAddressString('1421 sw 27th ave apt 402 Ocala fl')).toBe('1421 Sw 27th Ave');
     });
 
@@ -256,7 +256,7 @@ describe('AddressParser - v3.42.0', () => {
   describe('Real-world test cases from user CSVs', () => {
     it('should handle problematic addresses from cleaned-1900-a-scores-carter-1_xvxe56.csv', () => {
       // Row 13: Rachel Gray
-      expect(normalizeAddressString('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E. Ave.');
+      expect(normalizeAddressString('2833 s 115th E. Ave. Apt G')).toBe('2833 S 115th E Ave');
       
       // Row 36: Melba Rosa
       expect(normalizeAddressString('1421 sw 27th ave apt 402 Ocala fl')).toBe('1421 Sw 27th Ave');
@@ -265,7 +265,7 @@ describe('AddressParser - v3.42.0', () => {
       expect(normalizeAddressString('819 E hughBert st Norman')).toBe('819 E Hughbert St');
       
       // Row 17: Yasnely Vega
-      expect(normalizeAddressString('5840 Willard Street. Casa')).toBe('5840 Willard Street.');
+      expect(normalizeAddressString('5840 Willard Street. Casa')).toBe('5840 Willard Street');
     });
 
     it('should handle problematic addresses from cleaned-results-3000-b-to-f-ca_1d54rwg.csv', () => {
@@ -273,7 +273,7 @@ describe('AddressParser - v3.42.0', () => {
       expect(normalizeAddressString('815 S West St Green City MO 63545')).toBe('815 S West St');
       
       // Row 10: Robert Mcgibben
-      expect(normalizeAddressString('301 w6th st. ste 108')).toBe('301 W6th St.');
+      expect(normalizeAddressString('301 w6th st. ste 108')).toBe('301 W6th St');
       
       // Row 13: Ronald Moreno
       expect(normalizeAddressString('4426 E Lee St Unit 2')).toBe('4426 E Lee St');

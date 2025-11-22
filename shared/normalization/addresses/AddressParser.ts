@@ -68,9 +68,15 @@ export function stripSecondaryAddress(address: string): string {
   let cleaned = address;
   
   // Pattern 1: Explicit secondary address (word + number/letter)
-  // Matches: "Apt 402", "Suite 108", "Unit 2", "Bldg A", "Apt. 2111"
-  const explicitPattern = /\b(apt|apartment|ste|suite|unit|bldg|building|floor|fl|flr|rm|room|sp|space|lot|trailer|trlr|tr|u|no|number)\.?\s*[a-z0-9\-]+\b/gi;
+  // Matches: "Apt 402", "Suite 108", "Unit 2", "Bldg A", "Apt. 2111", "No 5"
+  // Use word boundaries on BOTH sides to ensure complete word match (not "North" or "Trailer")
+  const explicitPattern = /\b(apt|apartment|ste|suite|unit|bldg|building|floor|fl|flr|rm|room|sp|space|lot|trlr|u|number)\.?\s+[a-z0-9\-]+\b/gi;
   cleaned = cleaned.replace(explicitPattern, '');
+  
+  // Special case: "No" and "Trailer" and "Tr" - only match if followed by a digit (not a letter)
+  // This prevents matching "North-South" or "Trailer Park"
+  const numberOnlyPattern = /\b(no|trailer|tr)\.?\s+\d+[a-z]?\b/gi;
+  cleaned = cleaned.replace(numberOnlyPattern, '');
   
   // Pattern 2: Hash/pound sign with number
   // Matches: "#1124", "# 42", "#G"
@@ -79,12 +85,14 @@ export function stripSecondaryAddress(address: string): string {
   
   // Pattern 3: Trailing secondary (at end of address)
   // Matches: "123 Main St Apt 5", "456 Oak Ave Unit C"
-  const trailingPattern = /\s+(apt|apartment|ste|suite|unit|bldg|building|floor|fl|rm|room|sp|space|lot|#)\.?\s*[a-z0-9\-]+$/gi;
+  // Use word boundary to prevent matching "Springfield" as "sp"
+  const trailingPattern = /\s+(apt|apartment|ste|suite|unit|bldg|building|floor|fl|rm|room|sp|space|lot|#)\b\.?\s*[a-z0-9\-]+$/gi;
   cleaned = cleaned.replace(trailingPattern, '');
   
   // Pattern 4: Embedded secondary (in middle of address)
   // Matches: "123 Main St Apt 5 City State"
-  const embeddedPattern = /\s+(apt|apartment|ste|suite|unit|bldg|building|floor|fl|rm|room|sp|space|lot|#)\.?\s*[a-z0-9\-]+\s+/gi;
+  // Use word boundary to prevent matching "Springfield" as "sp"
+  const embeddedPattern = /\s+(apt|apartment|ste|suite|unit|bldg|building|floor|fl|rm|room|sp|space|lot|#)\b\.?\s*[a-z0-9\-]+\s+/gi;
   cleaned = cleaned.replace(embeddedPattern, ' ');
   
   // Clean up extra spaces
@@ -111,11 +119,18 @@ export function parseRunOnAddress(address: string): ParsedAddress {
   let city = '';
   let street = '';
   
-  // Step 1: Extract ZIP code (5 digits at end)
-  const zipMatch = remaining.match(/\b(\d{5})$/);
-  if (zipMatch) {
-    zip = zipMatch[1];
-    remaining = remaining.substring(0, zipMatch.index).trim();
+  // Step 1: Extract ZIP code (5 digits or ZIP+4 format: 12345-6789)
+  // Try ZIP+4 first, then fall back to 5-digit ZIP
+  const zip4Match = remaining.match(/\b(\d{5}-\d{4})$/);
+  if (zip4Match) {
+    zip = zip4Match[1];
+    remaining = remaining.substring(0, zip4Match.index).trim();
+  } else {
+    const zipMatch = remaining.match(/\b(\d{5})$/);
+    if (zipMatch) {
+      zip = zipMatch[1];
+      remaining = remaining.substring(0, zipMatch.index).trim();
+    }
   }
   
   // Step 2: Extract state (2-letter code at end or before ZIP)
@@ -130,11 +145,13 @@ export function parseRunOnAddress(address: string): ParsedAddress {
   
   // Step 3: Extract city (words between street and state)
   // Find last street suffix to identify where street ends
+  // Preserve hyphens in street names (they are NOT word boundaries)
   const words = remaining.split(/\s+/);
   let streetEndIndex = -1;
   
   for (let i = words.length - 1; i >= 0; i--) {
     const word = words[i].toLowerCase().replace(/[.,]/g, '');
+    // Check if entire word is a street suffix (don't split on hyphens)
     if (STREET_SUFFIXES.includes(word)) {
       streetEndIndex = i;
       break;
@@ -148,10 +165,32 @@ export function parseRunOnAddress(address: string): ParsedAddress {
     street = words.slice(0, streetEndIndex + 1).join(' ');
   } else if (state && remaining) {
     // No street suffix found, but we have a state
-    // Assume last 1-3 words before state are city
-    const potentialCityWords = Math.min(3, words.length);
-    city = words.slice(-potentialCityWords).join(' ');
-    street = words.slice(0, -potentialCityWords).join(' ');
+    // Try to identify city by looking for capitalized words before state
+    // Heuristic: City is typically 1-3 words before state
+    // Street address typically starts with a number
+    const hasNumberPrefix = /^\d+/.test(words[0]);
+    
+    if (hasNumberPrefix && words.length >= 2) {
+      // Likely format: "123 Main Durham" or "456 Maple Dr Springfield"
+      // Check if second-to-last word looks like a street suffix abbreviation
+      const secondToLast = words.length >= 2 ? words[words.length - 2].toLowerCase().replace(/[.,]/g, '') : '';
+      const isCommonAbbr = ['dr', 'st', 'ave', 'rd', 'ln', 'ct', 'blvd', 'way'].includes(secondToLast);
+      
+      if (isCommonAbbr && words.length >= 3) {
+        // Format: "456 Maple Dr Springfield" - last word is city, everything before is street
+        city = words[words.length - 1];
+        street = words.slice(0, -1).join(' ');
+      } else {
+        // Format: "123 Main Durham" - last word is city, rest is street
+        city = words[words.length - 1];
+        street = words.slice(0, -1).join(' ');
+      }
+    } else {
+      // Fallback: assume last 1-3 words are city
+      const potentialCityWords = Math.min(3, words.length);
+      city = words.slice(-potentialCityWords).join(' ');
+      street = words.slice(0, -potentialCityWords).join(' ');
+    }
   } else {
     // No parsing possible, return as-is
     street = remaining;
@@ -168,6 +207,7 @@ export function parseRunOnAddress(address: string): ParsedAddress {
 /**
  * Title case a string (capitalize first letter of each word)
  * Handles hyphens and apostrophes correctly
+ * Removes periods from abbreviations (W. → W, St. → St)
  * 
  * @param str - String to title case
  * @returns Title cased string
@@ -179,6 +219,9 @@ export function titleCase(str: string): string {
     .toLowerCase()
     .split(/\s+/)
     .map(word => {
+      // Remove periods from abbreviations (W. → W, St. → St)
+      word = word.replace(/\./g, '');
+      
       // Handle hyphenated words (e.g., "north-south" → "North-South")
       if (word.includes('-')) {
         return word.split('-').map(part => 
