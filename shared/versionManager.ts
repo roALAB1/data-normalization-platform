@@ -11,7 +11,7 @@
 const CACHE_KEY = 'app_version_cache';
 const CACHE_TIMESTAMP_KEY = 'app_version_cache_timestamp';
 const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
-const FALLBACK_VERSION = '3.45.0';
+const FALLBACK_VERSION = '3.46.1';
 
 /**
  * Read version from package.json

@@ -1,5 +1,25 @@
 # Project TODO
 
+## v3.46.1 - Critical Bug Fixes (Footer & Publish Button)
+
+**Status:** IN PROGRESS
+
+### Issue 1: Footer Version Not Updating
+- [x] Check package.json version (should be 3.46.1)
+- [x] Check versionManager cache implementation
+- [x] Check if server restart is needed to clear cache
+- [x] Verify Footer component is using getVersionWithCache()
+- [x] Test version display after cache clear - **FIXED! Footer now shows v3.46.1**
+
+### Issue 2: Publish Button Not Working
+- [x] Investigate what "Publish" button should do - **Manus platform feature for deployment**
+- [x] Check if it's a Manus platform feature (not our code) - **Confirmed: Platform UI feature**
+- [x] Verify latest checkpoint was created successfully - **Checkpoint 991c219 exists**
+- [x] Check if deployment process requires manual steps - **Creating fresh checkpoint to trigger UI**
+- [x] Document proper deployment workflow - **Click Publish in Management UI after checkpoint**
+
+---
+
 ## v3.46.1 - Fix NaN ZIP Codes (URGENT)
 
 **Status:** COMPLETED ✅
