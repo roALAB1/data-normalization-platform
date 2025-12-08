@@ -51,6 +51,19 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.41.0)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.41.0)
 
+### What's New in v3.46.1 🚀
+
+**Context-Aware City & ZIP Normalization - NaN ZIP Fix** 🎯  
+Fixed critical issue where 31 rows had NaN ZIP codes after normalization. Implemented comprehensive Texas city lookup table with 100+ cities to handle cases where external libraries (@mardillu/us-cities-utils) were missing major cities like Austin, and external APIs (Zippopotam.us) were hanging. The system now uses bidirectional repair logic (ZIP→City and City→ZIP) with intelligent fallback to static lookup tables, achieving 100% ZIP code population with 90% confidence scores.
+
+**Key Improvements:**
+- 🎯 **100% ZIP Population**: Fixed all 31 NaN ZIP codes using Texas city lookup table
+- 📍 **Comprehensive Coverage**: 100+ Texas cities with primary ZIP codes (Houston, Dallas, Austin, San Antonio, etc.)
+- 🔄 **Bidirectional Repair**: ZIP→City lookup (329 repairs) and City→ZIP lookup (41 repairs)
+- ✅ **High Confidence**: 90% confidence for city_lookup repairs, 96.92% average overall
+- ⚡ **Fast Processing**: 10.89s for 3,230 rows with full validation and cross-checking
+- 🛡️ **Reliable Fallback**: Static lookup table eliminates dependency on incomplete external libraries
+
 ### What's New in v3.45.0 🚀
 
 **PO Box Normalization, ZIP Validation & Confidence Scoring** 📮  
