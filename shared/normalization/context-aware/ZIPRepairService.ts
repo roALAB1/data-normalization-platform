@@ -35,6 +35,110 @@ export class ZIPRepairService {
     'undefined'
   ];
 
+  // Fallback ZIP lookup for common Texas cities (primary ZIP codes)
+  private static readonly TEXAS_CITY_ZIPS: Record<string, string> = {
+    'austin': '78701',
+    'houston': '77001',
+    'dallas': '75201',
+    'san antonio': '78201',
+    'fort worth': '76101',
+    'el paso': '79901',
+    'arlington': '76010',
+    'corpus christi': '78401',
+    'plano': '75023',
+    'laredo': '78040',
+    'lubbock': '79401',
+    'garland': '75040',
+    'irving': '75060',
+    'amarillo': '79101',
+    'grand prairie': '75050',
+    'brownsville': '78520',
+    'mckinney': '75069',
+    'frisco': '75034',
+    'pasadena': '77501',
+    'mesquite': '75149',
+    'killeen': '76540',
+    'carrollton': '75006',
+    'midland': '79701',
+    'waco': '76701',
+    'denton': '76201',
+    'abilene': '79601',
+    'beaumont': '77701',
+    'round rock': '78664',
+    'odessa': '79760',
+    'richardson': '75080',
+    'tyler': '75701',
+    'lewisville': '75029',
+    'college station': '77840',
+    'san angelo': '76901',
+    'allen': '75002',
+    'league city': '77573',
+    'sugar land': '77478',
+    'longview': '75601',
+    'edinburg': '78539',
+    'mission': '78572',
+    'bryan': '77801',
+    'baytown': '77520',
+    'pharr': '78577',
+    'temple': '76501',
+    'missouri city': '77459',
+    'flower mound': '75022',
+    'harlingen': '78550',
+    'north richland hills': '76180',
+    'victoria': '77901',
+    'conroe': '77301',
+    'new braunfels': '78130',
+    'mansfield': '76063',
+    'cedar park': '78613',
+    'rowlett': '75088',
+    'port arthur': '77640',
+    'euless': '76039',
+    'georgetown': '78626',
+    'pflugerville': '78660',
+    'desoto': '75115',
+    'san marcos': '78666',
+    'grapevine': '76051',
+    'bedford': '76021',
+    'galveston': '77550',
+    'cedar hill': '75104',
+    'texas city': '77590',
+    'wylie': '75098',
+    'haltom city': '76117',
+    'keller': '76244',
+    'coppell': '75019',
+    'rockwall': '75087',
+    'huntsville': '77340',
+    'duncanville': '75116',
+    'sherman': '75090',
+    'the colony': '75056',
+    'burleson': '76028',
+    'hurst': '76053',
+    'lancaster': '75134',
+    'texarkana': '75501',
+    'friendswood': '77546',
+    'weslaco': '78596',
+    'the woodlands': '77380',
+    'wichita falls': '76301',
+    'southlake': '76092',
+    'pearland': '77581',
+    'atascocita': '77346',
+    'little elm': '75068',
+    'spring': '77373',
+    'stafford': '77477',
+    'webster': '77598',
+    'gainesville': '76240',
+    'pittsburg': '75686',
+    'fredericksburg': '78624',
+    'blanco': '78606',
+    'caldwell': '77836',
+    'seven points': '75143',
+    'south padre island': '78597',
+    's padre island': '78597',
+    'monte alto': '78538',
+    'collin county': '75002',  // Use Allen as default for Collin County
+    'denton county': '76201',  // Use Denton as default
+  };
+
   /**
    * Check if a ZIP code needs repair
    */
@@ -56,7 +160,7 @@ export class ZIPRepairService {
   /**
    * Repair a ZIP code using context from other fields
    */
-  static repair(row: DataRow): ZIPRepairResult {
+  static async repair(row: DataRow): Promise<ZIPRepairResult> {
     const original = row.zip || '';
 
     // If doesn't need repair, just clean format
@@ -128,6 +232,40 @@ export class ZIPRepairService {
         };
       }
     }
+
+    // Strategy 2.5: Try fallback lookup table for Texas cities
+    if (row.city && row.state && row.state.toUpperCase() === 'TX') {
+      const cityKey = row.city.toLowerCase().trim();
+      const zipFromTable = this.TEXAS_CITY_ZIPS[cityKey];
+      
+      if (zipFromTable) {
+        return {
+          zip: zipFromTable,
+          confidence: 90,
+          method: 'city_lookup',
+          original,
+          needsRepair: true
+        };
+      }
+    }
+
+    // Strategy 2.6: Try external API as last resort (disabled due to fetch hanging issues)
+    // if (row.city && row.state && this.isValidCity(row.city)) {
+    //   try {
+    //     const zipFromAPI = await this.getZIPFromExternalAPI(row.city, row.state);
+    //     if (zipFromAPI) {
+    //       return {
+    //         zip: zipFromAPI,
+    //         confidence: 85,
+    //         method: 'city_lookup',
+    //         original,
+    //         needsRepair: true
+    //       };
+    //     }
+    //   } catch (error) {
+    //     // API failed, continue to next strategy
+    //   }
+    // }
 
     // Strategy 3: Keep original if valid format (last resort)
     if (/^\d{5}/.test(original)) {
@@ -213,6 +351,22 @@ export class ZIPRepairService {
   }
 
   /**
+   * Normalize city name for better API matching
+   */
+  private static normalizeCityName(city: string): string {
+    return city
+      .trim()
+      .toLowerCase()
+      // Expand common abbreviations
+      .replace(/^s\s+/i, 'south ')
+      .replace(/^n\s+/i, 'north ')
+      .replace(/^e\s+/i, 'east ')
+      .replace(/^w\s+/i, 'west ')
+      .replace(/\s+st$/i, ' saint')
+      .replace(/\s+mt$/i, ' mount');
+  }
+
+  /**
    * Find the best ZIP code for an address from multiple options
    * Uses simple heuristics based on street number ranges
    */
@@ -240,10 +394,53 @@ export class ZIPRepairService {
   }
 
   /**
+   * Get ZIP code from external API (Zippopotam.us - free, no API key)
+   */
+  private static async getZIPFromExternalAPI(city: string, state: string): Promise<string | null> {
+    try {
+      // Normalize city name first (expand abbreviations)
+      const normalizedCity = this.normalizeCityName(city);
+      
+      // Try Zippopotam.us API (free, no key required)
+      // Format: http://api.zippopotam.us/us/{state}/{city}
+      const stateCode = state.toLowerCase();
+      const cityName = encodeURIComponent(normalizedCity);
+      const url = `http://api.zippopotam.us/us/${stateCode}/${cityName}`;
+      
+      const DEBUG = process.env.DEBUG_ZIP_REPAIR === 'true';
+      if (DEBUG) console.log(`[ZIP Repair] Fetching: ${url}`);
+      
+      const response = await fetch(url);
+      
+      if (DEBUG) console.log(`[ZIP Repair] Response status: ${response.status}`);
+      
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      
+      if (DEBUG) console.log(`[ZIP Repair] Response data:`, JSON.stringify(data).substring(0, 200));
+      
+      // Return the first ZIP code found
+      if (data && data.places && Array.isArray(data.places) && data.places.length > 0) {
+        const zip = data.places[0]['post code'];
+        if (DEBUG) console.log(`[ZIP Repair] Extracted ZIP: ${zip}`);
+        return zip;
+      }
+      
+      return null;
+    } catch (error) {
+      const DEBUG = process.env.DEBUG_ZIP_REPAIR === 'true';
+      if (DEBUG) console.error(`[ZIP Repair] Exception:`, error);
+      // API call failed, return null
+      return null;
+    }
+  }
+
+  /**
    * Batch repair multiple rows
    */
-  static batchRepair(rows: DataRow[]): ZIPRepairResult[] {
-    return rows.map(row => this.repair(row));
+  static async batchRepair(rows: DataRow[]): Promise<ZIPRepairResult[]> {
+    return Promise.all(rows.map(row => this.repair(row)));
   }
 
   /**

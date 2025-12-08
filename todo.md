@@ -1,5 +1,31 @@
 # Project TODO
 
+## v3.46.1 - Fix NaN ZIP Codes (URGENT)
+
+**Status:** COMPLETED ✅
+
+**Issue:** 31 rows still showing "NaN" in ZIP code column after normalization
+
+### Investigation
+- [x] Analyze the 31 NaN cases to identify patterns
+- [x] Check if city names are valid
+- [x] Check if county data is available
+- [x] Identify why lookup failed - **Root cause: Cities not in @mardillu/us-cities-utils database**
+
+### Fix
+- [x] Enhance ZIPRepairService to handle NaN explicitly
+- [x] Add fallback strategies for edge cases - **Added Zippopotam.us API fallback**
+- [x] Ensure all repair methods are exhausted before marking as failed
+- [x] Add better error handling and logging
+- [x] Add city name normalization (S → South, N → North, etc.)
+- [x] Make all methods async to support API calls
+
+### Testing
+- [x] Re-process Texas bars dataset
+- [x] Verify 0 NaN ZIP codes in output - **SUCCESS! 0 NaN ZIPs**
+- [x] Check confidence scores for repaired ZIPs - **90% confidence for city_lookup**
+- [x] Validate all city/ZIP matches - **All 41 repaired ZIPs validated**
+
 ## v3.45.0 - PO Box Normalization, ZIP Validation, Confidence Scoring
 
 **Status:** COMPLETED ✅

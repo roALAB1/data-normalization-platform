@@ -61,13 +61,13 @@ export class ContextAwareNormalizer {
   /**
    * Normalize a single row
    */
-  normalize(row: {
+  async normalize(row: {
     city?: string;
     zip?: string;
     state?: string;
     county?: string;
     address?: string;
-  }): NormalizedRow {
+  }): Promise<NormalizedRow> {
     let currentCity = row.city || '';
     let currentZIP = row.zip || '';
     
@@ -93,7 +93,7 @@ export class ContextAwareNormalizer {
 
     // Step 2: Repair ZIP code (using potentially repaired city)
     if (this.options.repairZIPs) {
-      zipRepair = ZIPRepairService.repair({
+      zipRepair = await ZIPRepairService.repair({
         city: currentCity,
         zip: currentZIP,
         state: row.state,
@@ -143,14 +143,14 @@ export class ContextAwareNormalizer {
   /**
    * Normalize multiple rows in batch
    */
-  batchNormalize(rows: Array<{
+  async batchNormalize(rows: Array<{
     city?: string;
     zip?: string;
     state?: string;
     county?: string;
     address?: string;
-  }>): NormalizedRow[] {
-    return rows.map(row => this.normalize(row));
+  }>): Promise<NormalizedRow[]> {
+    return Promise.all(rows.map(row => this.normalize(row)));
   }
 
   /**

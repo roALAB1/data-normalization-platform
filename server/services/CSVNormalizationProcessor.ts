@@ -83,7 +83,7 @@ export class CSVNormalizationProcessor {
       }
 
       // Normalize all rows
-      const normalizedRows = this.normalizer.batchNormalize(
+      const normalizedRows = await this.normalizer.batchNormalize(
         records.map(record => ({
           city: record[columnMapping.city!],
           zip: record[columnMapping.zip!],
