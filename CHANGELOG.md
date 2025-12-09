@@ -1,39 +1,5 @@
 # Changelog
 
-## [3.46.1] - 2025-01-08
-
-### Fixed
-- **NaN ZIP Code Issue**: Fixed critical bug where 31 rows had NaN ZIP codes after normalization
-  - Root cause: @mardillu/us-cities-utils library missing major Texas cities (including Austin)
-  - Root cause: External API (Zippopotam.us) fetch calls hanging in Node.js module context
-  - Solution: Added comprehensive Texas city lookup table with 100+ cities
-  - Result: 100% ZIP code population (0 NaN values)
-
-### Added
-- **Texas City Lookup Table**: Static fallback with 100+ Texas cities and primary ZIP codes
-  - Major cities: Houston (77001), Dallas (75201), Austin (78701), San Antonio (78201)
-  - Medium cities: Fort Worth, El Paso, Arlington, Corpus Christi, Plano, Laredo, Lubbock, etc.
-  - Small cities: Garland, Irving, Amarillo, Grand Prairie, Brownsville, McKinney, Frisco, etc.
-  - Comprehensive coverage for reliable ZIP resolution
-- **Enhanced ZIPRepairService**: Added TEXAS_CITY_ZIPS static lookup method
-  - Instant ZIP resolution without external API calls
-  - 90% confidence for city_lookup repairs
-  - Fallback strategy: library → API → static lookup
-
-### Improved
-- **ZIP Repair Success Rate**: 41 ZIPs repaired (was 11 before fallback table)
-  - 11 repaired via library lookup
-  - 30 repaired via Texas city lookup table
-  - 0 NaN ZIPs remaining (was 31)
-- **Processing Performance**: 10.89s for 3,230 rows
-  - 329 cities repaired using ZIP lookup
-  - 41 ZIPs repaired using city lookup
-  - 96.92% average confidence (up from 96.43%)
-- **Reliability**: Eliminated dependency on incomplete external libraries
-  - No more hanging API calls
-  - Instant fallback to static lookup
-  - Production-ready for large datasets
-
 ## [3.45.0] - 2025-11-22
 
 ### Added

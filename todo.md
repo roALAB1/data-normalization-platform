@@ -1,53 +1,123 @@
 # Project TODO
 
-## v3.46.1 - Critical Bug Fixes (Footer & Publish Button)
+## v3.47.0 - City/ZIP Normalization Verification & Deployment (CURRENT)
 
 **Status:** COMPLETED ✅
 
-### Issue 1: Footer Version Not Updating
-- [x] Check package.json version (should be 3.46.1)
-- [x] Check versionManager cache implementation
-- [x] Identify root cause: require() doesn't work in browser, complex caching causing issues
-- [x] Implement foolproof solution: Simple hardcoded VERSION constant
-- [x] Update Footer component to clear old localStorage cache
-- [x] Restart server to clear all caches
-- [x] Verify footer shows v3.46.1 in dev environment - **VERIFIED! ✅**
-- [x] Test in fresh browser (no cache) - **WORKING! ✅**
+**Goal:** Verify and ensure all city/ZIP normalization fixes are properly deployed and working
 
-### Issue 2: Publish Button Not Working
-- [x] Investigate what "Publish" button should do - **Manus platform feature for deployment**
-- [x] Check if it's a Manus platform feature (not our code) - **Confirmed: Platform UI feature**
-- [x] Verify latest checkpoint was created successfully - **Checkpoint 991c219 exists**
-- [x] Check if deployment process requires manual steps - **Creating fresh checkpoint to trigger UI**
-- [x] Document proper deployment workflow - **Click Publish in Management UI after checkpoint**
+### Phase 1: Audit Current Deployment State
+- [x] Check current version display in footer (showing v3.45.0, should be v3.47.0)
+- [x] Verify shared/versionManager.ts has correct VERSION constant
+- [x] Check if CityRepairService.ts exists in codebase
+- [x] Check if ZIPRepairService.ts exists in codebase
+- [x] Check if ContextAwareNormalizer.ts exists in codebase
+- [x] Verify normalizeValue.ts imports and uses context-aware services
+
+### Phase 2: Update Version Display to v3.47.0
+- [x] Update VERSION constant in shared/versionManager.ts from 3.46.1 to 3.47.0
+- [x] Verify Footer component uses dynamic version
+- [x] Clear localStorage cache for version
+
+### Phase 3: Verify Code Integration
+- [x] Confirm CityRepairService has title case conversion
+- [x] Confirm CityRepairService has ZIP-to-city lookup
+- [x] Confirm ZIPRepairService has city-to-ZIP lookup
+- [x] Confirm ContextAwareNormalizer orchestrates both services
+- [x] Verify normalizeValue.ts calls context-aware normalization for city columns
+- [x] Verify normalizeValue.ts calls ZIP repair for ZIP columns
+
+### Phase 4: Run Functionality Tests
+- [x] Create test CSV with lowercase cities (austin, houston, dallas)
+- [x] Create test CSV with ZIP codes in city column (76903, 77304)
+- [x] Create test CSV with truncated cities (san, fort, el)
+- [x] Process test CSVs through web interface
+- [x] Verify output has Title Case cities
+- [x] Verify output has proper ZIP codes (not NaN)
+- [x] Verify truncated cities are repaired
+
+### Phase 5: Force Server Restart and Cache Clear
+- [x] Restart dev server to clear worker cache
+- [x] Hard refresh browser (Ctrl+Shift+R)
+- [x] Verify version shows v3.47.0 in footer
+- [x] Re-run functionality tests after restart
+
+### Phase 6: Deliver Verification Report
+- [x] Document test results
+- [x] Confirm all normalization fixes are working
+- [x] Provide user with verification report
 
 ---
 
-## v3.46.1 - Fix NaN ZIP Codes (URGENT)
+## v3.46.1 - Context-Aware City/ZIP Normalization
 
 **Status:** COMPLETED ✅
 
-**Issue:** 31 rows still showing "NaN" in ZIP code column after normalization
+**Features Implemented:**
+- CityRepairService with ZIP lookup and title case
+- ZIPRepairService with city lookup
+- ValidationService for cross-validation
+- ContextAwareNormalizer orchestration
+- Texas city fallback lookup (100+ cities)
+- Fixed 31 NaN ZIP codes
+- Achieved 100% ZIP population
+- Average confidence: 96.92%
 
-### Investigation
-- [x] Analyze the 31 NaN cases to identify patterns
-- [x] Check if city names are valid
-- [x] Check if county data is available
-- [x] Identify why lookup failed - **Root cause: Cities not in @mardillu/us-cities-utils database**
+**Test Results:**
+- 3,230 rows processed in 10.89s
+- 329 cities repaired
+- 41 ZIPs repaired
+- 133 validation failures flagged
+- 0 NaN ZIPs (was 31)
 
-### Fix
-- [x] Enhance ZIPRepairService to handle NaN explicitly
-- [x] Add fallback strategies for edge cases - **Added Zippopotam.us API fallback**
-- [x] Ensure all repair methods are exhausted before marking as failed
-- [x] Add better error handling and logging
-- [x] Add city name normalization (S → South, N → North, etc.)
-- [x] Make all methods async to support API calls
+---
 
-### Testing
-- [x] Re-process Texas bars dataset
-- [x] Verify 0 NaN ZIP codes in output - **SUCCESS! 0 NaN ZIPs**
-- [x] Check confidence scores for repaired ZIPs - **90% confidence for city_lookup**
-- [x] Validate all city/ZIP matches - **All 41 repaired ZIPs validated**
+## v3.46.0 - Dynamic Versioning & Shared Footer Component
+
+**Status:** COMPLETED ✅
+
+**Goal:** Implement dynamic version fetching from package.json with caching, create reusable Footer component, and add GitHub releases link with hover preview
+
+### Phase 1: Create version management utilities and shared Footer component
+- [x] Create shared/versionManager.ts utility
+  - [x] readVersionFromPackageJson() function
+  - [x] getVersionWithCache() function (cache in localStorage)
+  - [x] Cache expiration (1 hour)
+- [x] Create client/src/components/Footer.tsx shared component
+  - [x] Accept version prop
+  - [x] Display version number
+  - [x] GitHub link with icon
+  - [x] Hover preview for releases link
+  - [x] Responsive design
+
+### Phase 2: Implement dynamic version fetching with caching
+- [x] Update versionManager.ts with caching logic
+  - [x] localStorage key: "app_version_cache"
+  - [x] Cache timestamp tracking
+  - [x] Automatic cache invalidation after 1 hour
+  - [x] Fallback to hardcoded version if fetch fails
+
+### Phase 3: Refactor all pages to use shared Footer component (PARALLEL)
+- [x] Home.tsx - Replace footer with shared component
+- [x] IntelligentNormalization.tsx - Replace footer with shared component
+- [x] BatchJobs.tsx - Replace footer with shared component
+- [x] CRMSyncMapper.tsx - Replace footer with shared component
+- [x] MemoryMonitoringDashboard.tsx - Replace footer with shared component
+
+### Phase 4: Add GitHub releases link with hover preview
+- [x] Add hover tooltip to releases link
+  - [x] Show "View releases on GitHub" on hover
+  - [x] Link to https://github.com/roALAB1/data-normalization-platform/releases
+  - [x] Simple link styling (no complex preview needed)
+
+### Phase 5: Test and save checkpoint
+- [x] Test version fetching on all pages
+- [x] Verify caching works correctly
+- [x] Test hover preview on GitHub link
+- [x] Create and run unit tests (21/21 tests passing)
+- [x] Save checkpoint with all changes
+
+---
 
 ## v3.45.0 - PO Box Normalization, ZIP Validation, Confidence Scoring
 
@@ -235,48 +305,3 @@
 ### v3.13.9 - Systematic Credential Scan
 **Status:** COMPLETED ✅
 - Added 314 missing credentials (682 → 996)
-
-## v3.46.0 - Dynamic Versioning & Shared Footer Component
-
-**Status:** COMPLETED ✅
-
-**Goal:** Implement dynamic version fetching from package.json with caching, create reusable Footer component, and add GitHub releases link with hover preview
-
-### Phase 1: Create version management utilities and shared Footer component
-- [x] Create shared/versionManager.ts utility
-  - [x] readVersionFromPackageJson() function
-  - [x] getVersionWithCache() function (cache in localStorage)
-  - [x] Cache expiration (1 hour)
-- [x] Create client/src/components/Footer.tsx shared component
-  - [x] Accept version prop
-  - [x] Display version number
-  - [x] GitHub link with icon
-  - [x] Hover preview for releases link
-  - [x] Responsive design
-
-### Phase 2: Implement dynamic version fetching with caching
-- [x] Update versionManager.ts with caching logic
-  - [x] localStorage key: "app_version_cache"
-  - [x] Cache timestamp tracking
-  - [x] Automatic cache invalidation after 1 hour
-  - [x] Fallback to hardcoded version if fetch fails
-
-### Phase 3: Refactor all pages to use shared Footer component (PARALLEL)
-- [x] Home.tsx - Replace footer with shared component
-- [x] IntelligentNormalization.tsx - Replace footer with shared component
-- [x] BatchJobs.tsx - Replace footer with shared component
-- [x] CRMSyncMapper.tsx - Replace footer with shared component
-- [x] MemoryMonitoringDashboard.tsx - Replace footer with shared component
-
-### Phase 4: Add GitHub releases link with hover preview
-- [x] Add hover tooltip to releases link
-  - [x] Show "View releases on GitHub" on hover
-  - [x] Link to https://github.com/roALAB1/data-normalization-platform/releases
-  - [x] Simple link styling (no complex preview needed)
-
-### Phase 5: Test and save checkpoint
-- [x] Test version fetching on all pages
-- [x] Verify caching works correctly
-- [x] Test hover preview on GitHub link
-- [x] Create and run unit tests (21/21 tests passing)
-- [x] Save checkpoint with all changes

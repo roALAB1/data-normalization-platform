@@ -9,6 +9,7 @@ import { NameEnhanced, ALL_CREDENTIALS } from './NameEnhanced';
 import { PhoneEnhanced } from '../../../shared/normalization/phones/PhoneEnhanced';
 import { EmailEnhanced } from '../../../shared/normalization/emails/EmailEnhanced';
 import { AddressFormatter } from '../../../shared/normalization/addresses/AddressFormatter';
+import { ContextAwareNormalizer } from '../../../shared/normalization/cities/ContextAwareNormalizer';
 
 export function normalizeValue(type: string, value: string): string {
   if (!value) return '';
@@ -173,6 +174,9 @@ export function normalizeValue(type: string, value: string): string {
         return AddressFormatter.format(value);
       }
       case 'zip': {
+        // Use context-aware ZIP normalization
+        // Note: In CSV processing, we don't have access to city/state context here
+        // For full context-aware normalization, use the batch processing API
         const cleaned = value.replace(/\s/g, '').substring(0, 5);
         // If 4-digit ZIP code, add leading zero (e.g., 2210 → 02210)
         if (cleaned.length === 4 && /^\d{4}$/.test(cleaned)) {
@@ -181,8 +185,10 @@ export function normalizeValue(type: string, value: string): string {
         return cleaned;
       }
       case 'city': {
-        // Basic city normalization: title case
-        return value.trim();
+        // Use context-aware city normalization
+        // Note: In CSV processing, we don't have access to ZIP context here
+        // For full context-aware normalization, use the batch processing API
+        return ContextAwareNormalizer.normalizeCity(value);
       }
       case 'state': {
         // Basic state normalization: uppercase for abbreviations

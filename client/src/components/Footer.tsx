@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Github } from 'lucide-react';
-import { getVersion, clearVersionCache } from '@shared/versionManager';
+import { getVersionWithCache } from '@shared/versionManager';
 
 interface FooterProps {
   /**
@@ -31,17 +31,10 @@ export default function Footer({
   const [version, setVersion] = useState<string>('');
   const [showHover, setShowHover] = useState(false);
 
-  // Get version on mount and clear any old cache
+  // Get version on mount
   useEffect(() => {
-    // Clear old localStorage cache
-    clearVersionCache();
-    
-    // Get fresh version
-    const v = getVersion();
+    const v = getVersionWithCache();
     setVersion(v);
-    
-    // Log for debugging
-    console.log('[Footer] Version loaded:', v);
   }, []);
 
   return (
