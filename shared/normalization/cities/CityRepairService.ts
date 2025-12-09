@@ -25,7 +25,8 @@ export class CityRepairService {
     const original = city;
     
     // Strategy 1: If city looks like a ZIP code (5 digits), use ZIP lookup
-    if (/^\d{5}$/.test(city.trim()) && zipCode) {
+    // v3.47.1: Always repair if city contains ZIP, regardless of zipCode parameter
+    if (/^\d{5}$/.test(city.trim())) {
       const zipResult = this.repairFromZIP(city.trim());
       if (zipResult.confidence > 0.8) {
         return zipResult;

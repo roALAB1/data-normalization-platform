@@ -14,6 +14,7 @@
 import { NameEnhanced } from './NameEnhanced';
 import { normalizeValue } from './normalizeValue';
 import { parseLocation } from './locationParser';
+import { ContextAwareNormalizer } from '../../../shared/normalization/cities/ContextAwareNormalizer';
 import type { ColumnSchema } from './schemaAnalyzer';
 import type { NormalizationPlan } from './normalizationPlan';
 
@@ -33,6 +34,35 @@ export function processRowWithContext(
 ): any {
   const normalized = { ...row };
   const cache = new Map<string, NameEnhanced>(); // Cache normalized results
+  
+  // v3.47.1: Find city/ZIP/state columns for context-aware normalization
+  const cityCol = schema.find(s => s.type === 'city');
+  const zipCol = schema.find(s => s.type === 'zip');
+  const stateCol = schema.find(s => s.type === 'state');
+  
+  // v3.47.1: Apply context-aware city/ZIP normalization FIRST
+  if (cityCol || zipCol) {
+    const cityValue = cityCol ? row[cityCol.name] : undefined;
+    const zipValue = zipCol ? row[zipCol.name] : undefined;
+    const stateValue = stateCol ? row[stateCol.name] : undefined;
+    
+    // Only normalize if at least one value exists
+    if (cityValue || zipValue) {
+      const result = ContextAwareNormalizer.normalize({
+        city: cityValue,
+        zipCode: zipValue,
+        state: stateValue
+      });
+      
+      // Update normalized values
+      if (cityCol && result.city) {
+        normalized[cityCol.name] = result.city;
+      }
+      if (zipCol && result.zipCode) {
+        normalized[zipCol.name] = result.zipCode;
+      }
+    }
+  }
   
   // Phase 1: Normalize primary columns first
   plan.primary.forEach(colName => {

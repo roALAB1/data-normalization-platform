@@ -359,6 +359,39 @@ headers.forEach(header => {
 
       // Flatten results
       const flatResults = normalizedChunks.flat();
+      
+      // v3.47.1: Apply phone imputation if phone column exists
+      const phoneCol = columnMappings.find(m => (m.overrideType || m.detectedType) === 'phone');
+      const companyCol = columnMappings.find(m => (m.overrideType || m.detectedType) === 'company');
+      const addressCol = columnMappings.find(m => (m.overrideType || m.detectedType) === 'address');
+      const cityCol = columnMappings.find(m => (m.overrideType || m.detectedType) === 'city');
+      const stateCol = columnMappings.find(m => (m.overrideType || m.detectedType) === 'state');
+      
+      if (phoneCol && companyCol) {
+        // Import phone imputation service dynamically
+        const { PhoneImputationService } = await import('../../../shared/normalization/PhoneImputationService');
+        
+        // Build row contexts
+        const rowContexts = flatResults.map((row, idx) => ({
+          rowIndex: idx,
+          company: companyCol ? row[companyCol.columnName] : undefined,
+          address: addressCol ? row[addressCol.columnName] : undefined,
+          city: cityCol ? row[cityCol.columnName] : undefined,
+          state: stateCol ? row[stateCol.columnName] : undefined,
+          phone: phoneCol ? row[phoneCol.columnName] : undefined,
+        }));
+        
+        // Impute phone numbers
+        const imputationResults = PhoneImputationService.imputeBatch(rowContexts);
+        
+        // Apply imputed phones back to results
+        imputationResults.forEach((result, idx) => {
+          if (result.confidence > 0.7 && phoneCol) {
+            flatResults[idx][phoneCol.columnName] = result.imputed;
+          }
+        });
+      }
+      
       setAllResults(flatResults);
 
       // Show preview (first 100 rows)

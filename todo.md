@@ -1,6 +1,42 @@
 # Project TODO
 
-## v3.47.0 - City/ZIP Normalization Verification & Deployment (CURRENT)
+## v3.47.1 - CRITICAL: Fix City/ZIP Normalization Bugs (CURRENT)
+
+**Status:** IN PROGRESS 🔄
+
+**Problem:** City/ZIP normalization services exist but aren't being applied during CSV processing
+- ZIP codes appearing in city column (76102, 77539, 75220, 78621, 77304, 77060)
+- NaN values remaining in ZIP column
+- Context-aware normalization not integrated into actual CSV workflow
+
+**Root Cause Investigation:**
+- [x] Check if normalizeValue.ts is being called during CSV processing
+- [x] Verify column type detection for city/ZIP columns
+- [x] Check if ContextAwareNormalizer is actually being invoked
+- [x] Identify where CSV processing bypasses normalization logic
+
+**Fixes Needed:**
+- [x] Fix ZIP codes appearing in city column
+- [x] Fix NaN values in ZIP column
+- [x] Ensure ContextAwareNormalizer is called for every city/ZIP value
+- [x] Add context-aware normalization to contextAwareExecutor
+
+**Testing:**
+- [x] Create test CSV with problematic data
+- [x] Verify no ZIP codes in city column (76102 → Fort Worth)
+- [x] Verify no NaN in ZIP column (Houston + NaN → Houston + 77001)
+- [x] Verify title case cities (houston → Houston)
+- [x] All 8 test cases passing
+
+**Secondary Feature (Phone Imputation):**
+- [x] Evaluate intelligent imputation for missing phone numbers
+- [x] Check if same company + same address → copy phone number
+- [x] Implement PhoneImputationService
+- [x] All 6 test cases passing
+
+---
+
+## v3.47.0 - City/ZIP Normalization Verification & Deployment
 
 **Status:** COMPLETED ✅
 
@@ -305,3 +341,13 @@
 ### v3.13.9 - Systematic Credential Scan
 **Status:** COMPLETED ✅
 - Added 314 missing credentials (682 → 996)
+
+**Phone Number Imputation (NEW FEATURE):**
+- [x] Create PhoneImputationService
+- [x] Normalize company names for matching
+- [x] Normalize addresses for matching
+- [x] Build lookup map from rows with phone numbers
+- [x] Fill missing phones using context matching
+- [x] Integrate into CSV processing workflow
+- [x] Test with user's CSV data (ready for production)
+
