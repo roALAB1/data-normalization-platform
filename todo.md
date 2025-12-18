@@ -1,8 +1,55 @@
 # Project TODO
 
-## v3.47.1 - CRITICAL: Fix City/ZIP Normalization Bugs (CURRENT)
+## v3.48.0 - URL Normalization Feature (CURRENT)
 
 **Status:** IN PROGRESS 🔄
+
+**User Requirements:**
+- Remove HTTP/HTTPS protocols
+- Remove www. prefix
+- Extract only root domain + extension (e.g., google.com)
+- Remove all paths, query parameters, fragments
+- Examples:
+  * http://www.google.com → google.com
+  * https://www.example.com/page → example.com
+  * www.facebook.com/profile → facebook.com
+
+**Implementation Tasks:**
+- [x] Create URLNormalizer utility class
+- [x] Implement protocol removal (http://, https://)
+- [x] Implement www. prefix removal
+- [x] Implement path/query/fragment removal
+- [x] Handle edge cases (subdomains, international domains, etc.)
+- [x] Add 'url' column type to schema analyzer
+- [x] Integrate into UnifiedNormalizationEngine
+- [x] Add URL detection patterns
+- [x] Create comprehensive test suite (20+ test cases)
+- [x] Test with real-world URLs
+- [x] Update documentation
+
+**Test Cases to Cover:**
+- [x] Basic URLs (http://www.google.com)
+- [x] HTTPS URLs (https://example.com/path)
+- [x] URLs with paths (site.com/page/subpage)
+- [x] URLs with query parameters (site.com?query=value)
+- [x] URLs with fragments (site.com#section)
+- [x] URLs with subdomains (subdomain.site.com)
+- [x] International domains (.co.uk, .com.au)
+- [x] URLs without protocol (www.site.com)
+- [x] Already clean URLs (site.com)
+- [x] Invalid/malformed URLs
+
+**Test Results:**
+✅ 40/40 tests passing
+✅ All URL normalization patterns working correctly
+✅ Integrated into UnifiedNormalizationEngine
+✅ Auto-detection working for URL columns
+
+---
+
+## v3.47.1 - CRITICAL: Fix City/ZIP Normalization Bugs (COMPLETED)
+
+**Status:** COMPLETED ✅
 
 **Problem:** City/ZIP normalization services exist but aren't being applied during CSV processing
 - ZIP codes appearing in city column (76102, 77539, 75220, 78621, 77304, 77060)

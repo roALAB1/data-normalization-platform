@@ -26,6 +26,7 @@ export type DataType =
   | 'zip'
   | 'country'
   | 'company'
+  | 'url'
   | 'unknown';
 
 export interface DetectionResult {
@@ -103,6 +104,14 @@ export class DataTypeDetector {
       /^business$/i,
       /^employer$/i
     ],
+    url: [
+      /^(web)?[_\s-]?site([_\s-]?url)?$/i,
+      /^url$/i,
+      /^link$/i,
+      /^web[_\s-]?page$/i,
+      /^homepage$/i,
+      /^domain$/i
+    ],
     unknown: []
   };
 
@@ -119,6 +128,7 @@ export class DataTypeDetector {
     zip: /^\d{5}(-\d{4})?$/,
     country: /^[A-Z][a-zA-Z\s]{2,30}$/,
     company: /^[A-Z][a-zA-Z0-9\s\.,&'-]{2,50}(Inc|LLC|Ltd|Corp|Co|Company)?\.?$/i,
+    url: /^(https?:\/\/)?(www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?(\/.*)?$/i,
     unknown: /.*/
   };
 
@@ -147,6 +157,7 @@ export class DataTypeDetector {
     if (normalized.includes('zip') || normalized.includes('postal')) return { type: 'zip', score: 60 };
     if (normalized.includes('country')) return { type: 'country', score: 60 };
     if (normalized.includes('company') || normalized.includes('org')) return { type: 'company', score: 60 };
+    if (normalized.includes('url') || normalized.includes('website') || normalized.includes('link')) return { type: 'url', score: 60 };
 
     return { type: 'unknown', score: 0 };
   }
@@ -173,6 +184,7 @@ export class DataTypeDetector {
       zip: 0,
       country: 0,
       company: 0,
+      url: 0,
       unknown: 0
     };
 
@@ -315,6 +327,7 @@ export class DataTypeDetector {
       zip: 'ZIP/Postal Code',
       country: 'Country',
       company: 'Company Name',
+      url: 'Website URL',
       unknown: 'Unknown'
     };
     return labels[type];
@@ -336,6 +349,7 @@ export class DataTypeDetector {
       zip: '📮',
       country: '🌍',
       company: '🏢',
+      url: '🌐',
       unknown: '❓'
     };
     return icons[type];

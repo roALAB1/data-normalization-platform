@@ -181,6 +181,24 @@ export class UnifiedNormalizationEngine {
           break;
         }
 
+        case 'url': {
+          // v3.48.0: URL normalization
+          const { URLNormalizer } = await import('../urls/URLNormalizer');
+          const urlResult = URLNormalizer.normalize(value);
+          result = {
+            normalized: urlResult.normalized,
+            metadata: {
+              original: value,
+              domain: urlResult.domain,
+              subdomain: urlResult.subdomain,
+              tld: urlResult.tld,
+              isValid: urlResult.isValid,
+              confidence: urlResult.confidence
+            }
+          };
+          break;
+        }
+
         default:
           result = { normalized: value };
       }
