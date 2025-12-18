@@ -1,5 +1,63 @@
 # Changelog
 
+## [3.48.0] - 2025-12-17
+
+### Added
+- **URL Normalization Feature**: Comprehensive URL normalization that extracts clean domain names
+  - Protocol removal: Strips http://, https://, ftp://, ftps://, file://, ws://, wss://
+  - WWW prefix removal: Case-insensitive removal of www. prefix
+  - Root domain extraction: Extracts only domain + extension (e.g., google.com)
+  - Path/query/fragment removal: Removes /paths, ?query=params, and #fragments
+  - Username/password removal: Strips user:pass@ from URLs
+  - Port number preservation: Keeps port numbers (e.g., example.com:8080)
+- **International Domain Support**: Handles 18+ multi-part TLDs
+  - UK domains: .co.uk, .gov.uk, .ac.uk, .org.uk, .net.uk, .sch.uk
+  - Australian domains: .com.au, .gov.au, .edu.au, .org.au, .net.au
+  - Other regions: .co.nz, .co.za, .com.br, .com.mx, .co.jp, .co.kr, .co.in, .com.cn, .com.tw, .com.hk
+- **Auto-Detection**: Automatically identifies URL columns in CSV files
+  - Header patterns: website, url, link, webpage, homepage, domain
+  - Content pattern: Validates URL format with regex
+  - Partial matching: 60% confidence for headers containing "url", "website", or "link"
+- **Confidence Scoring**: 0-1 confidence scores based on domain validity
+  - Base confidence: 0.5 for any valid domain
+  - Valid TLD: +0.3 (TLD is 2+ characters)
+  - No subdomain: +0.2 (cleaner domain)
+  - Examples: google.com (1.0), subdomain.example.com (0.8)
+- **URLNormalizer Utility Class**: Three main methods
+  - normalize(url): Returns detailed result with metadata
+  - normalizeString(url): Simplified version for CSV processing
+  - normalizeBatch(urls): Batch processing for multiple URLs
+- **Integration with Intelligent Engine**: Added 'url' DataType to UnifiedNormalizationEngine
+  - Seamless integration with existing normalization pipeline
+  - Lazy import for optimal performance
+  - Metadata includes: domain, subdomain, tld, isValid, confidence
+
+### Fixed
+- **Subdomain Handling**: Correctly identifies root domain vs subdomain
+  - Example: subdomain.site.co.uk → site.co.uk (preserves multi-part TLD)
+  - Subdomain extracted to metadata for reference
+
+### Improved
+- **Test Coverage**: 40 comprehensive tests (100% pass rate)
+  - Basic URL normalization (4 tests)
+  - Protocol removal (4 tests)
+  - WWW prefix removal (3 tests)
+  - Path/query/fragment removal (6 tests)
+  - Subdomain handling (3 tests)
+  - International domains (4 tests)
+  - Edge cases (6 tests)
+  - Confidence scoring (3 tests)
+  - Batch normalization (1 test)
+  - String normalization (1 test)
+  - Real-world examples (5 tests)
+- **Documentation**: Complete VERSION_HISTORY_v3.48.0.md with:
+  - Implementation details
+  - Usage examples
+  - Technical architecture
+  - Performance considerations
+  - Known limitations
+  - Future enhancements
+
 ## [3.45.0] - 2025-11-22
 
 ### Added

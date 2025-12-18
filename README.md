@@ -51,6 +51,27 @@ A unified, enterprise-scale data normalization platform that automatically detec
 ✅ **Company Name Detection** 🏢: Intelligent identification of company columns, no splitting, title case normalization with abbreviation preservation (v3.41.0)  
 ✅ **Results Preservation** 💾: Seamless navigation between results and monitoring dashboard without data loss (v3.41.0)
 
+### What's New in v3.48.0 🚀
+
+**URL Normalization Feature** 🌐  
+Comprehensive URL normalization that extracts clean domain names from URLs by removing protocols, www prefixes, paths, query parameters, and fragments. Auto-detects URL columns in CSV files with 95%+ accuracy and supports international domains (.co.uk, .com.au, etc.). Includes confidence scoring for URL validity and handles 18+ multi-part TLDs. All 40 tests passing with full integration into the intelligent normalization engine.
+
+**Key Features:**
+- 🌐 **Protocol Removal**: Strips http://, https://, ftp://, and other protocols
+- 🔗 **WWW Prefix Removal**: Removes www. from domain names (case-insensitive)
+- 🎯 **Root Domain Extraction**: Extracts only domain + extension (google.com)
+- 🗑️ **Path/Query/Fragment Removal**: Removes /paths, ?query=params, and #fragments
+- 🌍 **International Domain Support**: Handles .co.uk, .com.au, and 18+ multi-part TLDs
+- 🤖 **Auto-Detection**: Automatically identifies URL columns (Website, URL, Link, Homepage)
+- 📊 **Confidence Scoring**: 0-1 confidence scores based on domain validity
+- ✅ **40 Tests Passing**: Comprehensive coverage including real-world examples
+
+**Examples:**
+- `http://www.google.com` → `google.com`
+- `https://www.example.com/page?query=1` → `example.com`
+- `www.facebook.com/profile#section` → `facebook.com`
+- `subdomain.site.co.uk/path` → `site.co.uk`
+
 ### What's New in v3.45.0 🚀
 
 **PO Box Normalization, ZIP Validation & Confidence Scoring** 📮  
