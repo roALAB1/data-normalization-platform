@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, FileText, AlertCircle, Sparkles, Download, Home, Phone, Mail, MapPin, Briefcase, Pause, Play, X, Zap, User, Building2, Trash2, Activity } from "lucide-react";
 import { ReportIssueButton } from "@/components/ReportIssueButton";
 import Footer from '@/components/Footer';
+import { SmartSuggestions } from "@/components/SmartSuggestions";
+import { ColumnCombinationDetector, type CombinationSuggestion } from "@/../../shared/utils/ColumnCombinationDetector";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { NameEnhanced } from "@/lib/NameEnhanced";
@@ -104,6 +106,9 @@ export default function IntelligentNormalization() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamingProcessorRef = useRef<StreamingCSVProcessor | null>(null);
   const chunkedNormalizerRef = useRef<ChunkedNormalizer | null>(null);
+  const [smartSuggestions, setSmartSuggestions] = useState<CombinationSuggestion[]>([]);
+  const [acceptedSuggestions, setAcceptedSuggestions] = useState<CombinationSuggestion[]>([]);
+  const [outputColumns, setOutputColumns] = useState<string[]>([]);
   
   // Restore results from context on mount (if available)
   useEffect(() => {
@@ -188,6 +193,11 @@ headers.forEach(header => {
       });
 
       setColumnMappings(mappings);
+
+      // Detect smart column combinations
+      const sampleData = sampleRows.map(row => parseCSVLine(row));
+      const detectionResult = ColumnCombinationDetector.detect(headers, sampleData);
+      setSmartSuggestions(detectionResult.suggestions);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze file");
     } finally {
@@ -220,6 +230,29 @@ headers.forEach(header => {
           : mapping
       )
     );
+  };
+
+  const handleAcceptSuggestion = (suggestion: CombinationSuggestion) => {
+    setAcceptedSuggestions(prev => [...prev, suggestion]);
+    setSmartSuggestions(prev => prev.filter(s => s !== suggestion));
+    
+    // Add new combined column to mappings
+    const newMapping: ColumnMapping = {
+      columnName: suggestion.targetColumnName,
+      detectedType: suggestion.type === 'name' ? 'name' : suggestion.type,
+      confidence: Math.round(suggestion.confidence * 100),
+      sampleValues: suggestion.previewSamples,
+    };
+    setColumnMappings(prev => [...prev, newMapping]);
+  };
+
+  const handleIgnoreSuggestion = (suggestion: CombinationSuggestion) => {
+    setSmartSuggestions(prev => prev.filter(s => s !== suggestion));
+  };
+
+  const handleCustomizeSuggestion = (suggestion: CombinationSuggestion) => {
+    // For now, just accept it (can add customization UI later)
+    handleAcceptSuggestion(suggestion);
   };
 
   const normalizeValue = (type: string, value: string): string => {
@@ -334,6 +367,21 @@ headers.forEach(header => {
       await processor.processFile(
         file,
         async (chunk) => {
+          // Apply accepted column combinations to each row
+          if (acceptedSuggestions.length > 0) {
+            chunk.data = chunk.data.map(row => {
+              const combinedRow = [...row];
+              
+              // Apply each accepted suggestion
+              acceptedSuggestions.forEach(suggestion => {
+                const combinedValue = ColumnCombinationDetector.applyCombination(row, suggestion);
+                combinedRow.push(combinedValue);
+              });
+              
+              return combinedRow;
+            });
+          }
+          
           chunks.push(chunk.data);
           totalRows += chunk.data.length;
         },
@@ -875,6 +923,16 @@ headers.forEach(header => {
         {/* Column Detection Section */}
         {file && columnMappings.length > 0 && !isProcessing && results.length === 0 && (
           <div className="space-y-6">
+            {/* Smart Suggestions */}
+            {smartSuggestions.length > 0 && (
+              <SmartSuggestions
+                suggestions={smartSuggestions}
+                onAccept={handleAcceptSuggestion}
+                onIgnore={handleIgnoreSuggestion}
+                onCustomize={handleCustomizeSuggestion}
+              />
+            )}
+
             <Card>
               <CardHeader>
                 <CardTitle>Column Detection Results</CardTitle>

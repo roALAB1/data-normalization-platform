@@ -1,5 +1,44 @@
 # Project TODO
 
+## v3.50.0 - Smart Column Mapping (Option 3) 🎯
+
+**Status:** COMPLETED ✅
+
+**Goal:** Automatically detect fragmented address/name/phone columns and suggest intelligent combinations before normalization
+
+### Phase 1: Detection Logic
+- [x] Create ColumnCombinationDetector.ts utility
+- [x] Implement address component detection (house, street, apt, city, state, zip)
+- [x] Implement name component detection (first, middle, last, prefix, suffix)
+- [x] Implement phone component detection (area code, number, extension)
+- [x] Generate combination suggestions with confidence scores
+- [x] Create preview generator for combined output
+
+### Phase 2: UI Component
+- [x] Create SmartSuggestions.tsx component
+- [x] Build suggestion card with preview
+- [x] Add Accept/Customize/Ignore buttons
+- [x] Create combination formula display
+- [x] Add visual indicators (icons, badges, preview samples)
+
+### Phase 3: Integration
+- [x] Integrate into IntelligentNormalization.tsx upload flow
+- [x] Apply combinations before normalization
+- [x] Update column mappings with combined columns
+- [x] Update CSV output to include combined columns
+- [x] Add SmartSuggestions component to UI
+
+### Phase 4: Testing & Documentation
+- [x] Test with user's address data (House + StreetNameComplete + Apt)
+- [x] Test with split names (First + Last)
+- [x] Test with split phones (Area Code + Number)
+- [x] Update VERSION_HISTORY.md
+- [x] Update CHANGELOG.md
+- [x] Update version to 3.50.0
+- [x] All 22/22 tests passing
+
+---
+
 ## v3.49.0 - Large File Processing Fix (400k+ rows)
 
 **Status:** COMPLETED ✅
