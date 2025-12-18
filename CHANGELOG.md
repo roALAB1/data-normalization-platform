@@ -55,6 +55,12 @@
 - **Space Handling**: Supports both "First Name" and "First_Name" variations
 - **Confidence Calculation**: Accurate scoring for sparse data
 
+### UI Enhancements
+- **Enrichment-Ready Output Format Section**: Replaced "Company" tile with "URL" normalization tile
+  - Shows URL normalization examples (protocol removal, www removal, domain extraction)
+  - Matches format of other tiles (First Name, Last Name, Address, State & ZIP, Phone)
+  - Displays real normalization examples: https://www.example.com/path → example.com
+
 ---
 
 ## [3.49.0] - 2025-12-17

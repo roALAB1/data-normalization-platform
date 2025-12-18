@@ -715,19 +715,28 @@ headers.forEach(header => {
                     </div>
                   </div>
                 </div>
-                {/* Company */}
+                {/* URL */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="flex items-center gap-2 mb-4">
-                    <Building2 className="h-5 w-5 text-white" />
-                    <h4 className="text-lg font-semibold text-white">Company</h4>
+                    <Zap className="h-5 w-5 text-white" />
+                    <h4 className="text-lg font-semibold text-white">URL</h4>
                   </div>
                   <ul className="space-y-2 text-sm text-indigo-100 mb-4">
-                    <li>• Company domain</li>
-                    <li>• Company name</li>
-                    <li>• LinkedIn profile</li>
+                    <li>• Extract clean domain names</li>
+                    <li>• Remove protocols and www</li>
+                    <li>• Handle international domains</li>
                   </ul>
-                  <div className="bg-black/20 rounded-lg p-3 flex items-center justify-center h-16">
-                    <span className="text-indigo-200 text-sm font-medium">Coming Soon</span>
+                  <div className="bg-black/20 rounded-lg p-3 space-y-1">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <span className="text-gray-300 truncate">https://www.example.com/path</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">example.com</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <span className="text-gray-300 truncate">http://subdomain.site.co.uk</span>
+                      <span className="text-white">→</span>
+                      <span className="text-green-300 font-medium">site.co.uk</span>
+                    </div>
                   </div>
                 </div>
               </div>
