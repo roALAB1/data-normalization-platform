@@ -115,17 +115,16 @@ async function startServer() {
     console.log(`Server running on http://localhost:${port}/`);
     console.log(`[Health] Health check available at http://localhost:${port}/api/health`);
     
-    // DISABLED v3.40.3: Batch jobs worker causes memory leaks
-    // Start batch jobs worker (uses IntelligentBatchProcessor with streaming)
-    // try {
-    //   const { BatchWorker } = await import("../queue/BatchWorker.js");
-    //   BatchWorker.getInstance();
-    //   console.log("[BatchWorker] Batch jobs worker started successfully");
-    // } catch (error) {
-    //   console.warn("[BatchWorker] Failed to start batch jobs worker:", error);
-    //   // Continue without worker rather than crashing
-    // }
-    console.log("[BatchWorker] DISABLED to prevent memory leaks");
+    // v3.49.0: Re-enabled with streaming support for large files
+    // Start batch jobs worker (uses StreamingIntelligentProcessor for files >= 50k rows)
+    try {
+      const { BatchWorker } = await import("../queue/BatchWorker.js");
+      BatchWorker.getInstance();
+      console.log("[BatchWorker] Batch jobs worker started successfully (with streaming support)");
+    } catch (error) {
+      console.warn("[BatchWorker] Failed to start batch jobs worker:", error);
+      // Continue without worker rather than crashing
+    }
 
     // DISABLED v3.40.2: CRM merge worker causes memory exhaustion with large datasets
     // Start CSV-based CRM merge worker (DuckDB version was removed in v3.40.5)

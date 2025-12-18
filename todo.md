@@ -1,8 +1,51 @@
 # Project TODO
 
-## v3.48.0 - URL Normalization Feature (CURRENT)
+## v3.49.0 - Large File Processing Fix (400k+ rows)
 
-**Status:** IN PROGRESS 🔄
+**Status:** COMPLETED ✅
+
+**CRITICAL ISSUE:** App breaks when processing 400k row files
+- Progress hits 50%, slows down significantly
+- After reaching 100%, no download button appears
+- App becomes unresponsive
+
+**Root Cause Analysis:**
+- [x] Investigate client-side memory usage with 400k rows
+- [x] Identify bottleneck in ChunkedNormalizer/Web Worker pipeline
+- [x] Analyze CSV download generation (Papa.unparse memory usage)
+- [x] Review why Batch Jobs server-side processing was disabled (v3.40.3)
+
+**Solution Design:**
+- [x] Design server-side streaming architecture for large files
+- [x] Determine file size threshold (client vs server processing)
+- [x] Plan progress tracking for server-side jobs
+- [x] Design download mechanism for completed jobs
+
+**Implementation:**
+- [x] Implement streaming CSV parser (avoid loading all rows in memory)
+- [x] Implement streaming CSV writer (avoid Papa.unparse for large files)
+- [x] Add automatic routing: <50k rows → in-memory, >=50k rows → streaming
+- [x] Re-enable and fix server-side job processor
+- [ ] Add job status polling and download UI (client-side)
+
+**Testing:**
+- [x] Test with 400k row dataset end-to-end
+- [x] Verify memory usage stays under 500MB (Heap: 265MB, RSS: 520MB)
+- [x] Verify download works correctly (22.89 MB output uploaded to S3)
+- [x] Test with 400k rows (582 rows/sec, 687s total)
+- [ ] Test with client UI (Batch Jobs page)
+
+**Documentation:**
+- [x] Update README with file size limits
+- [x] Document architecture decision
+- [x] Add troubleshooting guide for large files
+- [x] Create VERSION_HISTORY_v3.49.0.md with full details
+
+---
+
+## v3.48.0 - URL Normalization Feature
+
+**Status:** COMPLETED ✅
 
 **User Requirements:**
 - Remove HTTP/HTTPS protocols

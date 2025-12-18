@@ -4,11 +4,15 @@ import { NormalizationJobData } from './JobQueue';
 import { updateJobStatus, updateJobProgressSimple } from '../jobDb';
 import { storageGet, storagePut } from '../storage';
 import { IntelligentBatchProcessor } from '../services/IntelligentBatchProcessor';
+import { StreamingIntelligentProcessor } from '../services/StreamingIntelligentProcessor';
 import { NameEnhanced } from '../../shared/normalization/names';
 import { PhoneEnhanced } from '../../shared/normalization/phones';
 import { EmailEnhanced } from '../../shared/normalization/emails';
 import { AddressFormatter } from '../../shared/normalization/addresses';
 import Papa from 'papaparse';
+
+// Threshold for switching to streaming processing (50k rows)
+const STREAMING_THRESHOLD = 50000;
 
 /**
  * Redis connection configuration
@@ -85,45 +89,88 @@ export class BatchWorker {
       // Update status to processing
       await updateJobStatus(jobId, 'processing', new Date());
 
-      // Download input file from S3
+      // Get input file URL
       const { url: inputFileUrl } = await storageGet(inputFileKey);
-      const response = await fetch(inputFileUrl);
-      const csvContent = await response.text();
 
-      let outputCsv: string;
+      // Count rows to determine processing strategy
+      const rowCountResponse = await fetch(inputFileUrl);
+      const sampleContent = await rowCountResponse.text();
+      const rowCount = sampleContent.split('\n').length - 1; // Subtract header
+
+      console.log(`[BatchWorker] Job ${jobId} has ${rowCount} rows`);
+
+      let outputCsv: string | undefined;
+      let outputFileKey: string | undefined;
       let stats: { totalRows: number; validRows: number; invalidRows: number };
 
       if (type === 'intelligent') {
-        // Use intelligent processor for multi-column normalization
-        const processor = new IntelligentBatchProcessor();
-        const result = await processor.process(
-          csvContent,
-          job.data.columnMappings,
-          (progress) => {
-            // Update job progress
-            job.updateProgress(progress);
-            updateJobProgressSimple(jobId, progress.processedRows, progress.validRows, progress.invalidRows);
-          }
-        );
-        outputCsv = result.csv;
-        stats = result.stats;
+        if (rowCount >= STREAMING_THRESHOLD) {
+          // Use streaming processor for large files (>= 50k rows)
+          console.log(`[BatchWorker] Using streaming processor for ${rowCount} rows`);
+          const processor = new StreamingIntelligentProcessor();
+          outputFileKey = `jobs/${userId}/${Date.now()}-output.csv`;
+          
+          const result = await processor.processStreaming(
+            inputFileUrl,
+            outputFileKey,
+            (progress) => {
+              job.updateProgress(progress);
+              updateJobProgressSimple(jobId, progress.processedRows, progress.validRows, progress.invalidRows);
+            }
+          );
+          
+          stats = {
+            totalRows: result.stats.totalRows,
+            validRows: result.stats.validRows,
+            invalidRows: result.stats.invalidRows,
+          };
+          // outputCsv is undefined - file already written to S3
+        } else {
+          // Use in-memory processor for small files (< 50k rows)
+          console.log(`[BatchWorker] Using in-memory processor for ${rowCount} rows`);
+          const processor = new IntelligentBatchProcessor();
+          const result = await processor.process(
+            sampleContent,
+            job.data.columnMappings,
+            (progress) => {
+              job.updateProgress(progress);
+              updateJobProgressSimple(jobId, progress.processedRows, progress.validRows, progress.invalidRows);
+            }
+          );
+          outputCsv = result.csv;
+          stats = result.stats;
+        }
       } else {
-        // Use single-type processor
-        const result = await this.processSingleType(csvContent, type, config, (progress) => {
+        // Use single-type processor (always in-memory for single-type)
+        const result = await this.processSingleType(sampleContent, type, config, (progress) => {
           job.updateProgress(progress);
-          updateJobProgress(jobId, progress.processedRows, progress.validRows, progress.invalidRows);
+          updateJobProgressSimple(jobId, progress.processedRows, progress.validRows, progress.invalidRows);
         });
         outputCsv = result.csv;
         stats = result.stats;
       }
 
-      // Upload output file to S3
-      const outputFileKey = `jobs/${userId}/${Date.now()}-output.csv`;
-      const { url: outputFileUrl } = await storagePut(
-        outputFileKey,
-        outputCsv,
-        'text/csv'
-      );
+      // Upload output file to S3 (if not already uploaded by streaming processor)
+      let finalOutputFileKey: string;
+      let outputFileUrl: string;
+      
+      if (outputCsv) {
+        // In-memory processing - need to upload
+        finalOutputFileKey = `jobs/${userId}/${Date.now()}-output.csv`;
+        const uploadResult = await storagePut(
+          finalOutputFileKey,
+          outputCsv,
+          'text/csv'
+        );
+        outputFileUrl = uploadResult.url;
+      } else if (outputFileKey) {
+        // Streaming processing - file already uploaded
+        finalOutputFileKey = outputFileKey;
+        const { url } = await storageGet(outputFileKey);
+        outputFileUrl = url;
+      } else {
+        throw new Error('No output file generated');
+      }
 
       // Update job with results
       await updateJobStatus(
@@ -134,7 +181,7 @@ export class BatchWorker {
         stats.totalRows,
         stats.validRows,
         stats.invalidRows,
-        outputFileKey,
+        finalOutputFileKey,
         outputFileUrl
       );
 
@@ -192,15 +239,15 @@ export class BatchWorker {
                 break;
 
               case 'phone':
-                const phone = new PhoneEnhanced(inputValue, config?.defaultCountry || 'US');
+                const phone = new PhoneEnhanced(inputValue, { defaultCountry: config?.defaultCountry || 'US' });
                 normalizedValue = phone.format('international');
-                isValid = phone.isValid();
+                isValid = phone.result.isValid;
                 break;
 
               case 'email':
                 const email = new EmailEnhanced(inputValue);
                 normalizedValue = email.normalized;
-                isValid = email.isValid();
+                isValid = email.isValid;
                 break;
 
               case 'address':
@@ -265,23 +312,5 @@ export class BatchWorker {
   }
 }
 
-// Start worker if this file is run directly
-if (require.main === module) {
-  console.log('[BatchWorker] Starting batch worker...');
-  const worker = BatchWorker.getInstance();
-  
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    console.log('[BatchWorker] SIGTERM received, closing worker...');
-    await worker.close();
-    process.exit(0);
-  });
-
-  process.on('SIGINT', async () => {
-    console.log('[BatchWorker] SIGINT received, closing worker...');
-    await worker.close();
-    process.exit(0);
-  });
-}
-
+// Export singleton instance
 export const batchWorker = BatchWorker.getInstance();
